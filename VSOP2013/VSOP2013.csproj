@@ -4,44 +4,35 @@
     <TargetFramework>net6.0</TargetFramework>
     <PlatformTarget>x64</PlatformTarget>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Platforms>AnyCPU;x64</Platforms>
+    <Platforms>x64</Platforms>
+	  <Version>1.1.0</Version>
+	  <Title>VSOP2013.NET</Title>
+	  <Authors>KingsZNHONE</Authors>
+	  <Description>VSOP was developed and is maintained (updated with the latest data) by the scientists at the Bureau des Longitudes in Paris.
+
+VSOP2013,another version of VSOP, computed the positions of the planets directly at any moment, as well as their orbital elements with improved accuracy.</Description>
+	  <PackageProjectUrl>https://github.com/kingsznhone/VSOP2013.NET</PackageProjectUrl>
+	  <PackageOutputPath />
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Resources\VSOP2013DATA0.BIN" />
-    <None Remove="Resources\VSOP2013DATA1.BIN" />
-    <None Remove="Resources\VSOP2013DATA2.BIN" />
-    <None Remove="Resources\VSOP2013DATA3.BIN" />
-    <None Remove="Resources\VSOP2013DATA4.BIN" />
-    <None Remove="Resources\VSOP2013DATA5.BIN" />
-    <None Remove="Resources\VSOP2013DATA6.BIN" />
-    <None Remove="Resources\VSOP2013DATA7.BIN" />
-    <None Remove="Resources\VSOP2013DATA8.BIN" />
-    <None Remove="Resources\VSOP2013p1.dat" />
-    <None Remove="Resources\VSOP2013p2.dat" />
-    <None Remove="Resources\VSOP2013p3.dat" />
-    <None Remove="Resources\VSOP2013p4.dat" />
-    <None Remove="Resources\VSOP2013p5.dat" />
-    <None Remove="Resources\VSOP2013p6.dat" />
-    <None Remove="Resources\VSOP2013p7.dat" />
-    <None Remove="Resources\VSOP2013p8.dat" />
-    <None Remove="Resources\VSOP2013p9.dat" />
+    <EmbeddedResource Include="Resources\VSOP2013_EMB.BIN" />
+    <EmbeddedResource Include="Resources\VSOP2013_JUPITER.BIN" />
+    <EmbeddedResource Include="Resources\VSOP2013_MARS.BIN" />
+    <EmbeddedResource Include="Resources\VSOP2013_MERCURY.BIN" />
+    <EmbeddedResource Include="Resources\VSOP2013_NEPTUNE.BIN" />
+    <EmbeddedResource Include="Resources\VSOP2013_PLUTO.BIN" />
+    <EmbeddedResource Include="Resources\VSOP2013_SATURN.BIN" />
+    <EmbeddedResource Include="Resources\VSOP2013_URANUS.BIN" />
+    <EmbeddedResource Include="Resources\VSOP2013_VENUS.BIN" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources\VSOP2013p1.dat" />
-    <EmbeddedResource Include="Resources\VSOP2013p2.dat" />
-    <EmbeddedResource Include="Resources\VSOP2013p3.dat" />
-    <EmbeddedResource Include="Resources\VSOP2013p4.dat" />
-    <EmbeddedResource Include="Resources\VSOP2013p5.dat" />
-    <EmbeddedResource Include="Resources\VSOP2013p6.dat" />
-    <EmbeddedResource Include="Resources\VSOP2013p7.dat" />
-    <EmbeddedResource Include="Resources\VSOP2013p8.dat" />
-    <EmbeddedResource Include="Resources\VSOP2013p9.dat" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\.editorconfig" Link=".editorconfig" />
+    <PackageReference Include="MessagePack" Version="2.5.108" />
+    <PackageReference Include="MessagePackAnalyzer" Version="2.5.108">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
 </Project>

@@ -1,15 +1,15 @@
-﻿using System.Diagnostics;
+﻿using MessagePack;
+using System.Diagnostics;
+using System.Reflection;
+using System.Runtime.Serialization.Formatters.Binary;
+using VSOP2013.VSOPResult;
 
 namespace VSOP2013
 {
 
     public class Calculator
     {
-        public readonly List<PlanetTable> VSOP2013DATA;
-
-        public TimeSpan TimeUsed;
-
-        Stopwatch sw;
+        public List<PlanetTable> VSOP2013DATA;
 
         /// <summary>
         /// //Planetary frequency in longitude
@@ -33,24 +33,26 @@ namespace VSOP2013
         public Calculator()
         {
             //Import Planet Data
-            sw = new Stopwatch();
-            TimeUsed = new TimeSpan(0);
-
-            sw.Start();
-            VSOP2013DATA = DataReader.ReadData();
-            sw.Stop();
+            var lz4Options = MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4Block);
+            var assembly = Assembly.GetExecutingAssembly();
+            var names = assembly.GetManifestResourceNames();
+            VSOP2013DATA = new List<PlanetTable>();
+            ParallelLoopResult result = Parallel.For(0, 9, ip =>
+            {
+                string datafilename = $"VSOP2013.Resources.VSOP2013_{((VSOPBody)(ip)).ToString()}.BIN";
+                using (Stream s = assembly.GetManifestResourceStream(datafilename))
+                {
+                    var data = MessagePackSerializer.Deserialize<PlanetTable>(s, lz4Options);
+                    VSOP2013DATA.Add(data);
+                }
+            });
             GC.Collect();
             GC.WaitForPendingFinalizers();
-            double ticks = sw.ElapsedTicks;
-            double Freq = Stopwatch.Frequency;
-            double milliseconds = (ticks / Freq) * 1000;
-            Console.WriteLine($"Data Load OK...Elapsed milliseconds: {milliseconds} ms");
-
         }
 
-        public VSOPResult[] CalcAllPlanet(VSOPTime time)
+        public DynamicalELL[] CalcAllPlanet(VSOPTime time)
         {
-            VSOPResult[] vsopresult = new VSOPResult[9];
+            DynamicalELL[] vsopresult = new DynamicalELL[9];
 
             ParallelLoopResult result = Parallel.For(0, 9, ip =>
             {
@@ -59,7 +61,7 @@ namespace VSOP2013
             return vsopresult;
         }
 
-        public VSOPResult CalcPlanet(VSOPBody body, VSOPTime time)
+        public DynamicalELL CalcPlanet(VSOPBody body, VSOPTime time)
         {
 
             double[] ELL = new double[6];
@@ -67,7 +69,7 @@ namespace VSOP2013
             {
                 ELL[iv] = CalcIV(body, iv, time);
             });
-            VSOPResult Coordinate = new VSOPResult(body, time, ELL);
+            DynamicalELL Coordinate = new DynamicalELL(body, time, ELL);
             return Coordinate;
         }
 
@@ -91,8 +93,9 @@ namespace VSOP2013
         /// <returns>Elliptic Elements</returns>
         private double CalcIV(VariableTable vTable, double JD2000)
         {
-
+            //Thousand of Julian Years
             double tj = JD2000 / a1000;
+
             //Iteration on Time 
             double[] t = new double[21];
             t[0] = 1.0d;

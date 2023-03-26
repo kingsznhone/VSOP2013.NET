@@ -85,27 +85,15 @@ i : inclination
 
 ## Feature
 
-1. Use VSOPResult class to manage calculate results.
+1. Use ResultBase class to manage calculate results. Easy to cast diffirent frame.
 2. Use VSOPTime class to manage time. Easy to convert time by calling VSOPTime.UTC VSOPTime.TAI VSOPTime.TDB
-3. Extremely optimized. About 6ms per full result on 5900HX.
+3. Extremely optimized. About 6ms per full planet result on 5900HX.
 
 ![Performance Test](https://github.com/kingsznhone/VSOP2013.NET/blob/main/Performance.png)
 
+Use highly optimized binary serialize lib to load data.
 
-I found calculation of iphi it's not related with time. So calculations of aa&bb were done during data reading.
-
-I'm not sure should I Dump the preprocessed data to BIN file or not.
-
-### Pros
-- Smaller Data size
-
-### Cons
-- Slower on load 
-- more memory use.
-
-If program using original data file. Loading time is much less than using binary data file. About 1->4s. It's hard to choose which is better.
-
-Finally I decide to use original data file.
+With LZ4 compress. Core DLL is less than 100m now.
 
 ## API
  
@@ -171,7 +159,15 @@ Exclusive time class in VSOP2013.
 
 ## Change Log
 
-## 2022.06.02
+### 2023.03.26 V1.1
+
+Initialize performance upgrade.
+
+Add result classes.
+
+Use MessagePack to compress original data.
+
+### 2022.06.02
 
 New features.
 
@@ -179,14 +175,19 @@ Performance Optimization.
 
 Upgrade to .NET 6
 
-## 2020.11.14
+### 2020.11.14
 
 Upgrade to .NET 5
 
-## 2020.07.06
+### 2020.07.06
 
 Initial PR.
 
 ## Enviroment Require
 
 .NET6 Runtime
+
+## Reference
+ 
+ [MessagePack](https://github.com/neuecc/MessagePack-CSharp#lz4-compression"MessagePack for C#")
+

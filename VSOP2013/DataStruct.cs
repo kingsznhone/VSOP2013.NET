@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MessagePack;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -51,69 +52,79 @@ namespace VSOP2013
         public double[] ICRSXYZ;
     }
 
-    
 
+
+    [MessagePackObject]
     [Serializable]
     public struct PlanetTable
     {
-        public VariableTable[] variables;
+        [Key(0)]
         public VSOPBody body;
+        [Key(1)]
+        public VariableTable[] variables;
+        
     }
 
+    [MessagePackObject]
     [Serializable]
     public struct VariableTable
     {
-        
-        public PowerTable[] PowerTables;
+        [Key(0)]
         public VSOPBody Body;
+        [Key(1)]
         public int iv;
+        [Key(2)]
+        public PowerTable[] PowerTables;
     }
 
+    [MessagePackObject]
     [Serializable]
     public struct PowerTable
     {
-        public Header header;
-        public Term[] Terms;
+        [Key(0)]
         public VSOPBody Body;
-        
+        [Key(1)]
         public int iv;
+        [Key(2)]
         public int it;
+        [Key(3)]
+        public Header header;
+        [Key(4)]
+        public Term[] Terms;
     }
 
+    [MessagePackObject]
     [Serializable]
     public struct Header
     {
-
-        /// <summary>
-        /// body
-        /// </summary>
+        [Key(0)]
         public int ip;
-        /// <summary>
-        /// variable
-        /// </summary>
+        [Key(1)]
         public int iv;
-        /// <summary>
-        /// power
-        /// </summary>
+        [Key(2)]
         public int it;
-        /// <summary>
-        /// sum of terms
-        /// </summary>
+        [Key(3)]
         public int nt;
     }
 
+    [MessagePackObject]
     [Serializable]
     [StructLayout(LayoutKind.Explicit)]
     public struct Term
     {
+        [Key(0)]
         [FieldOffset(0)]        
         public long rank;
+        [Key(1)]
         [FieldOffset(8)]
         public double ss;
+        [Key(2)]
         [FieldOffset(16)]
         public double cc;
+        [Key(3)]
         [FieldOffset(24)]
         public double aa;
+        [Key(4)]
         [FieldOffset(32)]
         public double bb;
     }

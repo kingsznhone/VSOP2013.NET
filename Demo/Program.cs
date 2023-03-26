@@ -4,6 +4,8 @@ using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 using VSOP2013;
+using VSOP2013.VSOPResult;
+
 namespace Demo
 {
     class Program
@@ -45,9 +47,9 @@ namespace Demo
             Console.WriteLine("Press Enter To Start Substitution...");
             Console.ReadLine();
 
-            VSOPResult[] ResultAll = vsop.CalcAllPlanet(vTime);
+            DynamicalELL[] ResultAll = vsop.CalcAllPlanet(vTime);
 
-            foreach(VSOPResult result in ResultAll)
+            foreach(DynamicalELL result in ResultAll)
             {
                 FormattedPrint(result, vTime);
             }
@@ -60,7 +62,7 @@ namespace Demo
             Console.ReadLine();
         }
 
-        public static void FormattedPrint(VSOPResult Result, VSOPTime vtime)
+        public static void FormattedPrint(DynamicalELL Result, VSOPTime vtime)
         {
             Console.WriteLine("===============================================================");
             Console.WriteLine("PLANETARY EPHEMERIS VSOP2013");
@@ -69,28 +71,28 @@ namespace Demo
             Console.WriteLine(Enum.GetName(typeof(VSOPBody), Result.Body) + " at UTC:" + vtime.UTC.ToString());
             Console.WriteLine();
             Console.WriteLine("            Elliptic Elements - Dynamical Frame J2000");
-            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "semi-major axis (au)", Result.DynamicalELL[0]));
-            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "mean longitude (rd)", Result.DynamicalELL[1]));
-            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "k = e*cos(pi) (rd)", Result.DynamicalELL[2]));
-            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "h = e*sin(pi) (rd)", Result.DynamicalELL[3]));
-            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "q = sin(i/2)*cos(omega) (rd)", Result.DynamicalELL[4]));
-            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "p = sin(i/2)*sin(omega) (rd)", Result.DynamicalELL[5]));
+            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "semi-major axis (au)", (Result).A));
+            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "mean longitude (rd)", (Result).L));
+            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "k = e*cos(pi) (rd)", (Result).K));
+            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "h = e*sin(pi) (rd)", (Result).H));
+            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "q = sin(i/2)*cos(omega) (rd)", (Result).Q));
+            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "p = sin(i/2)*sin(omega) (rd)", (Result).P));
             Console.WriteLine();
             Console.WriteLine("            Ecliptic Heliocentric Coordinates - Dynamical Frame J2000");
-            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "Positions  X (au)", Result.DynamicalXYZ[0]));
-            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "Positions  Y (au)", Result.DynamicalXYZ[1]));
-            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "Positions  Z (au)", Result.DynamicalXYZ[2]));
-            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "Velocities X'(au/d)", Result.DynamicalXYZ[3]));
-            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "Velocities Y'(au/d)", Result.DynamicalXYZ[4]));
-            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "Velocities Z'(au/d)", Result.DynamicalXYZ[5]));
+            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "Positions  X (au)", ((DynamicalXYZ)Result).X));
+            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "Positions  Y (au)", ((DynamicalXYZ)Result).Y));
+            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "Positions  Z (au)", ((DynamicalXYZ)Result).Z));
+            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "Velocities X'(au/d)", ((DynamicalXYZ)Result).dX));
+            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "Velocities Y'(au/d)", ((DynamicalXYZ)Result).dY));
+            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "Velocities Z'(au/d)", ((DynamicalXYZ)Result).dZ));
             Console.WriteLine();
             Console.WriteLine("            Equatorial Heliocentric Coordinates - ICRS Frame J2000");
-            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "Positions  X (au)", Result.ICRSXYZ[0]));
-            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "Positions  Y (au)", Result.ICRSXYZ[1]));
-            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "Positions  Z (au)", Result.ICRSXYZ[2]));
-            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "Velocities X'(au/d)", Result.ICRSXYZ[3]));
-            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "Velocities Y'(au/d)", Result.ICRSXYZ[4]));
-            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "Velocities Z'(au/d)", Result.ICRSXYZ[5]));
+            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "Positions  X (au)", ((ICRSXYZ)Result).X));
+            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "Positions  Y (au)", ((ICRSXYZ)Result).Y));
+            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "Positions  Z (au)", ((ICRSXYZ)Result).Z));
+            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "Velocities X'(au/d)", ((ICRSXYZ)Result).dX));
+            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "Velocities Y'(au/d)", ((ICRSXYZ)Result).dY));
+            Console.WriteLine(String.Format("{0,-30} : {1,-30}", "Velocities Z'(au/d)", ((ICRSXYZ)Result).dZ));
             Console.WriteLine();
         }
 
@@ -102,44 +104,17 @@ namespace Demo
             Stopwatch sw = new Stopwatch();
             sw.Start();
             int completedCycle = 0;
-            var result = Parallel.For(0, cycle, (i) =>
+            for (int i = 0; i < cycle; i++)
             {
-                {
-                    VSOPResult[] ResultAll = vsop.CalcAllPlanet(vTime);
-                    completedCycle++;
-                    if (completedCycle % 1000 == 0)
-                    {
-                        Console.WriteLine($"Cycle: {completedCycle,-10}  {sw.Elapsed.TotalMilliseconds,10} ms");
-                    }
-                }
-            });
-
-            sw.Stop();
-            Console.WriteLine($"Cycle: {cycle,-10}  {sw.Elapsed.TotalMilliseconds,10} ms");
-        }
-
-
-        public static void PerformanceTestSync(int cycle)
-        {
-            Console.WriteLine();
-            Console.WriteLine("=====================Start Performance Test=====================");
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-            int completedCycle = 0;
-
-
-            for(int i = 0; i < cycle; i++)
-            {
-                double Result = vsop.CalcIV(VSOPBody.EMB,1,vTime);
+                DynamicalELL[] ResultAll = vsop.CalcAllPlanet(vTime);
                 completedCycle++;
-                if (completedCycle % 1000 == 0)
+                if (completedCycle % 100 == 0 && completedCycle<cycle)
                 {
-                    Console.WriteLine($"Cycle: {completedCycle,-10}  {sw.Elapsed.TotalMilliseconds,10} ms");
+                    Console.WriteLine($"Cycle: {completedCycle}/{cycle,-10}  {sw.Elapsed.TotalMilliseconds,10} ms");
                 }
             }
-
             sw.Stop();
-            Console.WriteLine($"Cycle: {cycle,-10}  {sw.Elapsed.TotalMilliseconds,10} ms");
+            Console.WriteLine($"Total: {completedCycle}/{cycle,-10}  {sw.Elapsed.TotalMilliseconds,10} ms");
         }
     }
 }
