@@ -1,10 +1,5 @@
-﻿using MessagePack;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Runtime.InteropServices;
+using MessagePack;
 
 namespace VSOP2013
 {
@@ -36,7 +31,7 @@ namespace VSOP2013
 
     public struct PlanetEphemeris
     {
-        //Elliptic   Elements 
+        //Elliptic   Elements
         //a (au), lambda (radian), k, h, q, p
         //Dynamical Frame J2000'
         public double[] DynamicalELL;
@@ -52,17 +47,15 @@ namespace VSOP2013
         public double[] ICRSXYZ;
     }
 
-
-
     [MessagePackObject]
     [Serializable]
     public struct PlanetTable
     {
         [Key(0)]
         public VSOPBody body;
+
         [Key(1)]
         public VariableTable[] variables;
-        
     }
 
     [MessagePackObject]
@@ -71,8 +64,10 @@ namespace VSOP2013
     {
         [Key(0)]
         public VSOPBody Body;
+
         [Key(1)]
         public int iv;
+
         [Key(2)]
         public PowerTable[] PowerTables;
     }
@@ -83,12 +78,13 @@ namespace VSOP2013
     {
         [Key(0)]
         public VSOPBody Body;
+
         [Key(1)]
         public int iv;
+
         [Key(2)]
         public int it;
-        [Key(3)]
-        public Header header;
+
         [Key(4)]
         public Term[] Terms;
     }
@@ -99,10 +95,13 @@ namespace VSOP2013
     {
         [Key(0)]
         public int ip;
+
         [Key(1)]
         public int iv;
+
         [Key(2)]
         public int it;
+
         [Key(3)]
         public int nt;
     }
@@ -113,17 +112,21 @@ namespace VSOP2013
     public struct Term
     {
         [Key(0)]
-        [FieldOffset(0)]        
+        [FieldOffset(0)]
         public long rank;
+
         [Key(1)]
         [FieldOffset(8)]
         public double ss;
+
         [Key(2)]
         [FieldOffset(16)]
         public double cc;
+
         [Key(3)]
         [FieldOffset(24)]
         public double aa;
+
         [Key(4)]
         [FieldOffset(32)]
         public double bb;

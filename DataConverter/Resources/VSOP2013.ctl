@@ -1,5 +1,4 @@
-
-  PLANETARY EPHEMERIS VSOP2013  MERCURY 
+  PLANETARY EPHEMERIS VSOP2013  MERCURY
 
   1/ Elliptic   Elements:    a(au), lambda (radian), k, h, q, p        - Dynamical Frame J2000
   2/ Ecliptic   Heliocentric Coordinates:  X, Y, Z(au)  X',Y',Z' (au/d)  - Dynamical Frame J2000
@@ -50,7 +49,7 @@ Julian Date JD 2411545.0 (TDB)
    -0.1300935038   -0.4472876448   -0.0245983783    0.0213663969   -0.0064479843   -0.0024878666
    -0.1300936046   -0.4005937206   -0.2004893069    0.0213663956   -0.0049262997   -0.0048474330
 
-  PLANETARY EPHEMERIS VSOP2013  VENUS   
+  PLANETARY EPHEMERIS VSOP2013  VENUS
 
   1/ Elliptic   Elements:    a(au), lambda (radian), k, h, q, p        - Dynamical Frame J2000
   2/ Ecliptic   Heliocentric Coordinates:  X, Y, Z(au)  X',Y',Z' (au/d)  - Dynamical Frame J2000
@@ -101,7 +100,7 @@ Julian Date JD 2411545.0 (TDB)
    -0.7183022848   -0.0326544811    0.0410142477    0.0007981222   -0.0202952185   -0.0003234552
    -0.7183022964   -0.0462742464    0.0246406381    0.0007981175   -0.0184918375   -0.0083697353
 
-  PLANETARY EPHEMERIS VSOP2013  EMB     
+  PLANETARY EPHEMERIS VSOP2013  EMB
 
   1/ Elliptic   Elements:    a(au), lambda (radian), k, h, q, p        - Dynamical Frame J2000
   2/ Ecliptic   Heliocentric Coordinates:  X, Y, Z(au)  X',Y',Z' (au/d)  - Dynamical Frame J2000
@@ -152,7 +151,7 @@ Julian Date JD 2411545.0 (TDB)
    -0.1771590071    0.9672193117   -0.0000009492   -0.0172031083   -0.0031639158    0.0000000254
    -0.1771587839    0.8874068590    0.3847367185   -0.0172031091   -0.0029028420   -0.0012585096
 
-  PLANETARY EPHEMERIS VSOP2013  MARS    
+  PLANETARY EPHEMERIS VSOP2013  MARS
 
   1/ Elliptic   Elements:    a(au), lambda (radian), k, h, q, p        - Dynamical Frame J2000
   2/ Ecliptic   Heliocentric Coordinates:  X, Y, Z(au)  X',Y',Z' (au/d)  - Dynamical Frame J2000
@@ -203,7 +202,7 @@ Julian Date JD 2411545.0 (TDB)
     1.3907159210   -0.0134159938   -0.0344678037    0.0006714961    0.0151872482    0.0003016544
     1.3907159214    0.0014012149   -0.0369601677    0.0006714996    0.0138140375    0.0063179004
 
-  PLANETARY EPHEMERIS VSOP2013  JUPITER 
+  PLANETARY EPHEMERIS VSOP2013  JUPITER
 
   1/ Elliptic   Elements:    a(au), lambda (radian), k, h, q, p        - Dynamical Frame J2000
   2/ Ecliptic   Heliocentric Coordinates:  X, Y, Z(au)  X',Y',Z' (au/d)  - Dynamical Frame J2000
@@ -254,7 +253,7 @@ Julian Date JD 2411545.0 (TDB)
     4.0011764936    2.9385770224   -0.1017848771   -0.0045683150    0.0064432050    0.0000755810
     4.0011771819    2.7365785897    1.0755125254   -0.0045683135    0.0058814622    0.0026323029
 
-  PLANETARY EPHEMERIS VSOP2013  SATURN  
+  PLANETARY EPHEMERIS VSOP2013  SATURN
 
   1/ Elliptic   Elements:    a(au), lambda (radian), k, h, q, p        - Dynamical Frame J2000
   2/ Ecliptic   Heliocentric Coordinates:  X, Y, Z(au)  X',Y',Z' (au/d)  - Dynamical Frame J2000
@@ -305,7 +304,7 @@ Julian Date JD 2411545.0 (TDB)
     6.4064073173    6.5699911538   -0.3690759502   -0.0042923528    0.0038903147    0.0001029490
     6.4064088704    6.1746578061    2.2747707349   -0.0042923519    0.0035283446    0.0016419315
 
-  PLANETARY EPHEMERIS VSOP2013  URANUS  
+  PLANETARY EPHEMERIS VSOP2013  URANUS
 
   1/ Elliptic   Elements:    a(au), lambda (radian), k, h, q, p        - Dynamical Frame J2000
   2/ Ecliptic   Heliocentric Coordinates:  X, Y, Z(au)  X',Y',Z' (au/d)  - Dynamical Frame J2000
@@ -356,7 +355,7 @@ Julian Date JD 2411545.0 (TDB)
    14.4318597263  -13.7343125162   -0.2381402777    0.0026781039    0.0026726980   -0.0000247713
    14.4318565807  -12.5062632452   -5.6816829828    0.0026781045    0.0024620054    0.0010404106
 
-  PLANETARY EPHEMERIS VSOP2013  NEPTUNE 
+  PLANETARY EPHEMERIS VSOP2013  NEPTUNE
 
   1/ Elliptic   Elements:    a(au), lambda (radian), k, h, q, p        - Dynamical Frame J2000
   2/ Ecliptic   Heliocentric Coordinates:  X, Y, Z(au)  X',Y',Z' (au/d)  - Dynamical Frame J2000
@@ -407,7 +406,7 @@ Julian Date JD 2411545.0 (TDB)
    16.8120537367  -24.9917592776    0.1272247241    0.0025792738    0.0017769013   -0.0000959080
    16.8120479567  -22.9801038994   -9.8244204429    0.0025792742    0.0016684245    0.0006188166
 
-  PLANETARY EPHEMERIS VSOP2013  PLUTO   
+  PLANETARY EPHEMERIS VSOP2013  PLUTO
 
   1/ Elliptic   Elements:    a(au), lambda (radian), k, h, q, p        - Dynamical Frame J2000
   2/ Ecliptic   Heliocentric Coordinates:  X, Y, Z(au)  X',Y',Z' (au/d)  - Dynamical Frame J2000

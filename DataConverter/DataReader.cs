@@ -54,12 +54,14 @@ namespace VSOP2013.DataConverter
 
         public static List<PlanetTable> ReadData()
         {
-            List<PlanetTable> VSOP2013DATA = new List<PlanetTable>();
+            List<PlanetTable> VSOP2013DATA = new();
             for (int ip = 0; ip < 9; ip++)
             {
-                PlanetTable planet = new PlanetTable();
-                planet.body = (VSOPBody)ip;
-                planet.variables = new VariableTable[6];
+                PlanetTable planet = new()
+                {
+                    body = (VSOPBody)ip,
+                    variables = new VariableTable[6]
+                };
 
                 for (int iv = 0; iv < 6; iv++)
                 {
@@ -115,7 +117,6 @@ namespace VSOP2013.DataConverter
                         ReadTerm(line, ref buffer[i]);
                     }
 
-                    Planet.variables[H.iv].PowerTables[H.it].header = H;
                     Planet.variables[H.iv].PowerTables[H.it].iv = H.iv;
                     Planet.variables[H.iv].PowerTables[H.it].it = H.it;
                     Planet.variables[H.iv].PowerTables[H.it].Body = (VSOPBody)H.ip;
@@ -127,7 +128,7 @@ namespace VSOP2013.DataConverter
 
         private static Header ReadHeader(string line)
         {
-            Header H = new Header();
+            Header H = new();
             int lineptr = 9;
             H.ip = Convert.ToInt32(line.Substring(lineptr, 3).Trim()) - 1;
             lineptr += 3;
@@ -148,7 +149,7 @@ namespace VSOP2013.DataConverter
 
             //
             lineptr = 5;
-            T.rank = Convert.ToInt32(line.Substring(0, lineptr));
+            T.rank = Convert.ToInt32(line[..lineptr]);
             //
             lineptr++;
             //
@@ -204,7 +205,7 @@ namespace VSOP2013.DataConverter
             ci = Convert.ToDouble(line.Substring(lineptr, 20).Trim());
             lineptr += 20;
             lineptr++;
-            ci = ci * Math.Pow(10, Convert.ToDouble(line.Substring(lineptr, 3).Trim()));
+            ci *= Math.Pow(10, Convert.ToDouble(line.Substring(lineptr, 3).Trim()));
 
             T.cc = ci;
 
@@ -216,7 +217,6 @@ namespace VSOP2013.DataConverter
                 T.aa += Bufferiphi[j] * ci0[j];
                 T.bb += Bufferiphi[j] * ci1[j];
             }
-
             return T;
         }
 
