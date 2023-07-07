@@ -31,10 +31,10 @@ This is the best VSOP2013 library ever.
 <br>![Performance Test](https://github.com/kingsznhone/VSOP2013.NET/blob/main/PerformanceTest.png)
 4. Useful Utility class. Convert Elliptic coordinates to cartesian  or spherical 
 5. Async Api.
-6. precalculation on <b>φ</b> in terms, which gives 10%+ speed of calculation.
+6. precalculation on <b>φ</b> in terms, which gives 20%+ speed up of calculation.
 7. Use [MessagePack](https://github.com/neuecc/MessagePack-CSharp#lz4-compression"MessagePack for C#") for binary serialize.
 <br>Initialization time becomes less than 10% of previous.
-7. Brotli compression on source data. ~300Mb -> ~50MB.
+8. Brotli compression on source data. ~300Mb -> ~50MB.
 
 <br>
 
@@ -55,7 +55,7 @@ The planetary solution VSOP2013 is fitted to the numerical integration INPOP10a 
 
 * NuGet Package Manager
     ```
-    PM> NuGet\Install-Package VSOP2013.NET -Version 1.1.2
+    PM> NuGet\Install-Package VSOP2013.NET -Version 1.1.5
     ```
 
 ```
@@ -65,21 +65,22 @@ Calculator vsop = new Calculator();
 
 //Create VSOPTime using UTC .
 DateTime Tinput = DateTime.Now;
-VSOPTime vTime = new VSOPTime(Tinput.ToUniversalTime());
+VSOPTime vTime = new VSOPTime(Tinput.ToUniversalTime(),TimeFrame.UTC);
 
 //Calculate EMB's present position
 VSOPResult_ELL ell = vsop.GetPlanetPosition(VSOPBody.EMB, vTime);
 
-//Cast to diffirent coordinate system.
-VSOPResult_XYZ xyz=(VSOPResult_XYZ)ell;
-VSOPResult_LBR lbr=(VSOPResult_LBR)ell;
+//Convert to diffirent coordinate system.
+VSOPResult_XYZ xyz=ell.ToXYZ();
+VSOPResult_LBR lbr=ell.ToLBR();
 
 //Print result
-Console.WriteLine($"Coordinates Type: {Enum.GetName(ell.CoordinatesType)}");
-Console.WriteLine($"InertialFrame: {Enum.GetName(ell.InertialFrame)}");
-Console.WriteLine($"Time Frame Reference: {Enum.GetName(ell.TimeFrameReference)}");
 Console.WriteLine($"Body: {Enum.GetName(ell.Body)}");
-Console.WriteLine($"Time: {ell.Time.UTC.ToString("o")}");
+Console.WriteLine($"Coordinates Type: {Enum.GetName(ell.CoordinatesType)}");
+Console.WriteLine($"Coordinates Reference: {Enum.GetName(ell.CoordinatesReference)}");
+Console.WriteLine($"Reference Frame: {Enum.GetName(ell.ReferenceFrame)}");
+Console.WriteLine($"Time UTC: {ell.Time.UTC.ToString("o")}");
+Console.WriteLine($"Time TDB: {ell.Time.TDB.ToString("o")}");
 Console.WriteLine("---------------------------------------------------------------");
 Console.WriteLine(String.Format("{0,-33}{1,30}", "semi-major axis (au)", ell.a));
 Console.WriteLine(String.Format("{0,-33}{1,30}", "mean longitude (rad)", ell.l));
@@ -91,6 +92,12 @@ Console.WriteLine("=============================================================
 ```
 
 ## Change Log
+
+### 2023.7.7 v1.1.5
+
+Bug Fix.
+
+API change with some feature in VSOP87
 
 ### 2023.7.05 v1.1.2
 
@@ -424,6 +431,32 @@ Array of cartesian coordinate elements that inertial frame of dynamical equinox 
 
 ## Class VSOPResult_XYZ : VSOPResult
 
+### Constructor
+
+```VSOPResult_XYZ(VSOPResult_LBR result)```
+
+Create a new cartesian result from spherical result. 
+
+<br>
+
+#### Arguments
+
+```result``` VSOPResult_LBR 
+
+<br>
+
+```VSOPResult_XYZ(VSOPResult_ELL result)```
+
+Create a new Cartisian result from ellipitic result. 
+
+<br>
+
+#### Arguments
+
+```result``` VSOPResult_ELL
+
+<br>
+
 ### Properties
 
 ```VSOPBody Body { get; }```
@@ -438,13 +471,15 @@ Coordinates type of this result.
 
 <br>
 
-```InertialFrame InertialFrame { get; }```
+```CoordinatesReference CoordinatesReference{ get; }```
 
-Inertial frame of this result.
+Coordinates Reference of this result.
 
-```TimeFrameReference TimeFrameReference { get; }```
+<br>
 
-Time frame reference  of this result.
+```ReferenceFrame ReferenceFrame { get; set;}```
+
+ReferenceFrame of this result. Set to ```ReferenceFrame.ICRSJ2000``` or ```ReferenceFrame.DynamicalJ2000``` will automatically change coordinate field.
 
 <br>
 
@@ -462,7 +497,7 @@ Raw data of this result in elliptic coordinate.
 
 ```double[] Variables_XYZ { get;}```
 
-Raw data of this result in cartesian coordinate.
+Cartesian coordinate of this result.
 
 <br>
 
@@ -494,19 +529,42 @@ Velocity z (au/day)
 
 ### Methods
 
-```void ToICRSFrame()```
+```VSOPResult_LBR ToLBR()```
 
-Convert this result to ICRS Inertial Frame.
-
-<br>
-
-```void ToDynamicalFrame()```
-
-Convert this result to Dynamical Inertial Frame.
+Convert this result to Spherical coordinate.
 
 <br>
+
 
 ## Class VSOPResult_ELL : VSOPResult
+
+### Constructor
+
+```public VSOPResult_ELL(VSOPBody body, VSOPTime time, double[] ell)```
+
+Create a new spherical result from cartesian result. 
+
+<br>
+
+#### Arguments
+
+```body``` VSOPBody
+
+Planet
+
+<br>
+
+```time``` VSOPTime
+
+Time wrapper for VSOP
+
+<br>
+
+```ell``` double[]
+
+Raw result data from calculator.
+
+<br>
 
 ### Properties
 
@@ -522,13 +580,13 @@ Coordinates type of this result.
 
 <br>
 
-```InertialFrame InertialFrame { get; }```
+```CoordinatesReference CoordinatesReference { get; }```
 
-Inertial frame of this result.
+Coordinates Reference of this result.
 
-```TimeFrameReference TimeFrameReference { get; }```
+```ReferenceFrame ReferenceFrame { get; }```
 
-Time frame reference  of this result.
+ELLiptic Coordinate can't change Reference Frame.
 
 <br>
 
@@ -541,12 +599,6 @@ Input time of this result.
 ```double[] Variables_ELL { get;}```
 
 Raw data of this result in elliptic coordinate.
-
-<br>
-
-```double[] Variables_LBR { get;}```
-
-Raw data of this result in spherical coordinate.
 
 <br>
 
@@ -576,25 +628,53 @@ sin(i/2)*sin(omega) (rd)
 
 <br>
 
-## Class VSOPResult_LBR : VSOPResult
+### Methods
 
-### Properties
+```VSOPResult_XYZ ToXYZ()```
 
-```VSOPVersion Version { get; }```
-
-VSOP version of this result.
+Convert this result to cartisian coordinate.
 
 <br>
+
+```VSOPResult_LBR ToLBR()```
+
+Convert this result to spherical coordinate.
+
+<br>
+
+## Class VSOPResult_LBR : VSOPResult
+
+### Constructor
+
+```VSOPResult_LBR(VSOPResult_XYZ result)```
+
+Create a new spherical result from cartesian result. 
+
+<br>
+
+#### Arguments
+
+```result``` VSOPResult_XYZ 
+
+<br>
+
+```VSOPResult_LBR(VSOPResult_ELL result)```
+
+Create a new spherical result from ellipitic result. 
+
+<br>
+
+#### Arguments
+
+```result``` VSOPResult_ELL
+
+<br>
+
+### Properties
 
 ```VSOPBody Body { get; }```
 
 Planet of this result.
-
-<br>
-
-```CoordinatesReference CoordinatesRefrence { get; }```
-
-Coordinates reference of this result.
 
 <br>
 
@@ -604,9 +684,13 @@ Coordinates type of this result.
 
 <br>
 
-```TimeFrameReference TimeFrameReference { get; }```
+```CoordinatesReference CoordinatesReference { get; }```
 
-Time frame reference  of this result.
+Coordinates Reference of this result.
+
+```ReferenceFrame ReferenceFrame { get; set;}```
+
+ReferenceFrame of this result. Set to ```ReferenceFrame.ICRSJ2000``` or ```ReferenceFrame.DynamicalJ2000``` will automatically change coordinate field.
 
 <br>
 
@@ -616,9 +700,15 @@ Input time of this result.
 
 <br>
 
-```double[] Variables { get;}```
+```double[] Variables_ELL { get;}```
 
-Raw data of this result.
+Raw data of this result in elliptic coordinate.
+
+<br>
+
+```double[] Variables_LBR { get;}```
+
+Spherical coordinate of this result.
 
 <br>
 
@@ -650,19 +740,14 @@ radius velocity (au/day)
 
 ### Methods
 
-```void ToICRSFrame()```
+```VSOPResult_XYZ ToXYZ()```
 
-Convert this result to ICRS Inertial Frame.
-
-<br>
-
-```void ToDynamicalFrame()```
-
-Convert this result to Dynamical Inertial Frame.
+Convert this result to cartisian coordinate.
 
 <br>
 
 ## Class VSOPTime
+
 #### summary
 
 This class provide time convert and management for VSOP87.
@@ -711,7 +796,7 @@ Get J2000 from TDB.
 
 ### Methods
 
-```DateTime ChangeFrame(DateTime dt, TimeFrame TargetFrame)```
+```static DateTime ChangeFrame(DateTime dt, TimeFrame SourceFrame, TimeFrame TargetFrame)```
 
 #### Parameters
 
@@ -741,7 +826,16 @@ Datetime of target time Frame.
 
 <br>
 
+#### Return
+
+```DateTime```
+
+Datetime of target time Frame.
+
+<br>
+
 ```static double ToJ2000(DateTime dt)```
+
 #### Parameters
 
 ```dt``` DateTime

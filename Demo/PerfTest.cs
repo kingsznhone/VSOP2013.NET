@@ -25,7 +25,7 @@ namespace Demo
             dt = DateTime.Now.ToUniversalTime();
             dt.ToUniversalTime();
             dt = dt.AddSeconds(-69.184);
-            vTime =new VSOPTime(dt);
+            vTime =new VSOPTime(dt,TimeFrame.UTC);
         }
 
         [Benchmark]

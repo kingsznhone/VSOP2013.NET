@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
-
+using VSOP2013;
 namespace VSOP2013.DataConverter
 {
     public static class DataReader
@@ -149,7 +149,7 @@ namespace VSOP2013.DataConverter
 
             //
             lineptr = 5;
-            T.rank = Convert.ToInt32(line[..lineptr]);
+            //T.rank = Convert.ToInt32(line[..lineptr]);
             //
             lineptr++;
             //

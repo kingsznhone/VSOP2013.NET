@@ -27,7 +27,7 @@ namespace Demo
             DateTime.TryParse(inputT, culture, style, out dt);
             dt.ToUniversalTime();
             dt = dt.AddSeconds(-69.184);
-            VSOPTime vTime = new VSOPTime(dt);
+            VSOPTime vTime = new VSOPTime(dt,TimeFrame.UTC);
             Console.WriteLine();
             Console.WriteLine("Start Substitution...");
 
@@ -35,17 +35,27 @@ namespace Demo
             VSOPResult_XYZ xyz;
             VSOPResult_LBR lbr;
 
-            foreach(VSOPBody body in Enum.GetValues(typeof(VSOPBody)))
-            {
-                ell = vsop.GetPlanetPosition(body, vTime);
-                xyz = (VSOPResult_XYZ)ell;
-                lbr = (VSOPResult_LBR)ell;
-                FormattedPrint(ell, vTime);
-                FormattedPrint(xyz, vTime);
-                FormattedPrint(lbr, vTime);
-            }
+            ell = vsop.GetPlanetPosition(VSOPBody.EMB, vTime);
+            FormattedPrint(ell, vTime);
 
-           
+            xyz = ell.ToXYZ();
+            FormattedPrint(xyz, vTime);
+            xyz.ReferenceFrame = ReferenceFrame.ICRSJ2000;
+            FormattedPrint(xyz, vTime);
+
+            lbr = ell.ToLBR();
+            FormattedPrint(lbr, vTime);
+            lbr.ReferenceFrame = ReferenceFrame.ICRSJ2000;
+            FormattedPrint(lbr, vTime);
+            //foreach(VSOPBody body in Enum.GetValues(typeof(VSOPBody)))
+            //{
+            //    ell = vsop.GetPlanetPosition(body, vTime);
+            //    xyz = (VSOPResult_XYZ)ell;
+            //    lbr = (VSOPResult_LBR)ell;
+            //    FormattedPrint(ell, vTime);
+            //    FormattedPrint(xyz, vTime);
+            //    FormattedPrint(lbr, vTime);
+            //}
 
 
             Console.WriteLine("Press Enter to Start Performance Test...");
@@ -60,17 +70,49 @@ namespace Demo
         public static void FormattedPrint(VSOPResult Result, VSOPTime vtime)
         {
             Console.WriteLine("===============================================================");
-            WriteColorLine(ConsoleColor.Cyan, "PLANETARY EPHEMERIS VSOP2013");
+            WriteColorLine(ConsoleColor.Green, "PLANETARY EPHEMERIS VSOP2013");
             Console.WriteLine("===============================================================");
+            WriteColorLine("Body: ", ConsoleColor.Green, $"\t\t\t{Enum.GetName(Result.Body)}");
+            switch (Result.CoordinatesType)
+            {
+                case CoordinatesType.Elliptic:
+                    WriteColorLine("Coordinates Type: ", ConsoleColor.Green, $"\tElliptic Elements");
+                    break;
+
+                case CoordinatesType.Rectangular:
+                    WriteColorLine("Coordinates Type: ", ConsoleColor.Green, $"\tCartesian Coordinate");
+                    break;
+
+                case CoordinatesType.Spherical:
+                    WriteColorLine("Coordinates Type: ", ConsoleColor.Green, $"\tSpherical Coordinate");
+                    break;
+            }
+            switch (Result.CoordinatesReference)
+            {
+                case CoordinatesReference.EclipticHeliocentric:
+                    WriteColorLine("Coordinates Reference: ", ConsoleColor.Green, $"\tEcliptic Heliocentric");
+                    break;
+
+                case CoordinatesReference.EquatorialHeliocentric:
+                    WriteColorLine("Coordinates Reference: ", ConsoleColor.Green, $"\tEquatorial Heliocentric");
+                    break;
+            }
+            switch (Result.ReferenceFrame)
+
+            {
+                case ReferenceFrame.DynamicalJ2000:
+                    WriteColorLine("Reference Frame: ", ConsoleColor.Green, $"\tDynamical equinox and ecliptic J2000");
+                    break;
+
+                case ReferenceFrame.ICRSJ2000:
+                    WriteColorLine("Reference Frame: ", ConsoleColor.Green, $"\tICRS equinox and ecliptic J2000");
+                    break;
+            }
+            WriteColorLine("At UTC: ", ConsoleColor.Green, $"\t\t{Result.Time.UTC.ToUniversalTime().ToString("o")}");
+            WriteColorLine("At TDB: ", ConsoleColor.Green, $"\t\t{Result.Time.TDB.ToString("o")}");
 
             if (Result.CoordinatesType == CoordinatesType.Elliptic)
             {
-                WriteColorLine("Coordinates Type: ", ConsoleColor.Green, "\tHeliocentric Elliptic");
-                WriteColorLine("Reference Frame: ", ConsoleColor.Green, "\tDynamical Equinox and Ecliptic J2000");
-                WriteColorLine("Body: ", ConsoleColor.Green, $"\t\t\t{Enum.GetName(Result.Body)}");
-                WriteColorLine("At UTC: ", ConsoleColor.Green, $"\t\t{Result.Time.UTC.ToUniversalTime().ToString("o")}");
-                WriteColorLine("At TDB: ", ConsoleColor.Green, $"\t\t{Result.Time.TDB.ToString("o")}");
-
                 Console.WriteLine("---------------------------------------------------------------");
                 Console.WriteLine(String.Format("{0,-33}{1,30}", "semi-major axis (au)", (Result as VSOPResult_ELL).a));
                 Console.WriteLine(String.Format("{0,-33}{1,30}", "mean longitude (rad)", (Result as VSOPResult_ELL).l));
@@ -88,20 +130,6 @@ namespace Demo
             }
             else if (Result.CoordinatesType == CoordinatesType.Rectangular)
             {
-                WriteColorLine("Coordinates Type: ", ConsoleColor.Green, "\t Heliocentric Rectangular");
-                if (Result.InertialFrame == InertialFrame.Dynamical)
-                {
-                    WriteColorLine("Reference Frame: ", ConsoleColor.Green, "\tDynamical Ecliptic J2000");
-                }
-                else
-                {
-                    WriteColorLine("Reference Frame: ", ConsoleColor.Green, "\tEquatorial ICRS J2000");
-                }
-
-                WriteColorLine("Body: ", ConsoleColor.Green, $"\t\t\t{Enum.GetName(Result.Body)}");
-                WriteColorLine("At UTC: ", ConsoleColor.Green, $"\t\t{Result.Time.UTC.ToUniversalTime().ToString("o")}");
-                WriteColorLine("At TDB: ", ConsoleColor.Green, $"\t\t{Result.Time.TDB.ToString("o")}");
-
                 Console.WriteLine("---------------------------------------------------------------");
                 Console.WriteLine(String.Format("{0,-33}{1,30}", "position x (au)", (Result as VSOPResult_XYZ).x));
                 Console.WriteLine(String.Format("{0,-33}{1,30}", "position y (au)", (Result as VSOPResult_XYZ).y));
@@ -115,19 +143,6 @@ namespace Demo
             }
             else if (Result.CoordinatesType == CoordinatesType.Spherical)
             {
-                WriteColorLine("Coordinates Type: ", ConsoleColor.Green, "\t Heliocentric Spherical");
-                if (Result.InertialFrame == InertialFrame.Dynamical)
-                {
-                    WriteColorLine("Reference Frame: ", ConsoleColor.Green, "\tDynamical Ecliptic J2000");
-                }
-                else
-                {
-                    WriteColorLine("Reference Frame: ", ConsoleColor.Green, "\tEquatorial ICRS J2000");
-                }
-
-                WriteColorLine("Body: ", ConsoleColor.Green, $"\t\t\t{Enum.GetName(Result.Body)}");
-                WriteColorLine("At UTC: ", ConsoleColor.Green, $"\t\t{Result.Time.UTC.ToUniversalTime().ToString("o")}");
-                WriteColorLine("At TDB: ", ConsoleColor.Green, $"\t\t{Result.Time.TDB.ToString("o")}");
                 Console.WriteLine("---------------------------------------------------------------");
                 Console.WriteLine(String.Format("{0,-33}{1,30}", "longitude (rad)", (Result as VSOPResult_LBR).l));
                 Console.WriteLine(String.Format("{0,-33}{1,30}", "latitude (rad)", (Result as VSOPResult_LBR).b));
@@ -136,6 +151,7 @@ namespace Demo
                 Console.WriteLine(String.Format("{0,-33}{1,30}", "latitude velocity (rd/day)", (Result as VSOPResult_LBR).db));
                 Console.WriteLine(String.Format("{0,-33}{1,30}", "radius velocity (au/day)", (Result as VSOPResult_LBR).dr));
                 Console.WriteLine("===============================================================");
+                Console.WriteLine();
             }
         }
 

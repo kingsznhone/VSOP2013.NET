@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+    <PlatformTarget>x64</PlatformTarget>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Platforms>x64</Platforms>
+	  <Version>1.1.5</Version>
+	  <Title>VSOP2013.NET</Title>
+	  	  <Authors>KingsZNHONE</Authors>
+	  <Description>VSOP was developed and is maintained (updated with the latest data) by the scientists at the Bureau des Longitudes in Paris.
+VSOP2013, computed the positions of the planets directly at any moment, as well as their orbital elements with improved accuracy.</Description>
+	  <RepositoryUrl>https://github.com/kingsznhone/VSOP2013.NET.git</RepositoryUrl>
+	  <RepositoryType>git</RepositoryType>
+	  <PackageProjectUrl>https://github.com/kingsznhone/VSOP2013.NET</PackageProjectUrl>
+	  <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+	  <Title>VSOP2013.NET</Title>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\VSOP2013_EMB.BIN" />
+    <EmbeddedResource Include="Resources\VSOP2013_JUPITER.BIN" />
+    <EmbeddedResource Include="Resources\VSOP2013_MARS.BIN" />
+    <EmbeddedResource Include="Resources\VSOP2013_MERCURY.BIN" />
+    <EmbeddedResource Include="Resources\VSOP2013_NEPTUNE.BIN" />
+    <EmbeddedResource Include="Resources\VSOP2013_PLUTO.BIN" />
+    <EmbeddedResource Include="Resources\VSOP2013_SATURN.BIN" />
+    <EmbeddedResource Include="Resources\VSOP2013_URANUS.BIN" />
+    <EmbeddedResource Include="Resources\VSOP2013_VENUS.BIN" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MessagePack" Version="2.5.108" />
+    <PackageReference Include="MessagePackAnalyzer" Version="2.5.108">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>
