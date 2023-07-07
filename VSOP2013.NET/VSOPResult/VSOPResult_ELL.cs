@@ -31,6 +31,7 @@
         }
 
         #region elements
+
         /// <summary>
         /// a = semi-major axis (au)
         /// </summary>
@@ -60,7 +61,9 @@
         /// p = sin(i/2)*sin(omega) (rd)
         /// </summary>
         public double p { get => Variables_ELL[5]; }
-        #endregion
+
+        #endregion elements
+
         public VSOPResult_XYZ ToXYZ()
         {
             return new VSOPResult_XYZ(this);

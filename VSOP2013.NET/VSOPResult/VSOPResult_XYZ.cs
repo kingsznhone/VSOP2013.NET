@@ -42,7 +42,7 @@
             _referenceFrame = result.ReferenceFrame;
             Body = result.Body;
             Time = result.Time;
-            Variables_XYZ = Utility.ELLtoXYZ(result.Body,result.Variables_ELL);
+            Variables_XYZ = Utility.ELLtoXYZ(result.Body, result.Variables_ELL);
         }
 
         public VSOPResult_XYZ(VSOPResult_ELL result)
@@ -86,7 +86,8 @@
         /// </summary>
         public double dz { get => Variables_XYZ[5]; }
 
-        #endregion
+        #endregion Elements
+
         public VSOPResult_LBR ToLBR()
         {
             return new VSOPResult_LBR(this);

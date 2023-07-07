@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using VSOP2013;
@@ -16,8 +12,10 @@ namespace Demo
         private Calculator vsop;
 
         private DateTime dt;
-        VSOPTime vTime;
-        public PerfTest() { vsop = new Calculator(); }
+        private VSOPTime vTime;
+
+        public PerfTest()
+        { vsop = new Calculator(); }
 
         [GlobalSetup]
         public void init()
@@ -25,7 +23,7 @@ namespace Demo
             dt = DateTime.Now.ToUniversalTime();
             dt.ToUniversalTime();
             dt = dt.AddSeconds(-69.184);
-            vTime =new VSOPTime(dt,TimeFrame.UTC);
+            vTime = new VSOPTime(dt, TimeFrame.UTC);
         }
 
         [Benchmark]
@@ -34,6 +32,5 @@ namespace Demo
             var ell = vsop.GetPlanetPosition(VSOPBody.JUPITER, vTime);
             return ell;
         }
-
     }
 }

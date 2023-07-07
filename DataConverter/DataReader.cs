@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
-using VSOP2013;
+
 namespace VSOP2013.DataConverter
 {
     public static class DataReader

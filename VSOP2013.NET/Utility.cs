@@ -331,6 +331,5 @@ namespace VSOP2013
 
             return dynamical.ToArray();
         }
-
     }
 }
