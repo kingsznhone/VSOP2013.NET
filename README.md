@@ -433,7 +433,7 @@ Array of cartesian coordinate elements that inertial frame of dynamical equinox 
 
 ### Constructor
 
-```VSOPResult_XYZ(VSOPResult_LBR result)```
+### ```VSOPResult_XYZ(VSOPResult_LBR result)```
 
 Create a new cartesian result from spherical result. 
 
@@ -445,7 +445,7 @@ Create a new cartesian result from spherical result.
 
 <br>
 
-```VSOPResult_XYZ(VSOPResult_ELL result)```
+### ```VSOPResult_XYZ(VSOPResult_ELL result)```
 
 Create a new Cartisian result from ellipitic result. 
 
@@ -529,7 +529,7 @@ Velocity z (au/day)
 
 ### Methods
 
-```VSOPResult_LBR ToLBR()```
+### ```VSOPResult_LBR ToLBR()```
 
 Convert this result to Spherical coordinate.
 
@@ -540,7 +540,7 @@ Convert this result to Spherical coordinate.
 
 ### Constructor
 
-```public VSOPResult_ELL(VSOPBody body, VSOPTime time, double[] ell)```
+### ```public VSOPResult_ELL(VSOPBody body, VSOPTime time, double[] ell)```
 
 Create a new spherical result from cartesian result. 
 
@@ -550,7 +550,7 @@ Create a new spherical result from cartesian result.
 
 ```body``` VSOPBody
 
-Planet
+Planet 
 
 <br>
 
@@ -630,13 +630,13 @@ sin(i/2)*sin(omega) (rd)
 
 ### Methods
 
-```VSOPResult_XYZ ToXYZ()```
+### ```VSOPResult_XYZ ToXYZ()```
 
 Convert this result to cartisian coordinate.
 
 <br>
 
-```VSOPResult_LBR ToLBR()```
+### ```VSOPResult_LBR ToLBR()```
 
 Convert this result to spherical coordinate.
 
@@ -646,7 +646,7 @@ Convert this result to spherical coordinate.
 
 ### Constructor
 
-```VSOPResult_LBR(VSOPResult_XYZ result)```
+### ```VSOPResult_LBR(VSOPResult_XYZ result)```
 
 Create a new spherical result from cartesian result. 
 
@@ -658,7 +658,7 @@ Create a new spherical result from cartesian result.
 
 <br>
 
-```VSOPResult_LBR(VSOPResult_ELL result)```
+### ```VSOPResult_LBR(VSOPResult_ELL result)```
 
 Create a new spherical result from ellipitic result. 
 
@@ -740,7 +740,7 @@ radius velocity (au/day)
 
 ### Methods
 
-```VSOPResult_XYZ ToXYZ()```
+### ```VSOPResult_XYZ ToXYZ()```
 
 Convert this result to cartisian coordinate.
 
@@ -748,15 +748,13 @@ Convert this result to cartisian coordinate.
 
 ## Class VSOPTime
 
-#### summary
-
 This class provide time convert and management for VSOP87.
 
 <br>
 
 #### Constructor
 
-```VSOPTime(DateTime UTC)```
+### ```VSOPTime(DateTime UTC)```
 
 Use UTC Time to initialize VSOPTime.
 
@@ -794,9 +792,9 @@ Get J2000 from TDB.
 
 <br>
 
-### Methods
+#### Methods
 
-```static DateTime ChangeFrame(DateTime dt, TimeFrame SourceFrame, TimeFrame TargetFrame)```
+### ```static DateTime ChangeFrame(DateTime dt, TimeFrame SourceFrame, TimeFrame TargetFrame)```
 
 #### Parameters
 
@@ -834,7 +832,7 @@ Datetime of target time Frame.
 
 <br>
 
-```static double ToJ2000(DateTime dt)```
+### ```static double ToJ2000(DateTime dt)```
 
 #### Parameters
 
@@ -852,7 +850,7 @@ Julian date.
 
 <br>
 
-```static DateTime FromJ2000(double JD)```
+### ```static DateTime FromJ2000(double JD)```
 
 #### Parameters
 

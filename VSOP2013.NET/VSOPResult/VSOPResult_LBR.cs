@@ -91,7 +91,9 @@
         /// p = sin(i/2)*sin(omega) (rd)
         /// </summary>
         public double dr { get => Variables_LBR[5]; }
-        #endregion
+
+        #endregion Elements
+
         public VSOPResult_XYZ ToXYZ()
         {
             return new VSOPResult_XYZ(this);

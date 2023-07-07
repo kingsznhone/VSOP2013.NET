@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Globalization;
-using VSOP2013;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Configs;
+using VSOP2013;
 
 namespace Demo
 {
@@ -27,7 +26,7 @@ namespace Demo
             DateTime.TryParse(inputT, culture, style, out dt);
             dt.ToUniversalTime();
             dt = dt.AddSeconds(-69.184);
-            VSOPTime vTime = new VSOPTime(dt,TimeFrame.UTC);
+            VSOPTime vTime = new VSOPTime(dt, TimeFrame.UTC);
             Console.WriteLine();
             Console.WriteLine("Start Substitution...");
 
@@ -56,7 +55,6 @@ namespace Demo
             //    FormattedPrint(xyz, vTime);
             //    FormattedPrint(lbr, vTime);
             //}
-
 
             Console.WriteLine("Press Enter to Start Performance Test...");
             Console.ReadLine();
@@ -167,6 +165,5 @@ namespace Demo
             Console.WriteLine();
             Console.ResetColor();
         }
-
     }
 }
