@@ -1,5 +1,8 @@
 # VSOP2013 .NET 
 
+[![NuGet package](https://img.shields.io/nuget/v/VSOP2013.NET.svg?logo=NuGet)](https://www.nuget.org/packages/VSOP2013.NET/)
+[![NuGet package](https://img.shields.io/nuget/dt/VSOP2013.NET?logo=NuGet)](https://www.nuget.org/packages/VSOP2013.NET/)
+
 ## What's this?
 
 VSOP was developed and is maintained (updated with the latest data) by the scientists at the Bureau des Longitudes in Paris.
@@ -153,6 +156,8 @@ Windows 10 64bit
 
 Provide methods to calculate planet position.
 
+#### Methods
+
 ### ```public double GetVariable(VSOPBody body,int iv, VSOPTime time)```
 
 Calculate a specific variable of  a planet.
@@ -281,11 +286,11 @@ Can be explicit cast to ```VSOPResult_XYZ``` and ```VSOPResult_LBR```
 
 ## Static Class Utility
 
-### Overview
-
 This Class Provide some useful function.
 
 <br>
+
+#### Methods
 
 ### ```static double[,] MultiplyMatrix(double[,] A, double[,] B)```
 
@@ -431,7 +436,7 @@ Array of cartesian coordinate elements that inertial frame of dynamical equinox 
 
 ## Class VSOPResult_XYZ : VSOPResult
 
-### Constructor
+#### Constructor
 
 ### ```VSOPResult_XYZ(VSOPResult_LBR result)```
 
@@ -457,7 +462,7 @@ Create a new Cartisian result from ellipitic result.
 
 <br>
 
-### Properties
+#### Properties
 
 ```VSOPBody Body { get; }```
 
@@ -527,7 +532,7 @@ Velocity z (au/day)
 
 <br>
 
-### Methods
+#### Methods
 
 ### ```VSOPResult_LBR ToLBR()```
 
@@ -538,7 +543,7 @@ Convert this result to Spherical coordinate.
 
 ## Class VSOPResult_ELL : VSOPResult
 
-### Constructor
+#### Constructor
 
 ### ```public VSOPResult_ELL(VSOPBody body, VSOPTime time, double[] ell)```
 
@@ -566,7 +571,7 @@ Raw result data from calculator.
 
 <br>
 
-### Properties
+#### Properties
 
 ```VSOPBody Body { get; }```
 
@@ -628,7 +633,7 @@ sin(i/2)*sin(omega) (rd)
 
 <br>
 
-### Methods
+#### Methods
 
 ### ```VSOPResult_XYZ ToXYZ()```
 
@@ -644,7 +649,7 @@ Convert this result to spherical coordinate.
 
 ## Class VSOPResult_LBR : VSOPResult
 
-### Constructor
+#### Constructor
 
 ### ```VSOPResult_LBR(VSOPResult_XYZ result)```
 
@@ -670,7 +675,7 @@ Create a new spherical result from ellipitic result.
 
 <br>
 
-### Properties
+#### Properties
 
 ```VSOPBody Body { get; }```
 
@@ -738,7 +743,7 @@ radius velocity (au/day)
 
 <br>
 
-### Methods
+#### Methods
 
 ### ```VSOPResult_XYZ ToXYZ()```
 
