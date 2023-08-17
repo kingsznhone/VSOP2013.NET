@@ -6,7 +6,6 @@ using VSOP2013;
 namespace Demo
 {
     [SimpleJob(RuntimeMoniker.Net70)]
-    [SimpleJob(RuntimeMoniker.Net60)]
     [MemoryDiagnoser]
     public class PerfTest
     {
@@ -35,7 +34,7 @@ namespace Demo
         }
 
         [Benchmark]
-        public VSOPResult GPU()
+        public VSOPResult CUDA()
         {
             var ell = vsop.GetPlanetPosition_CUDA(VSOPBody.JUPITER, vTime);
             return ell;

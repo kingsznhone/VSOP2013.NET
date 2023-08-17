@@ -89,13 +89,7 @@ namespace VSOP2013
         public Term[] Terms;
 
         [Key(5)]
-        public double[] AA;
-        [Key(6)]
-        public double[] BB;
-        [Key(7)]
-        public double[] SS;
-        [Key(8)]
-        public double[] CC;
+        public float[] AABBSSCC;
     }
 
     [MessagePackObject]

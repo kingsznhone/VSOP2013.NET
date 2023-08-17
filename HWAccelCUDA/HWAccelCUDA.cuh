@@ -9,16 +9,13 @@
 
 #ifdef DLL_EXPORT
 extern "C" {
-    DLLEXPORT void Legacy(int* in, int* out, int n);
-    DLLEXPORT void CUDA(double* AA,double* BB,double* SS ,double*CC, double* RR,int n, double tj,double tit);
-    DLLEXPORT double SUM(double* hIn, int n);
+    DLLEXPORT float CUDA(float* AABBSSCC, float* RR,int n, float tj, float tit);
+    DLLEXPORT void Init();
 }
 #else
 extern "C" {
-    DLLEXPORT void Legacy(int* in, int* out, int n);
-    DLLEXPORT void CUDA(double* AA, double* BB, double* SS, double* CC, double* RR, int n, double tj, double tit);
-    DLLEXPORT double SUM(double* hIn, int n);
-
+    DLLEXPORT float CUDA(float* AABBSSCC, float* RR, int n, float tj, float tit);
+    DLLEXPORT void Init();
 }
 #endif
 

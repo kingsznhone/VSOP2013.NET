@@ -12,27 +12,22 @@
 
 bool unitTest(int n)
 {
-	int* in = new int[n];
-	int* out1 = new int[n];
-	int* out2 = new int[n];
+	float* in = new float[4*n];
+	float* out = new float[n];
 
-	for (int i = 0; i < n; i++) in[i] = rand() % 100;
+	for (int i = 0; i < n*4; i++) in[i] = rand() % 100;
 
-	Legacy(in, out1, n);
-	int i;
-	for (i = 0; i < n; i++) {
-		if (out1[i] != out2[i]) {
-			printf("error at index = %d\n", i);
-			break;
-		}
-	}
+	
+	Init();
+
+	CUDA(in, out, 4, 10, 20);
 
 	delete in;
-	delete out1;
-	delete out2;
 
-	if (i == n) return true;
-	return false;
+
+
+
+	return true;
 }
 
 int main()

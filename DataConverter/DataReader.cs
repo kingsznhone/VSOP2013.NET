@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
 
 namespace VSOP2013.DataConverter
 {
@@ -117,23 +119,29 @@ namespace VSOP2013.DataConverter
                         ReadTerm(line, ref buffer[i]);
                     }
                     
-
-
-
                     Planet.variables[H.iv].PowerTables[H.it].iv = H.iv;
                     Planet.variables[H.iv].PowerTables[H.it].it = H.it;
                     Planet.variables[H.iv].PowerTables[H.it].Body = (VSOPBody)H.ip;
                     Planet.variables[H.iv].PowerTables[H.it].Terms = buffer;
 
-                    Planet.variables[H.iv].PowerTables[H.it].AA =
-                        Planet.variables[H.iv].PowerTables[H.it].Terms.Select(x => x.aa).ToArray();
-                    Planet.variables[H.iv].PowerTables[H.it].BB =
-                        Planet.variables[H.iv].PowerTables[H.it].Terms.Select(x => x.bb).ToArray();
-                    Planet.variables[H.iv].PowerTables[H.it].SS =
-                        Planet.variables[H.iv].PowerTables[H.it].Terms.Select(x => x.ss).ToArray();
-                    Planet.variables[H.iv].PowerTables[H.it].CC =
-                        Planet.variables[H.iv].PowerTables[H.it].Terms.Select(x => x.cc).ToArray();
-
+                    Planet.variables[H.iv].PowerTables[H.it].AABBSSCC =
+                            Planet.variables[H.iv].PowerTables[H.it].Terms.Select(x => (float)x.aa).ToArray()
+                    .Concat(Planet.variables[H.iv].PowerTables[H.it].Terms.Select(x => (float)x.bb).ToArray())
+                    .Concat(Planet.variables[H.iv].PowerTables[H.it].Terms.Select(x => (float)x.ss).ToArray())
+                    .Concat(Planet.variables[H.iv].PowerTables[H.it].Terms.Select(x => (float)x.cc).ToArray()).ToArray();
+                
+                    for(int i = 0; i < H.nt; i++)
+                    {
+                        Debug.Assert(Planet.variables[H.iv].PowerTables[H.it].AABBSSCC[i]
+                            ==(float) Planet.variables[H.iv].PowerTables[H.it].Terms[i].aa);
+                        Debug.Assert(Planet.variables[H.iv].PowerTables[H.it].AABBSSCC[H.nt+i]
+                            == (float)Planet.variables[H.iv].PowerTables[H.it].Terms[i].bb);
+                        Debug.Assert(Planet.variables[H.iv].PowerTables[H.it].AABBSSCC[2*H.nt+i]
+                            == (float)Planet.variables[H.iv].PowerTables[H.it].Terms[i].ss);
+                        Debug.Assert(Planet.variables[H.iv].PowerTables[H.it].AABBSSCC[3* H.nt+i]
+                            == (float)Planet.variables[H.iv].PowerTables[H.it].Terms[i].cc);
+                    }
+                
                 }
                 sr.Close();
             }

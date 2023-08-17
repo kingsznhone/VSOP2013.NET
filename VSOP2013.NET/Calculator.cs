@@ -12,15 +12,14 @@ namespace VSOP2013
 {
     public class Calculator
     {
-        [DllImport(@"Resources\HWAccelCUDA.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void Legacy(int[] a, int[] b, int n);
+
+        float[][] RR;
 
         [DllImport(@"Resources\HWAccelCUDA.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void CUDA(double[] AA, double[] BB, double[] SS, double[] CC ,double[] RR,
-            int n, double tj,double tit);
+        public static extern float CUDA(float[] AABBSSCC, float[] RR, int n, float tj, float tit);
 
         [DllImport(@"Resources\HWAccelCUDA.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern double SUM(double[] array,int length);
+        public static extern void Init();
 
         public List<PlanetTable> VSOP2013DATA;
 
@@ -58,6 +57,14 @@ namespace VSOP2013
             });
             VSOP2013DATA = VSOP2013DATA.OrderBy(x => x.body).ToList();
 
+            Init();
+
+            RR = new float[6][];
+            for (int i = 0; i < 6; i++)
+            {
+                RR[i] = new float[32768];
+            }
+
             GC.Collect();
             GC.WaitForPendingFinalizers();
         }
@@ -76,10 +83,9 @@ namespace VSOP2013
         public VSOPResult_ELL GetPlanetPosition_CUDA(VSOPBody body, VSOPTime time)
         {
             double[] ELL = new double[6];
-            ParallelLoopResult result = Parallel.For(0, 6, iv =>
-            {
+            for(int iv = 0; iv < 6; iv++) { 
                 ELL[iv] = GetVariable_CUDA(body, iv, time);
-            });
+            }
             VSOPResult_ELL Coordinate = new(body, time, ELL);
             return Coordinate;
         }
@@ -173,42 +179,41 @@ namespace VSOP2013
             double u, su, cu;
             double xl;
             Term[] terms;
+            
             for (int it = 0; it < Table.PowerTables.Length; it++)
             {
                 if (Table.PowerTables[it].Terms == null) continue;
                 terms = Table.PowerTables[it].Terms;
-
                 //Enter CUDA
-                double[] RR = new double[terms.Length];
-                
-                 CUDA(Table.PowerTables[it].AA, Table.PowerTables[it].BB, 
-                    Table.PowerTables[it].SS, Table.PowerTables[it].CC, 
-                    RR, terms.Length, tj, t[it]);
+                float sumofarray = CUDA(Table.PowerTables[it].AABBSSCC, RR[Table.iv], terms.Length, (float)tj, (float)t[it]);
+
+                //float sumCs = RR.Sum();
+                result_CUDA += sumofarray;
 #if NET6_0
-                result_CUDA += RR.Sum();
+
 #elif NET7_0
-                double R = 0;
-                Span<double> SR = new Span<double>(RR);
-                ref double ref_r = ref MemoryMarshal.GetReference<double>(SR);
-                Vector256<double> sum = new Vector256<double>();
-                int vectorSize = Vector256<double>.Count;
-                sum ^= sum;
-                int Offset = 0;
-                int SIMDLength = (SR.Length - vectorSize);
-                for (Offset = 0; Offset <= SIMDLength; Offset += vectorSize)
-                {
-                    var v1 = Vector256.LoadUnsafe(ref ref_r, (nuint)Offset);
-                    sum += v1;
-                }
-                result_CUDA += Vector256.Sum(sum);
-                for (; Offset < SR.Length; Offset++)
-                {
-                    result_CUDA += SR[Offset];
-                }
+                //double R = 0;
+                //Span<float> SR = new Span<float>(RR);
+                //ref float ref_r = ref MemoryMarshal.GetReference<float>(SR);
+                //Vector256<float> sum = new Vector256<float>();
+                //int vectorSize = Vector256<float>.Count;
+                //sum ^= sum;
+                //int Offset = 0;
+                //int SIMDLength = (SR.Length - vectorSize);
+                //for (Offset = 0; Offset <= SIMDLength; Offset += vectorSize)
+                //{
+                //    var v1 = Vector256.LoadUnsafe(ref ref_r, (nuint)Offset);
+                //    sum += v1;
+                //}
+                //result_CUDA += Vector256.Sum(sum);
+                //for (; Offset < SR.Length; Offset++)
+                //{
+                //    result_CUDA += SR[Offset];
+                //}
 
-                double CPU = RR.Sum();
+                //double CPU = RR.Sum();
 
-                //Debug.Assert(Math.Abs( GPU-CPU) < Math.Pow(10,-5) );  
+                ////Debug.Assert(Math.Abs( GPU-CPU) < Math.Pow(10,-5) );  
 #endif
             }
             if (Table.iv == 1)
