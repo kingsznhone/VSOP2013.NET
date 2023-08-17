@@ -1,11 +1,27 @@
-﻿using System.IO.Compression;
+﻿using System;
+using System.Diagnostics;
+using System.Diagnostics.Contracts;
+using System.IO.Compression;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Runtime.Intrinsics;
 using MessagePack;
 
 namespace VSOP2013
 {
     public class Calculator
     {
+        [DllImport(@"Resources\HWAccelCUDA.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void Legacy(int[] a, int[] b, int n);
+
+        [DllImport(@"Resources\HWAccelCUDA.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void CUDA(double[] AA, double[] BB, double[] SS, double[] CC ,double[] RR,
+            int n, double tj,double tit);
+
+        [DllImport(@"Resources\HWAccelCUDA.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern double SUM(double[] array,int length);
+
         public List<PlanetTable> VSOP2013DATA;
 
         /// <summary>
@@ -57,6 +73,17 @@ namespace VSOP2013
             return Coordinate;
         }
 
+        public VSOPResult_ELL GetPlanetPosition_CUDA(VSOPBody body, VSOPTime time)
+        {
+            double[] ELL = new double[6];
+            ParallelLoopResult result = Parallel.For(0, 6, iv =>
+            {
+                ELL[iv] = GetVariable_CUDA(body, iv, time);
+            });
+            VSOPResult_ELL Coordinate = new(body, time, ELL);
+            return Coordinate;
+        }
+
         public async Task<VSOPResult_ELL> GetPlanetPositionAsync(VSOPBody body, VSOPTime time)
         {
             return await Task.Run(() => GetPlanetPosition(body, time));
@@ -72,6 +99,11 @@ namespace VSOP2013
         public double GetVariable(VSOPBody body, int iv, VSOPTime time)
         {
             return Calculate(VSOP2013DATA[(int)body].variables[iv], time.J2000);
+        }
+
+        public double GetVariable_CUDA(VSOPBody body, int iv, VSOPTime time)
+        {
+            return Calculate_CUDA(VSOP2013DATA[(int)body].variables[iv], time.J2000);
         }
 
         public async Task<double> GetVariableAsync(VSOPBody body, int iv, VSOPTime time)
@@ -121,6 +153,72 @@ namespace VSOP2013
                 result = xl;
             }
             return result;
+        }
+
+        private double Calculate_CUDA(VariableTable Table, double JD2000)
+        {
+            //Thousand of Julian Years
+            double tj = JD2000 / a1000;
+
+            //Iteration on Time
+            Span<double> t = stackalloc double[21];
+            t[0] = 1.0d;
+            t[1] = tj;
+            for (int i = 2; i < 21; i++)
+            {
+                t[i] = t[1] * t[i - 1];
+            }
+
+            double result_CUDA = 0d;
+            double u, su, cu;
+            double xl;
+            Term[] terms;
+            for (int it = 0; it < Table.PowerTables.Length; it++)
+            {
+                if (Table.PowerTables[it].Terms == null) continue;
+                terms = Table.PowerTables[it].Terms;
+
+                //Enter CUDA
+                double[] RR = new double[terms.Length];
+                
+                 CUDA(Table.PowerTables[it].AA, Table.PowerTables[it].BB, 
+                    Table.PowerTables[it].SS, Table.PowerTables[it].CC, 
+                    RR, terms.Length, tj, t[it]);
+#if NET6_0
+                result_CUDA += RR.Sum();
+#elif NET7_0
+                double R = 0;
+                Span<double> SR = new Span<double>(RR);
+                ref double ref_r = ref MemoryMarshal.GetReference<double>(SR);
+                Vector256<double> sum = new Vector256<double>();
+                int vectorSize = Vector256<double>.Count;
+                sum ^= sum;
+                int Offset = 0;
+                int SIMDLength = (SR.Length - vectorSize);
+                for (Offset = 0; Offset <= SIMDLength; Offset += vectorSize)
+                {
+                    var v1 = Vector256.LoadUnsafe(ref ref_r, (nuint)Offset);
+                    sum += v1;
+                }
+                result_CUDA += Vector256.Sum(sum);
+                for (; Offset < SR.Length; Offset++)
+                {
+                    result_CUDA += SR[Offset];
+                }
+
+                double CPU = RR.Sum();
+
+                //Debug.Assert(Math.Abs( GPU-CPU) < Math.Pow(10,-5) );  
+#endif
+            }
+            if (Table.iv == 1)
+            {
+                xl = result_CUDA + freqpla[(int)Table.Body] * tj;
+                xl %= Math.Tau;
+                if (xl < 0) xl += Math.Tau;
+                result_CUDA = xl;
+            }
+            return result_CUDA;
         }
     }
 }

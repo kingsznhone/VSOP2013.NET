@@ -116,11 +116,24 @@ namespace VSOP2013.DataConverter
                         line = sr.ReadLine();
                         ReadTerm(line, ref buffer[i]);
                     }
+                    
+
+
 
                     Planet.variables[H.iv].PowerTables[H.it].iv = H.iv;
                     Planet.variables[H.iv].PowerTables[H.it].it = H.it;
                     Planet.variables[H.iv].PowerTables[H.it].Body = (VSOPBody)H.ip;
                     Planet.variables[H.iv].PowerTables[H.it].Terms = buffer;
+
+                    Planet.variables[H.iv].PowerTables[H.it].AA =
+                        Planet.variables[H.iv].PowerTables[H.it].Terms.Select(x => x.aa).ToArray();
+                    Planet.variables[H.iv].PowerTables[H.it].BB =
+                        Planet.variables[H.iv].PowerTables[H.it].Terms.Select(x => x.bb).ToArray();
+                    Planet.variables[H.iv].PowerTables[H.it].SS =
+                        Planet.variables[H.iv].PowerTables[H.it].Terms.Select(x => x.ss).ToArray();
+                    Planet.variables[H.iv].PowerTables[H.it].CC =
+                        Planet.variables[H.iv].PowerTables[H.it].Terms.Select(x => x.cc).ToArray();
+
                 }
                 sr.Close();
             }

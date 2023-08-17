@@ -15,7 +15,22 @@ VSOP2013, computed the positions of the planets directly at any moment, as well 
 	  <PackageProjectUrl>https://github.com/kingsznhone/VSOP2013.NET</PackageProjectUrl>
 	  <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 	  <Title>VSOP2013.NET</Title>
+	  <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\cudart64_12.dll" />
+    <None Remove="Resources\HWAccelCUDA.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Resources\cudart64_12.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\HWAccelCUDA.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\VSOP2013_EMB.BIN" />

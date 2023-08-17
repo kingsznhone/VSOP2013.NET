@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataConverter", "DataConverter\DataConverter.csproj", "{2A5C5EFE-C49F-436A-9FC1-176AE11E0334}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HWAccelCUDA", "HWAccelCUDA\HWAccelCUDA.vcxproj", "{B0E5119A-9CF1-48F9-BC21-3212604C6164}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -31,6 +33,10 @@ Global
 		{2A5C5EFE-C49F-436A-9FC1-176AE11E0334}.Debug|x64.ActiveCfg = Debug|x64
 		{2A5C5EFE-C49F-436A-9FC1-176AE11E0334}.Debug|x64.Build.0 = Debug|x64
 		{2A5C5EFE-C49F-436A-9FC1-176AE11E0334}.Release|x64.ActiveCfg = Release|x64
+		{B0E5119A-9CF1-48F9-BC21-3212604C6164}.Debug|x64.ActiveCfg = Debug|x64
+		{B0E5119A-9CF1-48F9-BC21-3212604C6164}.Debug|x64.Build.0 = Debug|x64
+		{B0E5119A-9CF1-48F9-BC21-3212604C6164}.Release|x64.ActiveCfg = Release|x64
+		{B0E5119A-9CF1-48F9-BC21-3212604C6164}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
+using System.Runtime.InteropServices;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
 using VSOP2013;
 
@@ -7,11 +10,18 @@ namespace Demo
 {
     internal class Program
     {
+
+        [DllImport(@"HWAccelCUDA.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern double SUM(double[] array, int length);
+
         private static Calculator vsop;
 
         private static void Main(string[] args)
         {
+            string frameworkDescription = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription;
+            Console.WriteLine($"Current .NET Framework Description: {frameworkDescription}");
             vsop = new Calculator();
+
             //Console.WriteLine("Parse UTC string that conforms to ISO 8601:  2018-08-18T07:22:16.0000000Z");
 
             //Parse Time
@@ -20,7 +30,7 @@ namespace Demo
             //    Console.Write("Input Time As UTC:");
             //    //string inputT = Console.ReadLine();
             DateTime dt = DateTime.Now.ToUniversalTime();
-            string inputT = "2000-01-01T12:00:00.0000000Z";
+            string inputT = "1500-01-01T12:00:00.0000000Z";
             CultureInfo culture = CultureInfo.CreateSpecificCulture("en-US");
             DateTimeStyles style = DateTimeStyles.AdjustToUniversal;
             DateTime.TryParse(inputT, culture, style, out dt);
@@ -31,12 +41,17 @@ namespace Demo
             Console.WriteLine("Start Substitution...");
 
             VSOPResult_ELL ell;
+            VSOPResult_ELL ell_CUDA;
+
             VSOPResult_XYZ xyz;
             VSOPResult_LBR lbr;
 
             ell = vsop.GetPlanetPosition(VSOPBody.EMB, vTime);
+            ell_CUDA = vsop.GetPlanetPosition_CUDA(VSOPBody.EMB, vTime);
             FormattedPrint(ell, vTime);
+            FormattedPrint(ell_CUDA, vTime);
 
+            Console.ReadLine();
             xyz = ell.ToXYZ();
             FormattedPrint(xyz, vTime);
             xyz.ReferenceFrame = ReferenceFrame.ICRSJ2000;
@@ -46,15 +61,16 @@ namespace Demo
             FormattedPrint(lbr, vTime);
             lbr.ReferenceFrame = ReferenceFrame.ICRSJ2000;
             FormattedPrint(lbr, vTime);
-            //foreach(VSOPBody body in Enum.GetValues(typeof(VSOPBody)))
-            //{
-            //    ell = vsop.GetPlanetPosition(body, vTime);
-            //    xyz = (VSOPResult_XYZ)ell;
-            //    lbr = (VSOPResult_LBR)ell;
-            //    FormattedPrint(ell, vTime);
-            //    FormattedPrint(xyz, vTime);
-            //    FormattedPrint(lbr, vTime);
-            //}
+            foreach (VSOPBody body in Enum.GetValues(typeof(VSOPBody)))
+            {
+                ell = vsop.GetPlanetPosition_CUDA(body, vTime);
+                ell = vsop.GetPlanetPosition(body, vTime);
+                xyz = ell.ToXYZ();
+                lbr = ell.ToLBR();
+                FormattedPrint(ell, vTime);
+                FormattedPrint(xyz, vTime);
+                FormattedPrint(lbr, vTime);
+            }
 
             Console.WriteLine("Press Enter to Start Performance Test...");
             Console.ReadLine();
