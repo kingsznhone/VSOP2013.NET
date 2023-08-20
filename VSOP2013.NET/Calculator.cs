@@ -121,8 +121,7 @@ namespace VSOP2013
         /// <returns>Elliptic Elements</returns>
         private double Calculate(VariableTable Table, double JD2000)
         {
-            
-
+            double result = 0d; 
             //Thousand of Julian Years
             double tj = JD2000 / a1000;
 
@@ -134,25 +133,22 @@ namespace VSOP2013
             {
                 t[i] = t[1] * t[i - 1];
             }
-
-            double result = 0d;
-            double u, su, cu;
-            double xl;
-            Term[] terms;
+           
             for (int it = 0; it < Table.PowerTables.Length; it++)
             {
                 if (Table.PowerTables[it].Terms == null) continue;
-                terms = Table.PowerTables[it].Terms;
+                Term[] terms = Table.PowerTables[it].Terms;
                 for (int n = 0; n < terms.Length; n++)
                 {
-                    u = terms[n].aa + terms[n].bb * tj;
+                    double su, cu;
+                    double u = terms[n].aa + terms[n].bb * tj;
                     (su, cu) = Math.SinCos(u);
                     result += t[it] * (terms[n].ss * su + terms[n].cc * cu);
                 }
             }
             if (Table.iv == 1)
             {
-                xl = result + freqpla[(int)Table.Body] * tj;
+                double xl = result + freqpla[(int)Table.Body] * tj;
                 xl %= Math.Tau;
                 if (xl < 0) xl += Math.Tau;
                 result = xl;
@@ -181,7 +177,7 @@ namespace VSOP2013
             }
 
             double result = 0d;
-            double u, su, cu;
+            double su, cu;
             double xl;
             Term[] terms;
             Vector256<double> sum = new Vector256<double>();
@@ -212,6 +208,7 @@ namespace VSOP2013
                 int SIMDLength = (TableSize - vectorSize);
                 int Offset = 0;
                 double tit = t[it];
+
                 //u=aa+bb*tj;
                 for (Offset = 0; Offset <= SIMDLength; Offset += vectorSize)
                 {
@@ -239,7 +236,7 @@ namespace VSOP2013
                     var vsu = Vector256.LoadUnsafe(ref ref_su, (nuint)Offset);
                     var vcc = Vector256.LoadUnsafe(ref ref_cc, (nuint)Offset);
                     var vcu = Vector256.LoadUnsafe(ref ref_cu, (nuint)Offset);
-                    (tit*((vss*vsu)+(vcc*vcu))).StoreUnsafe(ref ref_rr, (nuint)Offset);
+                    (tit * ((vss * vsu) + (vcc * vcu))).StoreUnsafe(ref ref_rr, (nuint)Offset);
                 }
                 for (; Offset < TableSize; Offset++)
                 {

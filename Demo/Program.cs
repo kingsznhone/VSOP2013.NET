@@ -52,20 +52,25 @@ namespace Demo
             //FormattedPrint(lbr, vTime);
             //lbr.ReferenceFrame = ReferenceFrame.ICRSJ2000;
             //FormattedPrint(lbr, vTime);
-            foreach (VSOPBody body in Enum.GetValues(typeof(VSOPBody)))
+            for (int i = 0; i < 100; i++)
             {
-                ell = vsop.GetPlanetPosition(body, vTime);
-                FormattedPrint(ell, vTime);
-                ell = vsop.GetPlanetPosition_SIMD(body, vTime);
-                FormattedPrint(ell, vTime);
-                //xyz = ell.ToXYZ();
-                //lbr = ell.ToLBR();
-                //FormattedPrint(xyz, vTime);
-                //FormattedPrint(lbr, vTime);
+                foreach (VSOPBody body in Enum.GetValues(typeof(VSOPBody)))
+                {
+                    ell = vsop.GetPlanetPosition(body, vTime);
+                    //FormattedPrint(ell, vTime);
+                    ell = vsop.GetPlanetPosition_SIMD(body, vTime);
+                    //FormattedPrint(ell, vTime);
+                    //xyz = ell.ToXYZ();
+                    //lbr = ell.ToLBR();
+                    //FormattedPrint(xyz, vTime);
+                    //FormattedPrint(lbr, vTime);
+                }
+
             }
 
             Console.WriteLine("Press Enter to Start Performance Test...");
             Console.ReadLine();
+            return;
 #if DEBUG
             var summary = BenchmarkRunner.Run<PerfTest>(new DebugBuildConfig());
 #else
