@@ -1,6 +1,8 @@
 ﻿using System.IO.Compression;
 using System.Numerics;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Runtime.Intrinsics;
 using MessagePack;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -12,19 +14,7 @@ namespace VSOP2013
         double[][] cu_collection = new double[6][];
         double[][] su_collection = new double[6][];
         double[][] rr_collection = new double[6][];
-
-
         public readonly int vectorSize = Vector256<double>.Count;
-
-        [DllImport(@"Resources\HWAccelCUDA.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void Legacy(int[] a, int[] b, int n);
-
-        [DllImport(@"Resources\HWAccelCUDA.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void CUDA(double[] AA, double[] BB, double[] SS, double[] CC ,double[] RR,
-            int n, double tj,double tit);
-
-        [DllImport(@"Resources\HWAccelCUDA.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern double SUM(double[] array,int length);
 
         public List<PlanetTable> VSOP2013DATA;
 
@@ -70,11 +60,6 @@ namespace VSOP2013
                 rr_collection[i] = new double[32768];
             }
 
-            //int maxlength =
-            //    VSOP2013DATA.SelectMany(x => x.variables).SelectMany(x => x.PowerTables).Select(x => x.Terms.Length).Max();
-            //Console.WriteLine($"Max count: {maxlength}");
-
-
             GC.Collect();
             GC.WaitForPendingFinalizers();
         }
@@ -89,6 +74,18 @@ namespace VSOP2013
             VSOPResult_ELL Coordinate = new(body, time, ELL);
             return Coordinate;
         }
+
+        public VSOPResult_ELL GetPlanetPosition_SIMD(VSOPBody body, VSOPTime time)
+        {
+            double[] ELL = new double[6];
+            ParallelLoopResult result = Parallel.For(0, 6, iv =>
+            {
+                ELL[iv] = GetVariable_SIMD(body, iv, time);
+            });
+            VSOPResult_ELL Coordinate = new(body, time, ELL);
+            return Coordinate;
+        }
+
 
         public async Task<VSOPResult_ELL> GetPlanetPositionAsync(VSOPBody body, VSOPTime time)
         {
@@ -105,11 +102,6 @@ namespace VSOP2013
         public double GetVariable(VSOPBody body, int iv, VSOPTime time)
         {
             return Calculate(VSOP2013DATA[(int)body].variables[iv], time.J2000);
-        }
-
-        public double GetVariable_CUDA(VSOPBody body, int iv, VSOPTime time)
-        {
-            return Calculate_CUDA(VSOP2013DATA[(int)body].variables[iv], time.J2000);
         }
 
         public double GetVariable_SIMD(VSOPBody body, int iv, VSOPTime time)

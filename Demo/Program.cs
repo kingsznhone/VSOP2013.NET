@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
 using VSOP2013;
 
