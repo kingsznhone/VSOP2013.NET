@@ -32,5 +32,12 @@ namespace Demo
             var ell = vsop.GetPlanetPosition(VSOPBody.JUPITER, vTime);
             return ell;
         }
+
+        [Benchmark]
+        public VSOPResult SIMD()
+        {
+            var ell = vsop.GetPlanetPosition_SIMD(VSOPBody.JUPITER, vTime);
+            return ell;
+        }
     }
 }

@@ -1,11 +1,31 @@
 ﻿using System.IO.Compression;
+using System.Numerics;
 using System.Reflection;
 using MessagePack;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace VSOP2013
 {
     public class Calculator
     {
+        double[][] u_collection = new double[6][];
+        double[][] cu_collection = new double[6][];
+        double[][] su_collection = new double[6][];
+        double[][] rr_collection = new double[6][];
+
+
+        public readonly int vectorSize = Vector256<double>.Count;
+
+        [DllImport(@"Resources\HWAccelCUDA.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void Legacy(int[] a, int[] b, int n);
+
+        [DllImport(@"Resources\HWAccelCUDA.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void CUDA(double[] AA, double[] BB, double[] SS, double[] CC ,double[] RR,
+            int n, double tj,double tit);
+
+        [DllImport(@"Resources\HWAccelCUDA.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern double SUM(double[] array,int length);
+
         public List<PlanetTable> VSOP2013DATA;
 
         /// <summary>
@@ -42,6 +62,19 @@ namespace VSOP2013
             });
             VSOP2013DATA = VSOP2013DATA.OrderBy(x => x.body).ToList();
 
+            for (int i = 0; i < 6; i++)
+            {
+                u_collection[i] = new double[32768];
+                cu_collection[i] = new double[32768];
+                su_collection[i] = new double[32768];
+                rr_collection[i] = new double[32768];
+            }
+
+            //int maxlength =
+            //    VSOP2013DATA.SelectMany(x => x.variables).SelectMany(x => x.PowerTables).Select(x => x.Terms.Length).Max();
+            //Console.WriteLine($"Max count: {maxlength}");
+
+
             GC.Collect();
             GC.WaitForPendingFinalizers();
         }
@@ -74,6 +107,16 @@ namespace VSOP2013
             return Calculate(VSOP2013DATA[(int)body].variables[iv], time.J2000);
         }
 
+        public double GetVariable_CUDA(VSOPBody body, int iv, VSOPTime time)
+        {
+            return Calculate_CUDA(VSOP2013DATA[(int)body].variables[iv], time.J2000);
+        }
+
+        public double GetVariable_SIMD(VSOPBody body, int iv, VSOPTime time)
+        {
+            return Calculate_SIMD(VSOP2013DATA[(int)body].variables[iv], time.J2000);
+        }
+
         public async Task<double> GetVariableAsync(VSOPBody body, int iv, VSOPTime time)
         {
             return await Task.Run(() => GetVariable(body, iv, time));
@@ -86,6 +129,8 @@ namespace VSOP2013
         /// <returns>Elliptic Elements</returns>
         private double Calculate(VariableTable Table, double JD2000)
         {
+            
+
             //Thousand of Julian Years
             double tj = JD2000 / a1000;
 
@@ -113,6 +158,119 @@ namespace VSOP2013
                     result += t[it] * (terms[n].ss * su + terms[n].cc * cu);
                 }
             }
+            if (Table.iv == 1)
+            {
+                xl = result + freqpla[(int)Table.Body] * tj;
+                xl %= Math.Tau;
+                if (xl < 0) xl += Math.Tau;
+                result = xl;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="Table"></param>
+        /// <param name="JD2000"></param>
+        /// <returns>Elliptic Elements</returns>
+        private double Calculate_SIMD(VariableTable Table, double JD2000)
+        {
+            //Thousand of Julian Years
+            double tj = JD2000 / a1000;
+
+            int iv = Table.iv;
+            //Iteration on Time
+            Span<double> t = stackalloc double[21];
+            t[0] = 1.0d;
+            t[1] = tj;
+            for (int i = 2; i < 21; i++)
+            {
+                t[i] = t[1] * t[i - 1];
+            }
+
+            double result = 0d;
+            double u, su, cu;
+            double xl;
+            Term[] terms;
+            Vector256<double> sum = new Vector256<double>();
+
+            Span<double> span_u = new Span<double>(u_collection[iv]);
+            Span<double> span_cu = new Span<double>(cu_collection[iv]);
+            Span<double> span_su = new Span<double>(su_collection[iv]);
+            Span<double> span_rr = new Span<double>(rr_collection[iv]);
+            ref double ref_u = ref MemoryMarshal.GetReference<double>(u_collection[iv]);
+            ref double ref_cu = ref MemoryMarshal.GetReference<double>(cu_collection[iv]);
+            ref double ref_su = ref MemoryMarshal.GetReference<double>(su_collection[iv]);
+            ref double ref_rr = ref MemoryMarshal.GetReference<double>(rr_collection[iv]);
+
+            for (int it = 0; it < Table.PowerTables.Length; it++)
+            {
+                if (Table.PowerTables[it].Terms == null) continue;
+                Span<double> span_aa = Table.PowerTables[it].AA;
+                Span<double> span_bb = Table.PowerTables[it].BB;
+                Span<double> span_ss = Table.PowerTables[it].SS;
+                Span<double> span_cc = Table.PowerTables[it].CC;
+
+                ref double ref_aa = ref MemoryMarshal.GetReference<double>(Table.PowerTables[it].AA);
+                ref double ref_bb = ref MemoryMarshal.GetReference<double>(Table.PowerTables[it].BB);
+                ref double ref_ss = ref MemoryMarshal.GetReference<double>(Table.PowerTables[it].SS);
+                ref double ref_cc = ref MemoryMarshal.GetReference<double>(Table.PowerTables[it].CC);
+
+                int TableSize = Table.PowerTables[it].Terms.Length;
+                int SIMDLength = (TableSize - vectorSize);
+                int Offset = 0;
+                double tit = t[it];
+                //u=aa+bb*tj;
+                for (Offset = 0; Offset <= SIMDLength; Offset += vectorSize)
+                {
+                    var va = Vector256.LoadUnsafe(ref ref_aa, (nuint)Offset);
+                    var vb = Vector256.LoadUnsafe(ref ref_bb, (nuint)Offset);
+                    (va+(vb * tj)).StoreUnsafe(ref ref_u, (nuint)Offset);
+                }
+                for (; Offset < TableSize; Offset++)
+                {
+                    span_u[Offset] = span_aa[Offset]+(span_bb[Offset] * tj) ;
+                }
+
+
+                //(su, cu) = Math.SinCos(u);
+                for (Offset = 0; Offset < TableSize; Offset++)
+                {
+                    span_su[Offset] = Math.Sin(span_u[Offset]);
+                    span_cu[Offset] = Math.Cos(span_u[Offset]);
+                }
+
+                //rr = t[it] * (ss * su + cc * cu);
+                for (Offset = 0; Offset <= SIMDLength; Offset += vectorSize)
+                {
+                    var vss = Vector256.LoadUnsafe(ref ref_ss, (nuint)Offset);
+                    var vsu = Vector256.LoadUnsafe(ref ref_su, (nuint)Offset);
+                    var vcc = Vector256.LoadUnsafe(ref ref_cc, (nuint)Offset);
+                    var vcu = Vector256.LoadUnsafe(ref ref_cu, (nuint)Offset);
+                    (tit*((vss*vsu)+(vcc*vcu))).StoreUnsafe(ref ref_rr, (nuint)Offset);
+                }
+                for (; Offset < TableSize; Offset++)
+                {
+                    span_rr[Offset] = tit * ((span_ss[Offset] * span_su[Offset]) + (span_cc[Offset] * span_cu[Offset]));
+                }
+
+#if NET6_0
+                result += span_rr.ToArray().Sum();
+#elif NET7_0
+                sum ^= sum;
+                for (Offset = 0; Offset <= SIMDLength; Offset += vectorSize)
+                {
+                    var v1 = Vector256.LoadUnsafe(ref ref_rr, (nuint)Offset);
+                    sum += v1;
+                }
+                result += Vector256.Sum(sum);
+                for (; Offset < TableSize; Offset++)
+                {
+                    result += span_rr[Offset];
+                }
+#endif
+            }
+
             if (Table.iv == 1)
             {
                 xl = result + freqpla[(int)Table.Body] * tj;

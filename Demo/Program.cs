@@ -34,27 +34,34 @@ namespace Demo
             VSOPResult_XYZ xyz;
             VSOPResult_LBR lbr;
 
-            ell = vsop.GetPlanetPosition(VSOPBody.EMB, vTime);
-            FormattedPrint(ell, vTime);
+            Console.ReadLine();
 
-            xyz = ell.ToXYZ();
-            FormattedPrint(xyz, vTime);
-            xyz.ReferenceFrame = ReferenceFrame.ICRSJ2000;
-            FormattedPrint(xyz, vTime);
+            //ell = vsop.GetPlanetPosition(VSOPBody.EMB, vTime);
+            //ell_CUDA = vsop.GetPlanetPosition_CUDA(VSOPBody.EMB, vTime);
+            //FormattedPrint(ell, vTime);
+            //FormattedPrint(ell_CUDA, vTime);
 
-            lbr = ell.ToLBR();
-            FormattedPrint(lbr, vTime);
-            lbr.ReferenceFrame = ReferenceFrame.ICRSJ2000;
-            FormattedPrint(lbr, vTime);
-            //foreach(VSOPBody body in Enum.GetValues(typeof(VSOPBody)))
-            //{
-            //    ell = vsop.GetPlanetPosition(body, vTime);
-            //    xyz = (VSOPResult_XYZ)ell;
-            //    lbr = (VSOPResult_LBR)ell;
-            //    FormattedPrint(ell, vTime);
-            //    FormattedPrint(xyz, vTime);
-            //    FormattedPrint(lbr, vTime);
-            //}
+            //Console.ReadLine();
+            //xyz = ell.ToXYZ();
+            //FormattedPrint(xyz, vTime);
+            //xyz.ReferenceFrame = ReferenceFrame.ICRSJ2000;
+            //FormattedPrint(xyz, vTime);
+
+            //lbr = ell.ToLBR();
+            //FormattedPrint(lbr, vTime);
+            //lbr.ReferenceFrame = ReferenceFrame.ICRSJ2000;
+            //FormattedPrint(lbr, vTime);
+            foreach (VSOPBody body in Enum.GetValues(typeof(VSOPBody)))
+            {
+                ell = vsop.GetPlanetPosition(body, vTime);
+                FormattedPrint(ell, vTime);
+                ell = vsop.GetPlanetPosition_SIMD(body, vTime);
+                FormattedPrint(ell, vTime);
+                //xyz = ell.ToXYZ();
+                //lbr = ell.ToLBR();
+                //FormattedPrint(xyz, vTime);
+                //FormattedPrint(lbr, vTime);
+            }
 
             Console.WriteLine("Press Enter to Start Performance Test...");
             Console.ReadLine();
