@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using System.Runtime.Intrinsics;
 
 namespace VSOP2013
 {
@@ -85,6 +86,24 @@ namespace VSOP2013
             //Sin(θ) = Cos(b), Cos(θ) = Sin(b)
             b = Math.Asin(z / r);
 
+
+#if NET7_0
+            #region vector matrix mul
+            if (Vector256.IsHardwareAccelerated)
+            {
+                Vector256<double> v1 = Vector256.Create(x / r, y / r, z / r, 0);
+                Vector256<double> v2 = Vector256.Create(x * z / (r * r * Math.Sqrt(x * x + y * y)), y * z / (r * r * Math.Sqrt(x * x + y * y)), -(x * x + y * y) / (r * r * Math.Sqrt(x * x + y * y)), 0);
+                Vector256<double> v3 = Vector256.Create(-y / (x * x + y * y), x / (x * x + y * y), 0, 0);
+                Vector256<double> vv = Vector256.Create(dx, dy, dz, 0);
+
+                lbr[3] = Vector256.Sum(vv * v1);
+                lbr[4] = Vector256.Sum(vv * v2);
+                lbr[5] = Vector256.Sum(vv * v3);
+                return lbr.ToArray();
+            }
+            #endregion
+#endif
+
             // Inverse Jacobian matrix  From  Caridnal to Sperical
             //https://en.wikipedia.org/wiki/Spherical_coordinate_system#Integration_and_differentiation_in_spherical_coordinates
             double[,] J_1 = {
@@ -133,6 +152,23 @@ namespace VSOP2013
             y = r * Math.Cos(b) * Math.Sin(l);
             z = r * Math.Sin(b);
 
+
+#if NET7_0
+            #region vector matrix mul
+            if (Vector256.IsHardwareAccelerated)
+            {
+                Vector256<double> v1 = Vector256.Create(Math.Cos(b) * Math.Cos(l), r * Math.Sin(b) * Math.Cos(l), -r * Math.Cos(b) * Math.Sin(l), 0);
+                Vector256<double> v2 = Vector256.Create(Math.Cos(b) * Math.Sin(l), r * Math.Sin(b) * Math.Sin(l), r * Math.Cos(b) * Math.Cos(l), 0);
+                Vector256<double> v3 = Vector256.Create(Math.Sin(b), -r * Math.Cos(b), 0, 0);
+                Vector256<double> vv = Vector256.Create(dr, db, dl, 0);
+
+                xyz[3] = Vector256.Sum(vv * v1);
+                xyz[4] = Vector256.Sum(vv * v2);
+                xyz[5] = Vector256.Sum(vv * v3);
+                return xyz.ToArray();
+            }
+            #endregion
+#endif
             // Jacobian matrix From Sperical to Caridnal
             //https://en.wikipedia.org/wiki/Spherical_coordinate_system#Integration_and_differentiation_in_spherical_coordinates
             double[,] J = {
@@ -257,6 +293,29 @@ namespace VSOP2013
             Sphi = Math.Sin(phi);
             Cphi = Math.Cos(phi);
 
+
+#if NET7_0
+            #region vector matrix mul
+            if (Vector256.IsHardwareAccelerated)
+            {
+                Vector256<double> v1 = Vector256.Create(Cphi, -Sphi * Ceps, Sphi * Seps, 0);
+                Vector256<double> v2 = Vector256.Create(Sphi, Cphi * Ceps, -Cphi * Seps, 0);
+                Vector256<double> v3 = Vector256.Create(0, Seps, Ceps, 0);
+                Vector256<double> vv = Vector256.Create(dynamical[0], dynamical[1], dynamical[2], 0);
+                Vector256<double> vv2 = Vector256.Create(dynamical[3], dynamical[4], dynamical[5], 0);
+
+                icrs[0] = Vector256.Sum(vv * v1);
+                icrs[1] = Vector256.Sum(vv * v2);
+                icrs[2] = Vector256.Sum(vv * v3);
+
+                icrs[3] = Vector256.Sum(vv2 * v1);
+                icrs[4] = Vector256.Sum(vv2 * v2);
+                icrs[5] = Vector256.Sum(vv2 * v3);
+                return icrs.ToArray();
+            }
+            #endregion
+#endif
+
             //Rotation Matrix
             double[,] R = new double[,] { {Cphi, -Sphi*Ceps,  Sphi*Seps },
                                           {Sphi,  Cphi*Ceps, -Cphi*Seps },
@@ -269,20 +328,20 @@ namespace VSOP2013
 
             double[,] C = MultiplyMatrix(R, A);
 
-            dynamical[0] = C[0, 0];
-            dynamical[1] = C[1, 0];
-            dynamical[2] = C[2, 0];
+            icrs[0] = C[0, 0];
+            icrs[1] = C[1, 0];
+            icrs[2] = C[2, 0];
 
             A = new double[,] { {dynamical[3]},
                                 {dynamical[4]},
                                 {dynamical[5]}};
 
             C = MultiplyMatrix(R, A);
-            dynamical[3] = C[0, 0];
-            dynamical[4] = C[1, 0];
-            dynamical[5] = C[2, 0];
+            icrs[3] = C[0, 0];
+            icrs[4] = C[1, 0];
+            icrs[5] = C[2, 0];
 
-            return dynamical.ToArray();
+            return icrs.ToArray();
         }
 
         /// <summary>
@@ -304,6 +363,29 @@ namespace VSOP2013
             Ceps = Math.Cos(eps);
             Sphi = Math.Sin(phi);
             Cphi = Math.Cos(phi);
+
+
+#if NET7_0
+            #region vector matrix mul
+            if (Vector256.IsHardwareAccelerated)
+            {
+                Vector256<double> v1 = Vector256.Create(Cphi, Sphi, 0, 0);
+                Vector256<double> v2 = Vector256.Create(-Sphi * Ceps, Cphi * Ceps, Seps, 0);
+                Vector256<double> v3 = Vector256.Create(Sphi * Seps, -Cphi * Seps, Ceps, 0);
+                Vector256<double> vv = Vector256.Create(icrs[0], icrs[1], icrs[2], 0);
+                Vector256<double> vv2 = Vector256.Create(icrs[3], icrs[4], icrs[5], 0);
+
+                dynamical[0] = Vector256.Sum(vv * v1);
+                dynamical[1] = Vector256.Sum(vv * v2);
+                dynamical[2] = Vector256.Sum(vv * v3);
+
+                dynamical[3] = Vector256.Sum(vv2 * v1);
+                dynamical[4] = Vector256.Sum(vv2 * v2);
+                dynamical[5] = Vector256.Sum(vv2 * v3);
+                return dynamical.ToArray();
+            }
+            #endregion
+#endif
 
             //Reverse Matrix
             double[,] R_1 = new double[,] {{ Cphi,       Sphi,      0    },

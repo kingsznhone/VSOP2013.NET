@@ -38,6 +38,7 @@
 
         public VSOPResult_XYZ(VSOPResult_LBR result)
         {
+            Variables_ELL = result.Variables_ELL;
             _coordinatesReference = result.CoordinatesReference;
             _referenceFrame = result.ReferenceFrame;
             Body = result.Body;
@@ -47,6 +48,7 @@
 
         public VSOPResult_XYZ(VSOPResult_ELL result)
         {
+            Variables_ELL = result.Variables_ELL;
             _coordinatesReference = result.CoordinatesReference;
             _referenceFrame = result.ReferenceFrame;
             Body = result.Body;

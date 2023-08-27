@@ -96,6 +96,12 @@ Console.WriteLine("=============================================================
 
 ## Change Log
 
+### 2023.9.3 v1.1.6
+
+SIMD Accel Utility. 
+
+Bug Fix
+
 ### 2023.7.7 v1.1.5
 
 Bug Fix.
