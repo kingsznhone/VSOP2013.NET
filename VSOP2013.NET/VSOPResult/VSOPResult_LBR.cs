@@ -44,6 +44,7 @@
         /// <param name="ell">Elliptic elements</param>
         public VSOPResult_LBR(VSOPResult_ELL result)
         {
+            Variables_ELL = result.Variables_ELL;
             _coordinatesReference = result.CoordinatesReference;
             _referenceFrame = result.ReferenceFrame;
             Body = result.Body;
@@ -53,6 +54,7 @@
 
         public VSOPResult_LBR(VSOPResult_XYZ result)
         {
+            Variables_ELL = result.Variables_ELL;
             _coordinatesReference = result.CoordinatesReference;
             _referenceFrame = result.ReferenceFrame;
             Body = result.Body;
