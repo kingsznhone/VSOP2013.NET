@@ -66,18 +66,22 @@ using VSOP2013;
 
 Calculator vsop = new Calculator();
 
-//Create VSOPTime using UTC .
+// Create VSOPTime using UTC .
 DateTime Tinput = DateTime.Now;
 VSOPTime vTime = new VSOPTime(Tinput.ToUniversalTime(),TimeFrame.UTC);
 
-//Calculate EMB's present position
+// Calculate EMB's present position
 VSOPResult_ELL ell = vsop.GetPlanetPosition(VSOPBody.EMB, vTime);
 
-//Convert to diffirent coordinate system.
+// Convert to diffirent coordinate system.
 VSOPResult_XYZ xyz=ell.ToXYZ();
 VSOPResult_LBR lbr=ell.ToLBR();
 
-//Print result
+// OR
+xyz = (VSOPResult_XYZ)ell;
+lbr = (VSOPResult_LBR)ell;
+
+// Print result
 Console.WriteLine($"Body: {Enum.GetName(ell.Body)}");
 Console.WriteLine($"Coordinates Type: {Enum.GetName(ell.CoordinatesType)}");
 Console.WriteLine($"Coordinates Reference: {Enum.GetName(ell.CoordinatesReference)}");
@@ -95,6 +99,12 @@ Console.WriteLine("=============================================================
 ```
 
 ## Change Log
+
+### 2023.12.13 v1.1.7
+
+Bug fix.
+
+Add explicit cast of VSOPResult
 
 ### 2023.9.3 v1.1.6
 
@@ -114,7 +124,7 @@ Many  improvements.
 
 Some of them are from VSOP87.NET
 
-### 2023.03.26 V1.1
+### 2023.03.26 v1.1.1
 
 Initialize performance upgrade.
 
@@ -122,7 +132,7 @@ Add result classes.
 
 Use MessagePack to compress original data.
 
-### 2022.06.02
+### 2022.06.02 v1.0.0
 
 New features.
 
@@ -130,11 +140,11 @@ Performance Optimization.
 
 Upgrade to .NET 6
 
-### 2020.11.14
+### 2020.11.14 v0.9b
 
 Upgrade to .NET 5
 
-### 2020.07.06
+### 2020.07.06 v0.1b
 
 Initial PR.
 
@@ -146,9 +156,9 @@ Initial PR.
 
 .NET7 Runtime
 
-.NET8 Runtime (Planned)
+.NET8 Runtime (Planned) 
 
-Windows 10 64bit 
+Windows 10 64bit or Higher
 
 ## Reference
  
@@ -553,9 +563,23 @@ Convert this result to Spherical coordinate.
 
 ### ```public VSOPResult_ELL(VSOPBody body, VSOPTime time, double[] ell)```
 
-Create a new spherical result from cartesian result. 
+Create a new elliptic result from calculate result. 
 
 <br>
+
+### ```public VSOPResult_ELL(VSOPResult_XYZ result)```
+
+Create a new elliptic result from cartesian result. 
+
+<br>
+
+
+### ```public VSOPResult_ELL(VSOPResult_LBR result)```
+
+Create a new elliptic result from spherical result. 
+
+<br>
+
 
 #### Arguments
 
@@ -597,7 +621,7 @@ Coordinates Reference of this result.
 
 ```ReferenceFrame ReferenceFrame { get; }```
 
-ELLiptic Coordinate can't change Reference Frame.
+Elliptic Coordinate can't change Reference Frame.
 
 <br>
 

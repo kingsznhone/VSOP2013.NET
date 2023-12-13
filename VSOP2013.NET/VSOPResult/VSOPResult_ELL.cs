@@ -30,6 +30,20 @@
             Variables_ELL = ell;
         }
 
+        public VSOPResult_ELL(VSOPResult_XYZ result)
+        {
+            Body = result.Body;
+            Time = result.Time;
+            Variables_ELL = result.Variables_ELL;
+        }
+
+        public VSOPResult_ELL(VSOPResult_LBR result)
+        {
+            Body = result.Body;
+            Time = result.Time;
+            Variables_ELL = result.Variables_ELL;
+        }
+
         #region elements
 
         /// <summary>
@@ -73,5 +87,9 @@
         {
             return new VSOPResult_LBR(this);
         }
+
+        public static explicit operator VSOPResult_XYZ(VSOPResult_ELL ell) => new VSOPResult_XYZ(ell);
+
+        public static explicit operator VSOPResult_LBR(VSOPResult_ELL ell) => new VSOPResult_LBR(ell);
     }
 }

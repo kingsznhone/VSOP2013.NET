@@ -1,6 +1,6 @@
 ﻿namespace VSOP2013
 {
-    public class VSOPResult_LBR : VSOPResult
+    public sealed class VSOPResult_LBR : VSOPResult
     {
         public override VSOPBody Body { get; }
 
@@ -100,5 +100,14 @@
         {
             return new VSOPResult_XYZ(this);
         }
+
+        public VSOPResult_ELL toELL()
+        {
+            return new VSOPResult_ELL(this);
+        }
+
+        public static explicit operator VSOPResult_XYZ(VSOPResult_LBR lbr) => new VSOPResult_XYZ(lbr);
+
+        public static explicit operator VSOPResult_ELL(VSOPResult_LBR lbr) => new VSOPResult_ELL(lbr);
     }
 }

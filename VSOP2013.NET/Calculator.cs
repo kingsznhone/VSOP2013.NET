@@ -1,6 +1,6 @@
-﻿using System.IO.Compression;
+﻿using MessagePack;
+using System.IO.Compression;
 using System.Reflection;
-using MessagePack;
 
 namespace VSOP2013
 {

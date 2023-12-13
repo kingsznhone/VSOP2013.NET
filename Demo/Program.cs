@@ -38,24 +38,23 @@ namespace Demo
             ell = vsop.GetPlanetPosition(VSOPBody.EMB, vTime);
             FormattedPrint(ell, vTime);
 
-            xyz = ell.ToXYZ();
+            xyz = (VSOPResult_XYZ)ell;
             FormattedPrint(xyz, vTime);
             xyz.ReferenceFrame = ReferenceFrame.ICRSJ2000;
             FormattedPrint(xyz, vTime);
 
-            lbr = ell.ToLBR();
+            lbr = (VSOPResult_LBR)ell;
             FormattedPrint(lbr, vTime);
             lbr.ReferenceFrame = ReferenceFrame.ICRSJ2000;
             FormattedPrint(lbr, vTime);
-            //foreach(VSOPBody body in Enum.GetValues(typeof(VSOPBody)))
-            //{
-            //    ell = vsop.GetPlanetPosition(body, vTime);
-            //    xyz = (VSOPResult_XYZ)ell;
-            //    lbr = (VSOPResult_LBR)ell;
-            //    FormattedPrint(ell, vTime);
-            //    FormattedPrint(xyz, vTime);
-            //    FormattedPrint(lbr, vTime);
-            //}
+
+            //for(int i = 0; i < 1000; i++)
+            {
+                foreach (VSOPBody body in Enum.GetValues(typeof(VSOPBody)))
+                {
+                    ell = vsop.GetPlanetPosition(body, vTime);
+                }
+            }
 
             Console.WriteLine("Press Enter to Start Performance Test...");
             Console.ReadLine();

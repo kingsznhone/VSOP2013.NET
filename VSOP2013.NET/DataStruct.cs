@@ -1,5 +1,5 @@
-﻿using System.Runtime.InteropServices;
-using MessagePack;
+﻿using MessagePack;
+using System.Runtime.InteropServices;
 
 namespace VSOP2013
 {
@@ -112,19 +112,19 @@ namespace VSOP2013
     public struct Term
     {
         [Key(0)]
-        [FieldOffset(8)]
+        [FieldOffset(0)]
         public double ss;
 
         [Key(1)]
-        [FieldOffset(16)]
+        [FieldOffset(8)]
         public double cc;
 
         [Key(2)]
-        [FieldOffset(24)]
+        [FieldOffset(16)]
         public double aa;
 
         [Key(3)]
-        [FieldOffset(32)]
+        [FieldOffset(24)]
         public double bb;
     }
 }

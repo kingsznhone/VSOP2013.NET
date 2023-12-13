@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.IO;
 using System.IO.Compression;
 using MessagePack;
 
@@ -8,8 +9,6 @@ namespace VSOP2013.DataConverter
     {
         private static void Main(string[] args)
         {
-            var lz4Options = MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4Block);
-
             #region Read Original Data
 
             Stopwatch sw = new();
@@ -47,6 +46,8 @@ namespace VSOP2013.DataConverter
                 using FileStream fs = new(filename, FileMode.OpenOrCreate);
                 using BrotliStream bs = new(fs, CompressionLevel.SmallestSize);
                 MessagePackSerializer.Serialize(bs, VSOP2013DATA[ip]);
+                Console.WriteLine($"{VSOP2013DATA[ip].body}: \n{filename}.");
+                Console.WriteLine();
             });
 
             sw.Stop();
@@ -74,6 +75,16 @@ namespace VSOP2013.DataConverter
             Console.WriteLine($"Dump Data Reload Test OK. Elapsed: {milliseconds}ms");
             Console.WriteLine("Press Enter to exit...");
             Console.ReadLine();
+
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+                FileName = "explorer.exe",
+                Arguments = OutputDir.FullName,
+                UseShellExecute = true
+            };
+
+            // 使用Process.Start启动进程
+            Process.Start(startInfo);
 
             #endregion Test
         }
