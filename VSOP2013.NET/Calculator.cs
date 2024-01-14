@@ -1,11 +1,14 @@
 ﻿using MessagePack;
 using System.IO.Compression;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace VSOP2013
 {
     public class Calculator
     {
+        [DllImport("Resources/NativeMethod.dll")]
+        public static extern double GetIteration(Term[] terms,int length, double tj, double tit);
         public List<PlanetTable> VSOP2013DATA;
 
         /// <summary>
@@ -56,6 +59,20 @@ namespace VSOP2013
             VSOPResult_ELL Coordinate = new(body, time, ELL);
             return Coordinate;
         }
+        public VSOPResult_ELL GetPlanetPosition_Native(VSOPBody body, VSOPTime time)
+        {
+            double[] ELL = new double[6];
+            ParallelLoopResult result = Parallel.For(0, 6, iv =>
+            {
+                ELL[iv] = GetVariable_Native(body, iv, time);
+            });
+            //for (int iv=0;iv<6; iv++)
+            //{
+            //    ELL[iv] = GetVariable_Native(body, iv, time);
+            //}
+            VSOPResult_ELL Coordinate = new(body, time, ELL);
+            return Coordinate;
+        }
 
         public async Task<VSOPResult_ELL> GetPlanetPositionAsync(VSOPBody body, VSOPTime time)
         {
@@ -72,6 +89,11 @@ namespace VSOP2013
         public double GetVariable(VSOPBody body, int iv, VSOPTime time)
         {
             return Calculate(VSOP2013DATA[(int)body].variables[iv], time.J2000);
+        }
+
+        public double GetVariable_Native(VSOPBody body, int iv, VSOPTime time)
+        {
+            return Calculate_Native(VSOP2013DATA[(int)body].variables[iv], time.J2000);
         }
 
         public async Task<double> GetVariableAsync(VSOPBody body, int iv, VSOPTime time)
@@ -112,6 +134,40 @@ namespace VSOP2013
                     (su, cu) = Math.SinCos(u);
                     result += t[it] * (terms[n].ss * su + terms[n].cc * cu);
                 }
+            }
+            if (Table.iv == 1)
+            {
+                xl = result + freqpla[(int)Table.Body] * tj;
+                xl %= Math.Tau;
+                if (xl < 0) xl += Math.Tau;
+                result = xl;
+            }
+            return result;
+        }
+
+        private double Calculate_Native(VariableTable Table, double JD2000)
+        {
+            //Thousand of Julian Years
+            double tj = JD2000 / a1000;
+
+            //Iteration on Time
+            Span<double> t = stackalloc double[21];
+            t[0] = 1.0d;
+            t[1] = tj;
+            for (int i = 2; i < 21; i++)
+            {
+                t[i] = t[1] * t[i - 1];
+            }
+
+            double result = 0d;
+            double xl;
+            Term[] terms;
+            for (int it = 0; it < Table.PowerTables.Length; it++)
+            {
+                if (Table.PowerTables[it].Terms == null) continue;
+                terms = Table.PowerTables[it].Terms;
+                double tit = t[it];
+                result += GetIteration(terms,terms.Length, tj, tit);
             }
             if (Table.iv == 1)
             {

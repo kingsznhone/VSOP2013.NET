@@ -37,4 +37,10 @@ VSOP2013, computed the positions of the planets directly at any moment, as well 
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Resources\NativeMethod.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

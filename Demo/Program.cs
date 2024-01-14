@@ -38,6 +38,8 @@ namespace Demo
             ell = vsop.GetPlanetPosition(VSOPBody.EMB, vTime);
             FormattedPrint(ell, vTime);
 
+            ell = vsop.GetPlanetPosition_Native(VSOPBody.EMB, vTime);
+            FormattedPrint(ell, vTime);
             xyz = (VSOPResult_XYZ)ell;
             FormattedPrint(xyz, vTime);
             xyz.ReferenceFrame = ReferenceFrame.ICRSJ2000;
