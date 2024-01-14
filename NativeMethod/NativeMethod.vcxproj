@@ -133,6 +133,11 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>copy /Y "$(TargetPath)" "$(SolutionDir)VSOP2013.NET\Resources"
+copy /Y "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)VSOP2013.NET\Resources"
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="NativeMethod.h" />

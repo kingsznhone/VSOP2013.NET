@@ -43,6 +43,7 @@ namespace VSOP2013
                 var data = MessagePackSerializer.Deserialize<PlanetTable>(bs);
                 VSOP2013DATA.Add(data);
             });
+
             VSOP2013DATA = VSOP2013DATA.OrderBy(x => x.body).ToList();
 
             GC.Collect();
@@ -66,10 +67,6 @@ namespace VSOP2013
             {
                 ELL[iv] = GetVariable_Native(body, iv, time);
             });
-            //for (int iv=0;iv<6; iv++)
-            //{
-            //    ELL[iv] = GetVariable_Native(body, iv, time);
-            //}
             VSOPResult_ELL Coordinate = new(body, time, ELL);
             return Coordinate;
         }
@@ -77,6 +74,10 @@ namespace VSOP2013
         public async Task<VSOPResult_ELL> GetPlanetPositionAsync(VSOPBody body, VSOPTime time)
         {
             return await Task.Run(() => GetPlanetPosition(body, time));
+        }
+        public async Task<VSOPResult_ELL> GetPlanetPositionAsync_Native(VSOPBody body, VSOPTime time)
+        {
+            return await Task.Run(() => GetPlanetPosition_Native(body, time));
         }
 
         /// <summary>
@@ -99,6 +100,10 @@ namespace VSOP2013
         public async Task<double> GetVariableAsync(VSOPBody body, int iv, VSOPTime time)
         {
             return await Task.Run(() => GetVariable(body, iv, time));
+        }
+        public async Task<double> GetVariableAsync_Native(VSOPBody body, int iv, VSOPTime time)
+        {
+            return await Task.Run(() => GetVariable_Native(body, iv, time));
         }
 
         /// <summary>
@@ -138,8 +143,7 @@ namespace VSOP2013
             if (Table.iv == 1)
             {
                 xl = result + freqpla[(int)Table.Body] * tj;
-                xl %= Math.Tau;
-                if (xl < 0) xl += Math.Tau;
+                xl = (xl % Math.Tau + Math.Tau) % Math.Tau;
                 result = xl;
             }
             return result;
@@ -161,19 +165,16 @@ namespace VSOP2013
 
             double result = 0d;
             double xl;
-            Term[] terms;
             for (int it = 0; it < Table.PowerTables.Length; it++)
             {
                 if (Table.PowerTables[it].Terms == null) continue;
-                terms = Table.PowerTables[it].Terms;
-                double tit = t[it];
-                result += GetIteration(terms,terms.Length, tj, tit);
+                Term[] terms = Table.PowerTables[it].Terms;
+                result += GetIteration(Table.PowerTables[it].Terms,terms.Length, tj, t[it]);
             }
             if (Table.iv == 1)
             {
                 xl = result + freqpla[(int)Table.Body] * tj;
-                xl %= Math.Tau;
-                if (xl < 0) xl += Math.Tau;
+                xl = (xl % Math.Tau + Math.Tau) % Math.Tau;
                 result = xl;
             }
             return result;

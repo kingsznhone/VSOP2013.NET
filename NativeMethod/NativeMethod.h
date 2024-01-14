@@ -1,5 +1,6 @@
 #pragma once
 
+
 #ifdef DLLEXPORT// DLLEXPORT
 #define DLL_EXPORT __declspec(dllexport)
 #else 
@@ -18,7 +19,7 @@ struct Term
 extern "C" {
 #endif
 
-    DLL_EXPORT double GetIteration(Term* terms,int length, double tj, double tit);
+DLL_EXPORT double GetIteration(struct Term* terms,int length, double tj, double tit);
 
 #ifdef __cplusplus
 }
