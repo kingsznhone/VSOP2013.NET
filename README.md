@@ -23,7 +23,7 @@ I promise it will be much faster than origin algorithm.
 
 This is the best VSOP2013 library ever.
 
-![Demo](https://raw.githubusercontent.com/kingsznhone/VSOP2013.NET/main/Demo.png)
+![Demo](https://github.com/kingsznhone/VSOP2013.NET/blob/main/Demo.png)
 
 ## Features
 
@@ -31,7 +31,7 @@ This is the best VSOP2013 library ever.
 2. Use VSOPTime class to manage time. 
 <br>Easy to convert time by calling ```VSOPTime.UTC```, ```VSOPTime.TAI```, ```VSOPTime.TDB```
 3. Veryhigh performance per solution
-<br>![Performance Test](https://raw.githubusercontent.com/kingsznhone/VSOP2013.NET/main/PerformanceTest.png)
+<br>![Performance Test](https://github.com/kingsznhone/VSOP2013.NET/blob/main/PerformanceTest.png)
 4. Useful Utility class. Convert Elliptic coordinates to cartesian  or spherical 
 5. Async Api.
 6. precalculation on <b>φ</b> in terms, which gives 20%+ speed up of calculation.
