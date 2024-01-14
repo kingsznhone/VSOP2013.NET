@@ -164,17 +164,17 @@ namespace VSOP2013
 
             if (Vector256.IsHardwareAccelerated)
             {
-                Vector256<double> v1 = Vector256.Create(Math.Cos(b) * Math.Cos(l), r * Math.Sin(b) * Math.Cos(l), -r * Math.Cos(b) * Math.Sin(l), 0);
-                Vector256<double> v2 = Vector256.Create(Math.Cos(b) * Math.Sin(l), r * Math.Sin(b) * Math.Sin(l), r * Math.Cos(b) * Math.Cos(l), 0);
-                Vector256<double> v3 = Vector256.Create(Math.Sin(b), -r * Math.Cos(b), 0, 0);
+                Vector256<double> m1 = Vector256.Create(Math.Cos(b) * Math.Cos(l), r * Math.Sin(b) * Math.Cos(l), -r * Math.Cos(b) * Math.Sin(l), 0);
+                Vector256<double> m2 = Vector256.Create(Math.Cos(b) * Math.Sin(l), r * Math.Sin(b) * Math.Sin(l), r * Math.Cos(b) * Math.Cos(l), 0);
+                Vector256<double> m3 = Vector256.Create(Math.Sin(b), -r * Math.Cos(b), 0, 0);
                 Vector256<double> vv = Vector256.Create(dr, db, dl, 0);
 
                 xyz[0] = x;
                 xyz[1] = y;
                 xyz[2] = z;
-                xyz[3] = Vector256.Sum(vv * v1);
-                xyz[4] = Vector256.Sum(vv * v2);
-                xyz[5] = Vector256.Sum(vv * v3);
+                xyz[3] = Vector256.Sum(vv * m1);
+                xyz[4] = Vector256.Sum(vv * m2);
+                xyz[5] = Vector256.Sum(vv * m3);
                 return xyz.ToArray();
             }
 
@@ -243,10 +243,10 @@ namespace VSOP2013
                 + 0.5d * ex2 * Math.Sin(2.0d * gm)
                 + 0.375d * ex3 * Math.Sin(3.0d * gm);
 
-            z2 = new Complex(0d, e);
-            zteta = Complex.Exp(z2);
             while (true)
             {
+                z2 = new Complex(0d, e);
+                zteta = Complex.Exp(z2);
                 z3 = z1 * zteta;
                 dl = gl - e + z3.Imaginary;
                 rsa = 1.0d - z3.Real;
@@ -311,19 +311,19 @@ namespace VSOP2013
 
             if (Vector256.IsHardwareAccelerated)
             {
-                Vector256<double> v1 = Vector256.Create(Cphi, -Sphi * Ceps, Sphi * Seps, 0);
-                Vector256<double> v2 = Vector256.Create(Sphi, Cphi * Ceps, -Cphi * Seps, 0);
-                Vector256<double> v3 = Vector256.Create(0, Seps, Ceps, 0);
+                Vector256<double> m1 = Vector256.Create(Cphi, -Sphi * Ceps, Sphi * Seps, 0);
+                Vector256<double> m2 = Vector256.Create(Sphi, Cphi * Ceps, -Cphi * Seps, 0);
+                Vector256<double> m3 = Vector256.Create(0, Seps, Ceps, 0);
                 Vector256<double> vv = Vector256.Create(dynamical[0], dynamical[1], dynamical[2], 0);
-                Vector256<double> vv2 = Vector256.Create(dynamical[3], dynamical[4], dynamical[5], 0);
+                Vector256<double> vdv = Vector256.Create(dynamical[3], dynamical[4], dynamical[5], 0);
 
-                icrs[0] = Vector256.Sum(vv * v1);
-                icrs[1] = Vector256.Sum(vv * v2);
-                icrs[2] = Vector256.Sum(vv * v3);
+                icrs[0] = Vector256.Sum(vv * m1);
+                icrs[1] = Vector256.Sum(vv * m2);
+                icrs[2] = Vector256.Sum(vv * m3);
 
-                icrs[3] = Vector256.Sum(vv2 * v1);
-                icrs[4] = Vector256.Sum(vv2 * v2);
-                icrs[5] = Vector256.Sum(vv2 * v3);
+                icrs[3] = Vector256.Sum(vdv * m1);
+                icrs[4] = Vector256.Sum(vdv * m2);
+                icrs[5] = Vector256.Sum(vdv * m3);
                 return icrs.ToArray();
             }
 
@@ -385,19 +385,19 @@ namespace VSOP2013
 
             if (Vector256.IsHardwareAccelerated)
             {
-                Vector256<double> v1 = Vector256.Create(Cphi, Sphi, 0, 0);
-                Vector256<double> v2 = Vector256.Create(-Sphi * Ceps, Cphi * Ceps, Seps, 0);
-                Vector256<double> v3 = Vector256.Create(Sphi * Seps, -Cphi * Seps, Ceps, 0);
+                Vector256<double> m1 = Vector256.Create(Cphi, Sphi, 0, 0);
+                Vector256<double> m2 = Vector256.Create(-Sphi * Ceps, Cphi * Ceps, Seps, 0);
+                Vector256<double> m3 = Vector256.Create(Sphi * Seps, -Cphi * Seps, Ceps, 0);
                 Vector256<double> vv = Vector256.Create(icrs[0], icrs[1], icrs[2], 0);
-                Vector256<double> vv2 = Vector256.Create(icrs[3], icrs[4], icrs[5], 0);
+                Vector256<double> vdv = Vector256.Create(icrs[3], icrs[4], icrs[5], 0);
 
-                dynamical[0] = Vector256.Sum(vv * v1);
-                dynamical[1] = Vector256.Sum(vv * v2);
-                dynamical[2] = Vector256.Sum(vv * v3);
+                dynamical[0] = Vector256.Sum(vv * m1);
+                dynamical[1] = Vector256.Sum(vv * m2);
+                dynamical[2] = Vector256.Sum(vv * m3);
 
-                dynamical[3] = Vector256.Sum(vv2 * v1);
-                dynamical[4] = Vector256.Sum(vv2 * v2);
-                dynamical[5] = Vector256.Sum(vv2 * v3);
+                dynamical[3] = Vector256.Sum(vdv * m1);
+                dynamical[4] = Vector256.Sum(vdv * m2);
+                dynamical[5] = Vector256.Sum(vdv * m3);
                 return dynamical.ToArray();
             }
 

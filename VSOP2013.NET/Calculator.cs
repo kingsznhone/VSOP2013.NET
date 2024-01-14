@@ -30,7 +30,7 @@ namespace VSOP2013
         {
             //Import Planet Data
             var assembly = Assembly.GetExecutingAssembly();
-            var names = assembly.GetManifestResourceNames();
+            //var names = assembly.GetManifestResourceNames();
             VSOP2013DATA = new List<PlanetTable>(9);
             ParallelLoopResult result = Parallel.For(0, 9, ip =>
             {
@@ -116,8 +116,8 @@ namespace VSOP2013
             if (Table.iv == 1)
             {
                 xl = result + freqpla[(int)Table.Body] * tj;
-                xl %= Math.Tau;
-                if (xl < 0) xl += Math.Tau;
+                //modulu into [0,tau)
+                xl = (xl % Math.Tau + Math.Tau) % Math.Tau;
                 result = xl;
             }
             return result;

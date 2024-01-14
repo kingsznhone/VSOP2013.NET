@@ -100,6 +100,10 @@ Console.WriteLine("=============================================================
 
 ## Change Log
 
+### 2024.01.14 v1.1.8
+
+Fix critical error in ELL to XYZ convertion. 
+
 ### 2023.12.13 v1.1.7
 
 Bug fix.
