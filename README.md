@@ -58,7 +58,7 @@ The planetary solution VSOP2013 is fitted to the numerical integration INPOP10a 
 
 * NuGet Package Manager
     ```
-    PM> NuGet\Install-Package VSOP2013.NET -Version 1.1.6
+    PM> NuGet\Install-Package VSOP2013.NET -Version 1.1.8
     ```
 
 ```
