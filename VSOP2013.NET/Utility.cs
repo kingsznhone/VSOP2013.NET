@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+using System.Numerics;
 using System.Runtime.Intrinsics;
 
 namespace VSOP2013
@@ -164,17 +164,17 @@ namespace VSOP2013
 
             if (Vector256.IsHardwareAccelerated)
             {
-                Vector256<double> v1 = Vector256.Create(Math.Cos(b) * Math.Cos(l), r * Math.Sin(b) * Math.Cos(l), -r * Math.Cos(b) * Math.Sin(l), 0);
-                Vector256<double> v2 = Vector256.Create(Math.Cos(b) * Math.Sin(l), r * Math.Sin(b) * Math.Sin(l), r * Math.Cos(b) * Math.Cos(l), 0);
-                Vector256<double> v3 = Vector256.Create(Math.Sin(b), -r * Math.Cos(b), 0, 0);
+                Vector256<double> m1 = Vector256.Create(Math.Cos(b) * Math.Cos(l), r * Math.Sin(b) * Math.Cos(l), -r * Math.Cos(b) * Math.Sin(l), 0);
+                Vector256<double> m2 = Vector256.Create(Math.Cos(b) * Math.Sin(l), r * Math.Sin(b) * Math.Sin(l), r * Math.Cos(b) * Math.Cos(l), 0);
+                Vector256<double> m3 = Vector256.Create(Math.Sin(b), -r * Math.Cos(b), 0, 0);
                 Vector256<double> vv = Vector256.Create(dr, db, dl, 0);
 
                 xyz[0] = x;
                 xyz[1] = y;
                 xyz[2] = z;
-                xyz[3] = Vector256.Sum(vv * v1);
-                xyz[4] = Vector256.Sum(vv * v2);
-                xyz[5] = Vector256.Sum(vv * v3);
+                xyz[3] = Vector256.Sum(vv * m1);
+                xyz[4] = Vector256.Sum(vv * m2);
+                xyz[5] = Vector256.Sum(vv * m3);
                 return xyz.ToArray();
             }
 

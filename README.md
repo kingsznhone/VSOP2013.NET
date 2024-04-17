@@ -58,7 +58,7 @@ The planetary solution VSOP2013 is fitted to the numerical integration INPOP10a 
 
 * NuGet Package Manager
     ```
-    PM> NuGet\Install-Package VSOP2013.NET -Version 1.1.6
+    PM> NuGet\Install-Package VSOP2013.NET -Version 1.1.8
     ```
 
 ```
@@ -100,15 +100,21 @@ Console.WriteLine("=============================================================
 
 ## Change Log
 
-### 2024.01.14 
+
+### 2024.04.17 v1.2.0 
 
 Add Native Library branch to accelerate calculation. with 30%+ performance Improvment. (Experimental)
 
-This branch will not publish in release for now. Because Native CPP DLL is only for Windows x64 AVX2 enviroment.
+Native CPP code is only for Windows x64 AVX2 enviroment.
 
 Using fast floating-point compilation options in C++ libraries can result in a decrease in precision and is difficult to estimate.
 
 ![Native Method](./README/NativeMethod.png)
+
+### 2024.01.14 v1.1.8
+
+Fix critical error in ELL to XYZ convertion. 
+
 
 ### 2023.12.13 v1.1.7
 

@@ -33,7 +33,7 @@ namespace VSOP2013
         {
             //Import Planet Data
             var assembly = Assembly.GetExecutingAssembly();
-            var names = assembly.GetManifestResourceNames();
+            //var names = assembly.GetManifestResourceNames();
             VSOP2013DATA = new List<PlanetTable>(9);
             ParallelLoopResult result = Parallel.For(0, 9, ip =>
             {
