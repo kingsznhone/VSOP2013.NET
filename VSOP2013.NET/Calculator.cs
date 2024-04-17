@@ -7,8 +7,10 @@ namespace VSOP2013
 {
     public class Calculator
     {
-        [DllImport("Resources/NativeMethod.dll")]
-        public static extern double GetIteration(Term[] terms,int length, double tj, double tit);
+
+        [DllImport("Resources/NativeAccelerator.dll")]
+        public static extern double StartIteration(Term[] terms,int length, double tj, double tit);
+
         public List<PlanetTable> VSOP2013DATA;
 
         /// <summary>
@@ -80,6 +82,7 @@ namespace VSOP2013
             return await Task.Run(() => GetPlanetPosition_Native(body, time));
         }
 
+
         /// <summary>
         /// Calculate a specific variable
         /// </summary>
@@ -91,7 +94,6 @@ namespace VSOP2013
         {
             return Calculate(VSOP2013DATA[(int)body].variables[iv], time.J2000);
         }
-
         public double GetVariable_Native(VSOPBody body, int iv, VSOPTime time)
         {
             return Calculate_Native(VSOP2013DATA[(int)body].variables[iv], time.J2000);
@@ -136,11 +138,16 @@ namespace VSOP2013
                 for (int n = 0; n < terms.Length; n++)
                 {
                     u = terms[n].aa + terms[n].bb * tj;
+#if NET8_0
+                    su = Math.Sin(u);
+                    cu = Math.Cos(u);
+#else
                     (su, cu) = Math.SinCos(u);
+#endif
                     result += t[it] * (terms[n].ss * su + terms[n].cc * cu);
                 }
             }
-            if (Table.iv == 1)
+            if (Table.Variable == VSOPVariable.A)
             {
                 xl = result + freqpla[(int)Table.Body] * tj;
                 xl = (xl % Math.Tau + Math.Tau) % Math.Tau;
@@ -149,7 +156,7 @@ namespace VSOP2013
             return result;
         }
 
-        private double Calculate_Native(VariableTable Table, double JD2000)
+        private unsafe double Calculate_Native(VariableTable Table, double JD2000)
         {
             //Thousand of Julian Years
             double tj = JD2000 / a1000;
@@ -169,9 +176,9 @@ namespace VSOP2013
             {
                 if (Table.PowerTables[it].Terms == null) continue;
                 Term[] terms = Table.PowerTables[it].Terms;
-                result += GetIteration(Table.PowerTables[it].Terms,terms.Length, tj, t[it]);
+                result += StartIteration(Table.PowerTables[it].Terms, terms.Length, tj, t[it]);
             }
-            if (Table.iv == 1)
+            if (Table.Variable == (VSOPVariable)1)
             {
                 xl = result + freqpla[(int)Table.Body] * tj;
                 xl = (xl % Math.Tau + Math.Tau) % Math.Tau;
@@ -179,5 +186,6 @@ namespace VSOP2013
             }
             return result;
         }
+
     }
 }

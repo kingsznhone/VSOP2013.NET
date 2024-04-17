@@ -5,15 +5,18 @@ namespace VSOP2013
 {
     public static class Utility
     {
-        public static readonly double[] gmp = {4.9125474514508118699e-11d,
-                        7.2434524861627027000e-10d,
-                        8.9970116036316091182e-10d,
-                        9.5495351057792580598e-11d,
-                        2.8253458420837780000e-07d,
-                        8.4597151856806587398e-08d,
-                        1.2920249167819693900e-08d,
-                        1.5243589007842762800e-08d,
-                        2.1886997654259696800e-12d};
+        public static readonly double[] gmp =
+            {
+                4.9125474514508118699e-11d,
+                7.2434524861627027000e-10d,
+                8.9970116036316091182e-10d,
+                9.5495351057792580598e-11d,
+                2.8253458420837780000e-07d,
+                8.4597151856806587398e-08d,
+                1.2920249167819693900e-08d,
+                1.5243589007842762800e-08d,
+                2.1886997654259696800e-12d
+            };
 
         public static readonly double gmsol = 2.9591220836841438269e-04d;
 
@@ -92,16 +95,16 @@ namespace VSOP2013
 
             if (Vector256.IsHardwareAccelerated)
             {
-                Vector256<double> v1 = Vector256.Create(x / r, y / r, z / r, 0);
+                Vector256<double> v1 = Vector256.Create(x / r                                     , y / r                                     , z / r                                                , 0);
                 Vector256<double> v2 = Vector256.Create(x * z / (r * r * Math.Sqrt(x * x + y * y)), y * z / (r * r * Math.Sqrt(x * x + y * y)), -(x * x + y * y) / (r * r * Math.Sqrt(x * x + y * y)), 0);
-                Vector256<double> v3 = Vector256.Create(-y / (x * x + y * y), x / (x * x + y * y), 0, 0);
-                Vector256<double> vv = Vector256.Create(dx, dy, dz, 0);
+                Vector256<double> v3 = Vector256.Create(-y / (x * x + y * y)                      , x / (x * x + y * y)                       , 0                                                    , 0);
+                Vector256<double> vv = Vector256.Create(dx                                        , dy                                        , dz                                                   , 0);
 
                 lbr[0] = l;
                 lbr[1] = b;
                 lbr[2] = r;
                 lbr[3] = Vector256.Sum(vv * v1);
-                lbr[4] = Vector256.Sum(vv * v2);
+                lbr[4] =-Vector256.Sum(vv * v2);
                 lbr[5] = Vector256.Sum(vv * v3);
                 return lbr.ToArray();
             }
@@ -131,7 +134,7 @@ namespace VSOP2013
             lbr[1] = b;
             lbr[2] = r;
             lbr[3] = dl;
-            lbr[4] = -db;
+            lbr[4] =-db;
             lbr[5] = dr;
             return lbr.ToArray();
         }
@@ -165,16 +168,16 @@ namespace VSOP2013
             if (Vector256.IsHardwareAccelerated)
             {
                 Vector256<double> m1 = Vector256.Create(Math.Cos(b) * Math.Cos(l), r * Math.Sin(b) * Math.Cos(l), -r * Math.Cos(b) * Math.Sin(l), 0);
-                Vector256<double> m2 = Vector256.Create(Math.Cos(b) * Math.Sin(l), r * Math.Sin(b) * Math.Sin(l), r * Math.Cos(b) * Math.Cos(l), 0);
-                Vector256<double> m3 = Vector256.Create(Math.Sin(b), -r * Math.Cos(b), 0, 0);
-                Vector256<double> vv = Vector256.Create(dr, db, dl, 0);
+                Vector256<double> m2 = Vector256.Create(Math.Cos(b) * Math.Sin(l), r * Math.Sin(b) * Math.Sin(l), r * Math.Cos(b) * Math.Cos(l) , 0);
+                Vector256<double> m3 = Vector256.Create(Math.Sin(b)              , -r * Math.Cos(b)             , 0                             , 0);
+                Vector256<double> vv = Vector256.Create(dr                       , db                           , dl                            , 0);
 
                 xyz[0] = x;
                 xyz[1] = y;
                 xyz[2] = z;
                 xyz[3] = Vector256.Sum(vv * m1);
                 xyz[4] = Vector256.Sum(vv * m2);
-                xyz[5] = Vector256.Sum(vv * m3);
+                xyz[5] =-Vector256.Sum(vv * m3);
                 return xyz.ToArray();
             }
 
@@ -198,7 +201,7 @@ namespace VSOP2013
             xyz[2] = z;
             xyz[3] = dx;
             xyz[4] = dy;
-            xyz[5] = -dz;
+            xyz[5] =-dz;
             return xyz.ToArray();
         }
 

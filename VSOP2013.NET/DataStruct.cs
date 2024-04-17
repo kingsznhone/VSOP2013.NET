@@ -16,35 +16,14 @@ namespace VSOP2013
         PLUTO = 8
     }
 
-    public enum VSOPFileName
+    public enum VSOPVariable
     {
-        VSOP2013p1 = 0,
-        VSOP2013p2 = 1,
-        VSOP2013p3 = 2,
-        VSOP2013p4 = 3,
-        VSOP2013p5 = 4,
-        VSOP2013p6 = 5,
-        VSOP2013p7 = 6,
-        VSOP2013p8 = 7,
-        VSOP2013p9 = 8
-    }
-
-    public struct PlanetEphemeris
-    {
-        //Elliptic   Elements
-        //a (au), lambda (radian), k, h, q, p
-        //Dynamical Frame J2000'
-        public double[] DynamicalELL;
-
-        //Ecliptic   Heliocentric Coordinates
-        //X,Y,Z (au)  X'',Y'',Z'' (au/d)
-        //Dynamical Frame J2000'
-        public double[] DynamicalXYZ;
-
-        //Equatorial Heliocentric Coordinates:
-        //X,Y,Z (au)  X'',Y'',Z'' (au/d)
-        //ICRS Frame J2000
-        public double[] ICRSXYZ;
+        A = 0,
+        L = 1,
+        K = 2,
+        H = 3,
+        Q = 4,
+        P = 5,
     }
 
     [MessagePackObject]
@@ -66,7 +45,7 @@ namespace VSOP2013
         public VSOPBody Body;
 
         [Key(1)]
-        public int iv;
+        public VSOPVariable Variable;
 
         [Key(2)]
         public PowerTable[] PowerTables;
@@ -80,13 +59,16 @@ namespace VSOP2013
         public VSOPBody Body;
 
         [Key(1)]
-        public int iv;
+        public VSOPVariable Variable;
 
         [Key(2)]
-        public int it;
+        public int Power;
+
+        [Key(3)]
+        public int TermsCount;
 
         [Key(4)]
-        public Term[] Terms;
+        public Term[] Terms;      
     }
 
     [MessagePackObject]

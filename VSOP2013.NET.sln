@@ -14,7 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataConverter", "DataConverter\DataConverter.csproj", "{2A5C5EFE-C49F-436A-9FC1-176AE11E0334}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NativeMethod", "NativeMethod\NativeMethod.vcxproj", "{1F19706F-2068-4359-A307-FF6620D57100}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NativeAccelerator", "NativeAccelerator\NativeAccelerator.vcxproj", "{1F19706F-2068-4359-A307-FF6620D57100}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
