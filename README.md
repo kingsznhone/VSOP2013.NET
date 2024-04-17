@@ -23,7 +23,7 @@ I promise it will be much faster than origin algorithm.
 
 This is the best VSOP2013 library ever.
 
-![Demo](https://github.com/kingsznhone/VSOP2013.NET/blob/CppAccel/README/Demo.png)
+![Demo](./README/Demo.png)
 
 ## Features
 
@@ -31,7 +31,7 @@ This is the best VSOP2013 library ever.
 2. Use VSOPTime class to manage time. 
 <br>Easy to convert time by calling ```VSOPTime.UTC```, ```VSOPTime.TAI```, ```VSOPTime.TDB```
 3. Veryhigh performance per solution
-<br>![Performance Test](https://github.com/kingsznhone/VSOP2013.NET/blob/CppAccel/README/PerformanceTest.png)
+<br>![Performance Test](./README/PerformanceTest.png)
 4. Useful Utility class. Convert Elliptic coordinates to cartesian  or spherical 
 5. Async Api.
 6. precalculation on <b>φ</b> in terms, which gives 20%+ speed up of calculation.
@@ -108,7 +108,7 @@ This branch will not publish in release for now. Because Native CPP DLL is only 
 
 Using fast floating-point compilation options in C++ libraries can result in a decrease in precision and is difficult to estimate.
 
-![Native Method](https://github.com/kingsznhone/VSOP2013.NET/blob/CppAccel/README/NativeMethod.png)
+![Native Method](./README/NativeMethod.png)
 
 ### 2023.12.13 v1.1.7
 
