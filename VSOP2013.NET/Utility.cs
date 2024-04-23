@@ -1,19 +1,22 @@
-﻿using System.Numerics;
+using System.Numerics;
 using System.Runtime.Intrinsics;
 
 namespace VSOP2013
 {
     public static class Utility
     {
-        public static readonly double[] gmp = {4.9125474514508118699e-11d,
-                        7.2434524861627027000e-10d,
-                        8.9970116036316091182e-10d,
-                        9.5495351057792580598e-11d,
-                        2.8253458420837780000e-07d,
-                        8.4597151856806587398e-08d,
-                        1.2920249167819693900e-08d,
-                        1.5243589007842762800e-08d,
-                        2.1886997654259696800e-12d};
+        public static readonly double[] gmp =
+            {
+                4.9125474514508118699e-11d,
+                7.2434524861627027000e-10d,
+                8.9970116036316091182e-10d,
+                9.5495351057792580598e-11d,
+                2.8253458420837780000e-07d,
+                8.4597151856806587398e-08d,
+                1.2920249167819693900e-08d,
+                1.5243589007842762800e-08d,
+                2.1886997654259696800e-12d
+            };
 
         public static readonly double gmsol = 2.9591220836841438269e-04d;
 
@@ -92,16 +95,16 @@ namespace VSOP2013
 
             if (Vector256.IsHardwareAccelerated)
             {
-                Vector256<double> v1 = Vector256.Create(x / r, y / r, z / r, 0);
+                Vector256<double> v1 = Vector256.Create(x / r                                     , y / r                                     , z / r                                                , 0);
                 Vector256<double> v2 = Vector256.Create(x * z / (r * r * Math.Sqrt(x * x + y * y)), y * z / (r * r * Math.Sqrt(x * x + y * y)), -(x * x + y * y) / (r * r * Math.Sqrt(x * x + y * y)), 0);
-                Vector256<double> v3 = Vector256.Create(-y / (x * x + y * y), x / (x * x + y * y), 0, 0);
-                Vector256<double> vv = Vector256.Create(dx, dy, dz, 0);
+                Vector256<double> v3 = Vector256.Create(-y / (x * x + y * y)                      , x / (x * x + y * y)                       , 0                                                    , 0);
+                Vector256<double> vv = Vector256.Create(dx                                        , dy                                        , dz                                                   , 0);
 
                 lbr[0] = l;
                 lbr[1] = b;
                 lbr[2] = r;
                 lbr[3] = Vector256.Sum(vv * v1);
-                lbr[4] = Vector256.Sum(vv * v2);
+                lbr[4] =-Vector256.Sum(vv * v2);
                 lbr[5] = Vector256.Sum(vv * v3);
                 return lbr.ToArray();
             }
@@ -131,7 +134,7 @@ namespace VSOP2013
             lbr[1] = b;
             lbr[2] = r;
             lbr[3] = dl;
-            lbr[4] = -db;
+            lbr[4] =-db;
             lbr[5] = dr;
             return lbr.ToArray();
         }
@@ -165,16 +168,16 @@ namespace VSOP2013
             if (Vector256.IsHardwareAccelerated)
             {
                 Vector256<double> m1 = Vector256.Create(Math.Cos(b) * Math.Cos(l), r * Math.Sin(b) * Math.Cos(l), -r * Math.Cos(b) * Math.Sin(l), 0);
-                Vector256<double> m2 = Vector256.Create(Math.Cos(b) * Math.Sin(l), r * Math.Sin(b) * Math.Sin(l), r * Math.Cos(b) * Math.Cos(l), 0);
-                Vector256<double> m3 = Vector256.Create(Math.Sin(b), -r * Math.Cos(b), 0, 0);
-                Vector256<double> vv = Vector256.Create(dr, db, dl, 0);
+                Vector256<double> m2 = Vector256.Create(Math.Cos(b) * Math.Sin(l), r * Math.Sin(b) * Math.Sin(l), r * Math.Cos(b) * Math.Cos(l) , 0);
+                Vector256<double> m3 = Vector256.Create(Math.Sin(b)              , -r * Math.Cos(b)             , 0                             , 0);
+                Vector256<double> vv = Vector256.Create(dr                       , db                           , dl                            , 0);
 
                 xyz[0] = x;
                 xyz[1] = y;
                 xyz[2] = z;
                 xyz[3] = Vector256.Sum(vv * m1);
                 xyz[4] = Vector256.Sum(vv * m2);
-                xyz[5] = Vector256.Sum(vv * m3);
+                xyz[5] =-Vector256.Sum(vv * m3);
                 return xyz.ToArray();
             }
 
@@ -198,13 +201,13 @@ namespace VSOP2013
             xyz[2] = z;
             xyz[3] = dx;
             xyz[4] = dy;
-            xyz[5] = -dz;
+            xyz[5] =-dz;
             return xyz.ToArray();
         }
 
         /// <summary>
         /// Convert Elliptic coordinate to cardinal coordinate.
-        /// This is kind of magic that I will never undersdand.
+        /// This is kind of magic that I will never understand.
         /// Directly translate from VSOP2013.f.
         /// </summary>
         /// <param name="body">planet</param>
@@ -235,14 +238,13 @@ namespace VSOP2013
             z = new Complex(k, h);
             ex = z.Magnitude;
             ex2 = ex * ex;
-            ex3 = ex2 * ex;
+            ex3 = ex * ex * ex;
             z1 = Complex.Conjugate(z);
             gl = ell[1] % (Math.Tau);
             gm = gl - Math.Atan2(h, k);
             e = gl + (ex - 0.125d * ex3) * Math.Sin(gm)
                 + 0.5d * ex2 * Math.Sin(2.0d * gm)
                 + 0.375d * ex3 * Math.Sin(3.0d * gm);
-
             while (true)
             {
                 z2 = new Complex(0d, e);
@@ -263,12 +265,13 @@ namespace VSOP2013
             xyz[0] = xr * (zto.Real - 2.0d * p * xm);
             xyz[1] = xr * (zto.Imaginary + 2.0d * q * xm);
             xyz[2] = -2.0d * xr * xki * xm;
+
             xms = a * (h + zto.Imaginary) / xfi;
             xmc = a * (k + zto.Real) / xfi;
-
             xn = rgm / Math.Pow(a, 1.5d);
-            xyz[3] = xn * (((2.0d * p * p) - 1.0d) * xms + (2.0d * p * q * xmc));
-            xyz[4] = xn * ((1.0d - (2.0d * q * q)) * xmc - (2.0d * p * q * xms));
+
+            xyz[3] = xn * ((2.0d * p * p - 1.0d) * xms + 2.0d * p * q * xmc);
+            xyz[4] = xn * ((1.0d - 2.0d * q * q) * xmc - 2.0d * p * q * xms);
             xyz[5] = xn * 2.0d * xki * (p * xms + q * xmc);
 
             return xyz.ToArray();
@@ -306,9 +309,6 @@ namespace VSOP2013
             Cphi = Math.Cos(phi);
 
 #if NET7_0
-
-            #region vector matrix mul
-
             if (Vector256.IsHardwareAccelerated)
             {
                 Vector256<double> m1 = Vector256.Create(Cphi, -Sphi * Ceps, Sphi * Seps, 0);
@@ -326,9 +326,6 @@ namespace VSOP2013
                 icrs[5] = Vector256.Sum(vdv * m3);
                 return icrs.ToArray();
             }
-
-            #endregion vector matrix mul
-
 #endif
 
             //Rotation Matrix

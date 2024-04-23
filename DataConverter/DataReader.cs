@@ -69,7 +69,7 @@ namespace VSOP2013.DataConverter
                 }
                 VSOP2013DATA.Add(planet);
             }
-
+            
             ParallelLoopResult result = Parallel.For(0, 9, ip =>
             {
                 ReadPlanet(VSOP2013DATA[ip], ip);
@@ -108,7 +108,7 @@ namespace VSOP2013.DataConverter
 
                     Planet.body = (VSOPBody)H.ip;
                     Planet.variables[H.iv].Body = (VSOPBody)H.ip;
-                    Planet.variables[H.iv].iv = H.iv;
+                    Planet.variables[H.iv].Variable = (VSOPVariable) H.iv;
 
                     Term[] buffer = new Term[H.nt];
                     for (int i = 0; i < H.nt; i++)
@@ -116,9 +116,8 @@ namespace VSOP2013.DataConverter
                         line = sr.ReadLine();
                         ReadTerm(line, ref buffer[i]);
                     }
-
-                    Planet.variables[H.iv].PowerTables[H.it].iv = H.iv;
-                    Planet.variables[H.iv].PowerTables[H.it].it = H.it;
+                    Planet.variables[H.iv].PowerTables[H.it].Variable = (VSOPVariable)H.iv;
+                    Planet.variables[H.iv].PowerTables[H.it].Power = H.it;
                     Planet.variables[H.iv].PowerTables[H.it].Body = (VSOPBody)H.ip;
                     Planet.variables[H.iv].PowerTables[H.it].Terms = buffer;
                 }
@@ -128,22 +127,24 @@ namespace VSOP2013.DataConverter
 
         private static Header ReadHeader(string line)
         {
+            ReadOnlySpan<char> lineSpan = line.AsSpan();
             Header H = new();
             int lineptr = 9;
-            H.ip = Convert.ToInt32(line.Substring(lineptr, 3).Trim()) - 1;
+            H.ip = int.Parse(lineSpan[lineptr..(lineptr + 3)].Trim()) - 1;
             lineptr += 3;
-            H.iv = Convert.ToInt32(line.Substring(lineptr, 3).Trim()) - 1;
+            H.iv = int.Parse(lineSpan[lineptr..(lineptr + 3)].Trim()) - 1;
             lineptr += 3;
-            H.it = Convert.ToInt32(line.Substring(lineptr, 3).Trim());
+            H.it = int.Parse(lineSpan[lineptr..(lineptr + 3)].Trim());
             lineptr += 3;
-            H.nt = Convert.ToInt32(line.Substring(lineptr, 7).Trim());
+            H.nt = int.Parse(lineSpan[lineptr..(lineptr + 7)].Trim());
             return H;
         }
 
         private static Term ReadTerm(string line, ref Term T)
         {
+            ReadOnlySpan<char> lineSpan = line.AsSpan();
             int lineptr;
-            int[] Bufferiphi = new int[17];
+            Span<int> Bufferiphi = stackalloc int[17];
             int index = 0;
             double ci;
 
@@ -155,7 +156,8 @@ namespace VSOP2013.DataConverter
             //
             for (int counter = 0; counter < 4; counter++)
             {
-                Bufferiphi[index] = Convert.ToInt32(line.Substring(lineptr, 3).Trim());
+                var debug = lineSpan[lineptr..(lineptr + 3)].Trim();
+                Bufferiphi[index] = int.Parse(lineSpan[lineptr..(lineptr + 3)].Trim());
                 index++;
                 lineptr += 3;
             }
@@ -164,7 +166,8 @@ namespace VSOP2013.DataConverter
             //
             for (int counter = 0; counter < 5; counter++)
             {
-                Bufferiphi[index] = Convert.ToInt32(line.Substring(lineptr, 3).Trim());
+                
+                Bufferiphi[index] = int.Parse(lineSpan[lineptr..(lineptr + 3)].Trim());
                 index++;
                 lineptr += 3;
             }
@@ -173,14 +176,14 @@ namespace VSOP2013.DataConverter
             //
             for (int counter = 0; counter < 4; counter++)
             {
-                Bufferiphi[index] = Convert.ToInt32(line.Substring(lineptr, 4).Trim());
+                Bufferiphi[index] = int.Parse(lineSpan[lineptr..(lineptr + 4)].Trim());
                 index++;
                 lineptr += 4;
             }
             //
             lineptr++;
             //
-            Bufferiphi[index] = Convert.ToInt32(line.Substring(lineptr, 6).Trim());
+            Bufferiphi[index] = int.Parse(lineSpan[lineptr..(lineptr + 6)].Trim());
             index++;
             lineptr += 6;
             //
@@ -188,24 +191,22 @@ namespace VSOP2013.DataConverter
             //
             for (int counter = 0; counter < 3; counter++)
             {
-                Bufferiphi[index] = Convert.ToInt32(line.Substring(lineptr, 3).Trim());
+                Bufferiphi[index] = int.Parse(lineSpan[lineptr..(lineptr + 3)].Trim());
                 index++;
                 lineptr += 3;
             }
 
-            //T.iphi = Bufferiphi;
-
-            ci = Convert.ToDouble(line.Substring(lineptr, 20).Trim());
+            ci = double.Parse(lineSpan[lineptr..(lineptr + 20)].Trim());
             lineptr += 20;
             lineptr++;
-            ci *= Math.Pow(10, Convert.ToDouble(line.Substring(lineptr, 3).Trim()));
+            ci *= Math.Pow(10, double.Parse(lineSpan[lineptr..(lineptr + 3)].Trim()));
             lineptr += 3;
             T.ss = ci;
 
-            ci = Convert.ToDouble(line.Substring(lineptr, 20).Trim());
+            ci = double.Parse(lineSpan[lineptr..(lineptr + 20)].Trim());
             lineptr += 20;
             lineptr++;
-            ci *= Math.Pow(10, Convert.ToDouble(line.Substring(lineptr, 3).Trim()));
+            ci *= Math.Pow(10, double.Parse(lineSpan[lineptr..(lineptr + 3)].Trim()));
 
             T.cc = ci;
 

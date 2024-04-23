@@ -23,21 +23,27 @@ I promise it will be much faster than origin algorithm.
 
 This is the best VSOP2013 library ever.
 
-![Demo](https://github.com/kingsznhone/VSOP2013.NET/blob/main/Demo.png)
+![Demo](./README/Demo.png)
+
+## Performance
+
+<br>![Performance Test](./README/NativeAccelerate.png)
+
+Note: .NET 8 occurs performance regression due to RyuJIT bugs. [Detail Here](https://github.com/dotnet/runtime/issues/95954#issuecomment-1956661569)
 
 ## Features
 
 1. Use VSOPResult class to manage calculate results.
 2. Use VSOPTime class to manage time. 
 <br>Easy to convert time by calling ```VSOPTime.UTC```, ```VSOPTime.TAI```, ```VSOPTime.TDB```
-3. Veryhigh performance per solution
-<br>![Performance Test](https://github.com/kingsznhone/VSOP2013.NET/blob/main/PerformanceTest.png)
-4. Useful Utility class. Convert Elliptic coordinates to cartesian  or spherical 
-5. Async Api.
+3. Very high performance per solution
+4. Useful Utility class. Convert Elliptic coordinates to cartesian and spherical 
+5. Async Api included.
 6. precalculation on <b>φ</b> in terms, which gives 20%+ speed up of calculation.
 7. Use [MessagePack](https://github.com/neuecc/MessagePack-CSharp#lz4-compression"MessagePack for C#") for binary serialize.
-<br>Initialization time becomes less than 10% of previous.
+<br>Initialization time becomes less than 10% of previous version.
 8. Brotli compression on source data. ~300Mb -> ~50MB.
+9. Optional Native Side library accelerate. (Only on Windows)
 
 <br>
 
@@ -58,7 +64,7 @@ The planetary solution VSOP2013 is fitted to the numerical integration INPOP10a 
 
 * NuGet Package Manager
     ```
-    PM> NuGet\Install-Package VSOP2013.NET -Version 1.1.8
+    PM> NuGet\Install-Package VSOP2013.NET
     ```
 
 ```
@@ -100,9 +106,22 @@ Console.WriteLine("=============================================================
 
 ## Change Log
 
+
+### 2024.04.24 v1.2.0 
+
+Add .NET 8. which cause performance regression.
+
+Add Native Accelerate method ```GetPlanetPosition_Native``` to accelerate calculation. with 30%+ performance Improvment. (Experimental)
+
+Native CPP code is only for Windows x64 AVX2 enviroment.
+
+Using fast floating-point compile options on native libraries can result in a decrease in precision and is difficult to estimate.
+
+
 ### 2024.01.14 v1.1.8
 
 Fix critical error in ELL to XYZ convertion. 
+
 
 ### 2023.12.13 v1.1.7
 
@@ -210,9 +229,75 @@ Exclusive time class in VSOP2013.
 
 <br>
 
+### ```public double GetVariable_Native(VSOPBody body,int iv, VSOPTime time)```
+
+Calculate a specific variable of  a planet. Using Native Accelerate.
+
+<br>
+
+#### Parameters
+
+```body``` VSOPBody
+
+Planet enum.
+
+<br>
+
+```iv``` Variable index
+
+0-5 : a l k h q p
+
+<br>
+
+```time``` VSOPTime
+
+Exclusive time class in VSOP2013.
+
+<br>
+
+#### Return
+
+```double``` variable result.
+
+<br>
+
 ### ```public Task<double> GetVariableAsync(VSOPBody body,int iv, VSOPTime time)```
 
 Calculate a specific variable of  a planet.
+
+<br>
+
+#### Parameters
+
+```body``` VSOPBody
+
+Planet enum.
+
+<br>
+
+```iv``` Variable index
+
+0-5 : a l k h q p
+
+<br>
+
+```time``` VSOPTime
+
+Exclusive time class in VSOP2013.
+
+<br>
+
+#### Return
+
+```Task<double>```
+
+variable result.
+
+<br>
+
+### ```public Task<double> GetVariableAsync_Native(VSOPBody body,int iv, VSOPTime time)```
+
+Calculate a specific variable of  a planet. Using Native Accelerate.
 
 <br>
 
@@ -274,6 +359,36 @@ Can be explicit cast to ```VSOPResult_XYZ``` and ```VSOPResult_LBR```
 
 <br>
 
+### ```public VSOPResult_ELL GetPlanetPosition_Native(VSOPBody body, VSOPTime time)```
+
+Calculate all variable of a planet. Using Native Accelerate.
+
+<br>
+
+#### Parameters
+
+```body``` VSOPBody
+
+Planet enum.
+
+<br>
+
+```time``` VSOPTime
+
+Exclusive time class in VSOP2013.
+
+<br>
+
+#### Return
+
+```VSOPResult_ELL``` 
+
+Full Result with 6 variable of Elliptic  Coordinates.
+
+Can be explicit cast to ```VSOPResult_XYZ``` and ```VSOPResult_LBR```
+
+<br>
+
 ### ```public Task<VSOPResult_ELL> GetPlanetPositionAsync(VSOPBody body, VSOPTime time)```
 
 Calculate all variable of a planet.
@@ -303,6 +418,37 @@ Full Result with 6 variable of Elliptic  Coordinates.
 Can be explicit cast to ```VSOPResult_XYZ``` and ```VSOPResult_LBR```
 
 <br>
+
+### ```public Task<VSOPResult_ELL> GetPlanetPositionAsync_Native(VSOPBody body, VSOPTime time)```
+
+Calculate all variable of a planet. Using Native Accelerate.
+
+<br>
+
+#### Parameters
+
+```body``` VSOPBody
+
+Planet enum.
+
+<br>
+
+```time``` VSOPTime
+
+Exclusive time class in VSOP2013.
+
+<br>
+
+#### Return
+
+```Task<VSOPResult_ELL>``` 
+
+Full Result with 6 variable of Elliptic  Coordinates.
+
+Can be explicit cast to ```VSOPResult_XYZ``` and ```VSOPResult_LBR```
+
+<br>
+
 
 ## Static Class Utility
 
@@ -376,7 +522,7 @@ Array of cartesian coordinate elements
 
 ### ```static double[] ELLtoXYZ(double[] ell)```
 
-This is a magic function I directly copy from VSOP2013.
+This is a magic function I directly copy from original VSOP2013.
 
 It's way beyond my math level.
 

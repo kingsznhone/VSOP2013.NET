@@ -37,24 +37,24 @@ namespace Demo
 
             ell = vsop.GetPlanetPosition(VSOPBody.EMB, vTime);
             FormattedPrint(ell, vTime);
+            ell = vsop.GetPlanetPosition_Native(VSOPBody.EMB, vTime);
+            FormattedPrint(ell, vTime);
+            //xyz = (VSOPResult_XYZ)ell;
+            //FormattedPrint(xyz, vTime);
+            //xyz.ReferenceFrame = ReferenceFrame.ICRSJ2000;
+            //FormattedPrint(xyz, vTime);
 
-            xyz = (VSOPResult_XYZ)ell;
-            FormattedPrint(xyz, vTime);
-            xyz.ReferenceFrame = ReferenceFrame.ICRSJ2000;
-            FormattedPrint(xyz, vTime);
+            //lbr = (VSOPResult_LBR)ell;
+            //FormattedPrint(lbr, vTime);
+            //lbr.ReferenceFrame = ReferenceFrame.ICRSJ2000;
+            //FormattedPrint(lbr, vTime);
 
-            lbr = (VSOPResult_LBR)ell;
-            FormattedPrint(lbr, vTime);
-            lbr.ReferenceFrame = ReferenceFrame.ICRSJ2000;
-            FormattedPrint(lbr, vTime);
-
-            //for(int i = 0; i < 1000; i++)
-            {
-                foreach (VSOPBody body in Enum.GetValues(typeof(VSOPBody)))
-                {
-                    ell = vsop.GetPlanetPosition(body, vTime);
-                }
-            }
+            //{
+            //    foreach (VSOPBody body in Enum.GetValues(typeof(VSOPBody)))
+            //    {
+            //        ell = vsop.GetPlanetPosition(body, vTime);
+            //    }
+            //}
 
             Console.WriteLine("Press Enter to Start Performance Test...");
             Console.ReadLine();
@@ -63,6 +63,7 @@ namespace Demo
 #else
             var summary = BenchmarkRunner.Run<PerfTest>();
 #endif
+            Console.ReadLine();
         }
 
         public static void FormattedPrint(VSOPResult Result, VSOPTime vtime)
@@ -106,8 +107,8 @@ namespace Demo
                     WriteColorLine("Reference Frame: ", ConsoleColor.Green, $"\tICRS equinox and ecliptic J2000");
                     break;
             }
-            WriteColorLine("At UTC: ", ConsoleColor.Green, $"\t\t{Result.Time.UTC.ToUniversalTime().ToString("o")}");
-            WriteColorLine("At TDB: ", ConsoleColor.Green, $"\t\t{Result.Time.TDB.ToString("o")}");
+            WriteColorLine("At UTC: ", ConsoleColor.Green, $"\t\t{Result.Time.UTC.ToUniversalTime():o}");
+            WriteColorLine("At TDB: ", ConsoleColor.Green, $"\t\t{Result.Time.TDB:o}");
 
             if (Result.CoordinatesType == CoordinatesType.Elliptic)
             {
@@ -158,8 +159,8 @@ namespace Demo
             foreach (var o in oo)
                 if (o == null)
                     Console.ResetColor();
-                else if (o is ConsoleColor)
-                    Console.ForegroundColor = (ConsoleColor)o;
+                else if (o is ConsoleColor color)
+                    Console.ForegroundColor = color;
                 else
                     Console.Write(o.ToString());
             Console.WriteLine();

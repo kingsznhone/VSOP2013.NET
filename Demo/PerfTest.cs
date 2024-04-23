@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using VSOP2013;
@@ -6,8 +7,8 @@ using VSOP2013;
 namespace Demo
 {
     [SimpleJob(RuntimeMoniker.Net60)]
+    [SimpleJob(RuntimeMoniker.Net70)]
     [SimpleJob(RuntimeMoniker.Net80)]
-    
     [MemoryDiagnoser]
     public class PerfTest
     {
@@ -28,10 +29,17 @@ namespace Demo
             vTime = new VSOPTime(dt, TimeFrame.UTC);
         }
 
-        [Benchmark]
+        [Benchmark(Baseline = true)]
         public VSOPResult Compute()
         {
             var ell = vsop.GetPlanetPosition(VSOPBody.JUPITER, vTime);
+            return ell;
+        }
+
+        [Benchmark]
+        public VSOPResult Compute_Native()
+        {
+            var ell = vsop.GetPlanetPosition_Native(VSOPBody.JUPITER, vTime);
             return ell;
         }
     }
