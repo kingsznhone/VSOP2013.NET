@@ -9,9 +9,9 @@ namespace VSOP2013
     {
 
         [DllImport("Resources/NativeAccelerator.dll")]
-        public static extern double StartIteration(Term[] terms,int length, double tj, double tit);
+        private static extern double StartIteration(Term[] terms,int length, double tj, double tit);
 
-        public List<PlanetTable> VSOP2013DATA;
+        private List<PlanetTable> VSOP2013DATA;
 
         /// <summary>
         /// //Planetary frequency in longitude
