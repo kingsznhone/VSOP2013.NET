@@ -1,7 +1,6 @@
-﻿using System.Diagnostics;
-using System.IO;
+﻿using MessagePack;
+using System.Diagnostics;
 using System.IO.Compression;
-using MessagePack;
 
 namespace VSOP2013.DataConverter
 {

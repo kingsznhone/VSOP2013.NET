@@ -1,7 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
+using System;
 using VSOP2013;
 
 namespace Demo

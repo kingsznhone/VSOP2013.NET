@@ -69,7 +69,7 @@ namespace VSOP2013.DataConverter
                 }
                 VSOP2013DATA.Add(planet);
             }
-            
+
             ParallelLoopResult result = Parallel.For(0, 9, ip =>
             {
                 ReadPlanet(VSOP2013DATA[ip], ip);
@@ -108,7 +108,7 @@ namespace VSOP2013.DataConverter
 
                     Planet.body = (VSOPBody)H.ip;
                     Planet.variables[H.iv].Body = (VSOPBody)H.ip;
-                    Planet.variables[H.iv].Variable = (VSOPVariable) H.iv;
+                    Planet.variables[H.iv].Variable = (VSOPVariable)H.iv;
 
                     Term[] buffer = new Term[H.nt];
                     for (int i = 0; i < H.nt; i++)
@@ -166,7 +166,6 @@ namespace VSOP2013.DataConverter
             //
             for (int counter = 0; counter < 5; counter++)
             {
-                
                 Bufferiphi[index] = int.Parse(lineSpan[lineptr..(lineptr + 3)].Trim());
                 index++;
                 lineptr += 3;
