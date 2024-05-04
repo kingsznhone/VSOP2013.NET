@@ -24,7 +24,7 @@
                 else if (_referenceFrame == ReferenceFrame.ICRSJ2000 && value == ReferenceFrame.DynamicalJ2000)
                 {
                     Variables_XYZ = Utility.ICRStoDynamical(Variables_XYZ);
-                    _referenceFrame = ReferenceFrame.DynamicalJ2000;
+                    _referenceFrame = value;
                     _coordinatesReference = CoordinatesReference.EclipticHeliocentric;
                 }
             }

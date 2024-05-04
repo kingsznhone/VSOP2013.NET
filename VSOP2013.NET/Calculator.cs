@@ -7,11 +7,15 @@ using System.Runtime.Intrinsics;
 
 namespace VSOP2013
 {
-    public class Calculator
+    public partial class Calculator
     {
+#if NET6_0
         [DllImport("Resources/NativeAccelerator.dll")]
-        private static extern double StartIteration(Term[] terms, int length, double tj, double tit);
-
+        public static extern double StartIteration(Term[] terms, int length, double tj, double tit);
+#elif NET7_0_OR_GREATER
+        [LibraryImport("Resources/NativeAccelerator.dll", EntryPoint = "StartIteration", StringMarshalling = StringMarshalling.Utf16)]
+        internal static partial double StartIteration(Term[] terms, int length, double tj, double tit);
+#endif
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Vector128<float> GetZero() => Vector128<float>.Zero;
 

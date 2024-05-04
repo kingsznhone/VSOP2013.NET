@@ -28,14 +28,14 @@ namespace Demo
             vTime = new VSOPTime(dt, TimeFrame.UTC);
         }
 
-        [Benchmark(Baseline = true)]
+        //[Benchmark(Baseline = true)]
         public VSOPResult Compute()
         {
             var ell = vsop.GetPlanetPosition(VSOPBody.JUPITER, vTime);
             return ell;
         }
 
-        //[Benchmark]
+        [Benchmark]
         public VSOPResult Compute_Native()
         {
             var ell = vsop.GetPlanetPosition_Native(VSOPBody.JUPITER, vTime);
