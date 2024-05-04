@@ -36,12 +36,6 @@
 
         public double[] Variables_LBR { get; set; }
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="body"></param>
-        /// <param name="time"></param>
-        /// <param name="ell">Elliptic elements</param>
         public VSOPResult_LBR(VSOPResult_ELL result)
         {
             Variables_ELL = result.Variables_ELL;

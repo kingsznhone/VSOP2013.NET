@@ -68,7 +68,7 @@ namespace VSOP2013
         public int TermsCount;
 
         [Key(4)]
-        public Term[] Terms;      
+        public Term[] Terms;
     }
 
     [MessagePackObject]

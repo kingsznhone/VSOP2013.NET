@@ -134,7 +134,7 @@ namespace VSOP2013
             lbr[1] = b;
             lbr[2] = r;
             lbr[3] = dl;
-            lbr[4] =-db;
+            lbr[4] = -db;
             lbr[5] = dr;
             return lbr.ToArray();
         }
@@ -201,7 +201,7 @@ namespace VSOP2013
             xyz[2] = z;
             xyz[3] = dx;
             xyz[4] = dy;
-            xyz[5] =-dz;
+            xyz[5] = -dz;
             return xyz.ToArray();
         }
 
