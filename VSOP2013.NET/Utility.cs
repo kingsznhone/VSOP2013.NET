@@ -55,7 +55,7 @@ namespace VSOP2013
         }
 
         /// <summary>
-        /// Convert cardinal coordinate to spherical coordinate
+        /// Convert cartesian coordinate to spherical coordinate
         /// </summary>
         /// <param name="xyz">x,y,z,dx,dy,dz</param>
         /// <returns>l,b,r,dl,db,dr</returns>
@@ -89,7 +89,7 @@ namespace VSOP2013
             //Sin(θ) = Cos(b), Cos(θ) = Sin(b)
             b = Math.Asin(z / r);
 
-#if NET7_0
+#if NET7_0_OR_GREATER
 
             #region vector matrix mul
 
@@ -98,6 +98,7 @@ namespace VSOP2013
                 Vector256<double> v1 = Vector256.Create(x / r                                     , y / r                                     , z / r                                                , 0);
                 Vector256<double> v2 = Vector256.Create(x * z / (r * r * Math.Sqrt(x * x + y * y)), y * z / (r * r * Math.Sqrt(x * x + y * y)), -(x * x + y * y) / (r * r * Math.Sqrt(x * x + y * y)), 0);
                 Vector256<double> v3 = Vector256.Create(-y / (x * x + y * y)                      , x / (x * x + y * y)                       , 0                                                    , 0);
+
                 Vector256<double> vv = Vector256.Create(dx                                        , dy                                        , dz                                                   , 0);
 
                 lbr[0] = l;
@@ -113,14 +114,14 @@ namespace VSOP2013
 
 #endif
 
-            // Inverse Jacobian matrix  From  Caridnal to Sperical
+            // Inverse Jacobian matrix  From  cartesian to spherical
             //https://en.wikipedia.org/wiki/Spherical_coordinate_system#Integration_and_differentiation_in_spherical_coordinates
-            double[,] J_1 = {
+            double[,] Inverse_J = {
                            {x/r                          , y/r                         , z/r                                 },
                            {x*z/(r*r*Math.Sqrt(x*x+y*y)) , y*z/(r*r*Math.Sqrt(x*x+y*y)),-(x*x+y*y)/(r*r*Math.Sqrt(x*x+y*y))  },
                            {-y/(x*x+y*y)                 , x/(x*x+y*y)                 , 0                                   }};
             double[,] Velocity = { { dx }, { dy }, { dz } };
-            var C = MultiplyMatrix(J_1, Velocity);
+            var C = MultiplyMatrix(Inverse_J, Velocity);
             dl = C[2, 0];
             db = C[1, 0];
             dr = C[0, 0];
@@ -134,13 +135,13 @@ namespace VSOP2013
             lbr[1] = b;
             lbr[2] = r;
             lbr[3] = dl;
-            lbr[4] =-db;
+            lbr[4] = -db;
             lbr[5] = dr;
             return lbr.ToArray();
         }
 
         /// <summary>
-        /// convert spherical coordinate to cardinal coordinate
+        /// convert spherical coordinate to cartesian coordinate
         /// </summary>
         /// <param name="lbr">l,b,r,dl,db,dr</param>
         /// <returns>x,y,z,dx,dy,dz</returns>
@@ -161,7 +162,7 @@ namespace VSOP2013
             y = r * Math.Cos(b) * Math.Sin(l);
             z = r * Math.Sin(b);
 
-#if NET7_0
+#if NET7_0_OR_GREATER
 
             #region vector matrix mul
 
@@ -170,6 +171,7 @@ namespace VSOP2013
                 Vector256<double> m1 = Vector256.Create(Math.Cos(b) * Math.Cos(l), r * Math.Sin(b) * Math.Cos(l), -r * Math.Cos(b) * Math.Sin(l), 0);
                 Vector256<double> m2 = Vector256.Create(Math.Cos(b) * Math.Sin(l), r * Math.Sin(b) * Math.Sin(l), r * Math.Cos(b) * Math.Cos(l) , 0);
                 Vector256<double> m3 = Vector256.Create(Math.Sin(b)              , -r * Math.Cos(b)             , 0                             , 0);
+                
                 Vector256<double> vv = Vector256.Create(dr                       , db                           , dl                            , 0);
 
                 xyz[0] = x;
@@ -184,7 +186,7 @@ namespace VSOP2013
             #endregion vector matrix mul
 
 #endif
-            // Jacobian matrix From Sperical to Caridnal
+            // Jacobian matrix From spherical to cartesian
             //https://en.wikipedia.org/wiki/Spherical_coordinate_system#Integration_and_differentiation_in_spherical_coordinates
             double[,] J = {
                            { Math.Cos(b) * Math.Cos(l),  r * Math.Sin(b) * Math.Cos(l), -r * Math.Cos(b) * Math.Sin(l)  },
@@ -201,18 +203,18 @@ namespace VSOP2013
             xyz[2] = z;
             xyz[3] = dx;
             xyz[4] = dy;
-            xyz[5] =-dz;
+            xyz[5] = -dz;
             return xyz.ToArray();
         }
 
         /// <summary>
-        /// Convert Elliptic coordinate to cardinal coordinate.
+        /// Convert Elliptic coordinate to cartesian coordinate.
         /// This is kind of magic that I will never understand.
         /// Directly translate from VSOP2013.f.
         /// </summary>
         /// <param name="body">planet</param>
         /// <param name="ell">Elliptic Elements: a,l,k,h,q,p </param>
-        /// <returns>Cardinal Heliocentric Coordinates</returns>
+        /// <returns>cartesian Heliocentric Coordinates</returns>
         public static double[] ELLtoXYZ(VSOPBody body, double[] ell)
         {
             Span<double> xyz = stackalloc double[6];
@@ -289,7 +291,7 @@ namespace VSOP2013
         }
 
         /// <summary>
-        /// Convert innertial frame from dynamical to ICRS.
+        /// Convert inertial frame from dynamical to ICRS.
         /// </summary>
         /// <param name="dynamical">Ecliptic Heliocentric Coordinates - Dynamical Frame J2000</param>
         /// <returns>Equatorial Heliocentric Coordinates - ICRS Frame J2000</returns>
@@ -308,12 +310,13 @@ namespace VSOP2013
             Sphi = Math.Sin(phi);
             Cphi = Math.Cos(phi);
 
-#if NET7_0
+#if NET7_0_OR_GREATER
             if (Vector256.IsHardwareAccelerated)
             {
                 Vector256<double> m1 = Vector256.Create(Cphi, -Sphi * Ceps, Sphi * Seps, 0);
                 Vector256<double> m2 = Vector256.Create(Sphi, Cphi * Ceps, -Cphi * Seps, 0);
                 Vector256<double> m3 = Vector256.Create(0, Seps, Ceps, 0);
+                
                 Vector256<double> vv = Vector256.Create(dynamical[0], dynamical[1], dynamical[2], 0);
                 Vector256<double> vdv = Vector256.Create(dynamical[3], dynamical[4], dynamical[5], 0);
 
@@ -333,7 +336,7 @@ namespace VSOP2013
                                           {Sphi,  Cphi*Ceps, -Cphi*Seps },
                                           {0,     Seps,       Ceps      }};
 
-            // Vector for cardinal coordnate element
+            // Vector for cartesian coordinate element
             double[,] A = new double[,] { {dynamical[0]},
                                           {dynamical[1]},
                                           {dynamical[2]}};
@@ -357,7 +360,7 @@ namespace VSOP2013
         }
 
         /// <summary>
-        /// Convert innertial frame from ICRS to dynamical.
+        /// Convert inertial frame from ICRS to dynamical.
         /// </summary>
         /// <param name="icrs">Equatorial Heliocentric Coordinates - ICRS Frame J2000</param>
         /// <returns>Ecliptic Heliocentric Coordinates - Dynamical Frame J2000</returns>
@@ -376,7 +379,7 @@ namespace VSOP2013
             Sphi = Math.Sin(phi);
             Cphi = Math.Cos(phi);
 
-#if NET7_0
+#if NET7_0_OR_GREATER
 
             #region vector matrix mul
 
@@ -385,6 +388,7 @@ namespace VSOP2013
                 Vector256<double> m1 = Vector256.Create(Cphi, Sphi, 0, 0);
                 Vector256<double> m2 = Vector256.Create(-Sphi * Ceps, Cphi * Ceps, Seps, 0);
                 Vector256<double> m3 = Vector256.Create(Sphi * Seps, -Cphi * Seps, Ceps, 0);
+                
                 Vector256<double> vv = Vector256.Create(icrs[0], icrs[1], icrs[2], 0);
                 Vector256<double> vdv = Vector256.Create(icrs[3], icrs[4], icrs[5], 0);
 
@@ -406,7 +410,7 @@ namespace VSOP2013
             double[,] R_1 = new double[,] {{ Cphi,       Sphi,      0    },
                                            {-Sphi*Ceps,  Cphi*Ceps, Seps },
                                            { Sphi*Seps, -Cphi*Seps, Ceps }};
-            // Vector for cardinal coordnate element
+            // Vector for cartesian coordinate element
             double[,] A = new double[,] { {icrs[0]},
                                           {icrs[1]},
                                           {icrs[2]}};

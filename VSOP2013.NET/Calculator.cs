@@ -1,15 +1,25 @@
 ﻿using MessagePack;
 using System.IO.Compression;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Intrinsics;
 
 namespace VSOP2013
 {
+#if NET6_0
     public class Calculator
     {
-
         [DllImport("Resources/NativeAccelerator.dll")]
-        private static extern double StartIteration(Term[] terms,int length, double tj, double tit);
+        public static extern double StartIteration(Term[] terms, int length, double tj, double tit);
+#elif NET7_0_OR_GREATER
+    public partial class Calculator
+    {
+        [LibraryImport("Resources/NativeAccelerator.dll", EntryPoint = "StartIteration", StringMarshalling = StringMarshalling.Utf16)]
+        internal static partial double StartIteration(Term[] terms, int length, double tj, double tit);
+#endif
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static Vector128<float> GetZero() => Vector128<float>.Zero;
 
         private List<PlanetTable> VSOP2013DATA;
 
@@ -62,6 +72,7 @@ namespace VSOP2013
             VSOPResult_ELL Coordinate = new(body, time, ELL);
             return Coordinate;
         }
+
         public VSOPResult_ELL GetPlanetPosition_Native(VSOPBody body, VSOPTime time)
         {
             double[] ELL = new double[6];
@@ -77,11 +88,11 @@ namespace VSOP2013
         {
             return await Task.Run(() => GetPlanetPosition(body, time));
         }
+
         public async Task<VSOPResult_ELL> GetPlanetPositionAsync_Native(VSOPBody body, VSOPTime time)
         {
             return await Task.Run(() => GetPlanetPosition_Native(body, time));
         }
-
 
         /// <summary>
         /// Calculate a specific variable
@@ -94,6 +105,7 @@ namespace VSOP2013
         {
             return Calculate(VSOP2013DATA[(int)body].variables[iv], time.J2000);
         }
+
         public double GetVariable_Native(VSOPBody body, int iv, VSOPTime time)
         {
             return Calculate_Native(VSOP2013DATA[(int)body].variables[iv], time.J2000);
@@ -103,6 +115,7 @@ namespace VSOP2013
         {
             return await Task.Run(() => GetVariable(body, iv, time));
         }
+
         public async Task<double> GetVariableAsync_Native(VSOPBody body, int iv, VSOPTime time)
         {
             return await Task.Run(() => GetVariable_Native(body, iv, time));
@@ -135,15 +148,14 @@ namespace VSOP2013
             {
                 if (Table.PowerTables[it].Terms == null) continue;
                 terms = Table.PowerTables[it].Terms;
+#if NET8_0
+                // Detail https://github.com/dotnet/runtime/issues/95954
+                _ = GetZero();
+#endif
                 for (int n = 0; n < terms.Length; n++)
                 {
                     u = terms[n].aa + terms[n].bb * tj;
-#if NET8_0
-                    su = Math.Sin(u);
-                    cu = Math.Cos(u);
-#else
                     (su, cu) = Math.SinCos(u);
-#endif
                     result += t[it] * (terms[n].ss * su + terms[n].cc * cu);
                 }
             }
@@ -186,6 +198,5 @@ namespace VSOP2013
             }
             return result;
         }
-
     }
 }

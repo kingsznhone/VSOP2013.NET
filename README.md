@@ -45,7 +45,7 @@ Note: .NET 8 occurs performance regression due to RyuJIT bugs. [Detail Here](htt
 8. Brotli compression on source data. ~300Mb -> ~50MB.
 9. Optional Native Side library accelerate. (Only on Windows)
 
-<br>
+<br> 
 
 ## Introduction
 
