@@ -76,15 +76,13 @@ namespace VSOP2013.DataConverter
             Console.WriteLine("Press Enter to exit...");
             Console.ReadLine();
 
-            ProcessStartInfo startInfo = new ProcessStartInfo
+            // Open explorer to output path.
+            Process.Start(new ProcessStartInfo
             {
                 FileName = "explorer.exe",
                 Arguments = OutputDir.FullName,
                 UseShellExecute = true
-            };
-
-            // 使用Process.Start启动进程
-            Process.Start(startInfo);
+            });
 
             #endregion Test
         }

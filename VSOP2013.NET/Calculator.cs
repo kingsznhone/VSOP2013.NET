@@ -7,12 +7,14 @@ using System.Runtime.Intrinsics;
 
 namespace VSOP2013
 {
-    public partial class Calculator
-    {
 #if NET6_0
+    public class Calculator
+    {
         [DllImport("Resources/NativeAccelerator.dll")]
         public static extern double StartIteration(Term[] terms, int length, double tj, double tit);
 #elif NET7_0_OR_GREATER
+    public partial class Calculator
+    {
         [LibraryImport("Resources/NativeAccelerator.dll", EntryPoint = "StartIteration", StringMarshalling = StringMarshalling.Utf16)]
         internal static partial double StartIteration(Term[] terms, int length, double tj, double tit);
 #endif

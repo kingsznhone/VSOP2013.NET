@@ -98,6 +98,7 @@ namespace VSOP2013
                 Vector256<double> v1 = Vector256.Create(x / r                                     , y / r                                     , z / r                                                , 0);
                 Vector256<double> v2 = Vector256.Create(x * z / (r * r * Math.Sqrt(x * x + y * y)), y * z / (r * r * Math.Sqrt(x * x + y * y)), -(x * x + y * y) / (r * r * Math.Sqrt(x * x + y * y)), 0);
                 Vector256<double> v3 = Vector256.Create(-y / (x * x + y * y)                      , x / (x * x + y * y)                       , 0                                                    , 0);
+
                 Vector256<double> vv = Vector256.Create(dx                                        , dy                                        , dz                                                   , 0);
 
                 lbr[0] = l;
@@ -170,6 +171,7 @@ namespace VSOP2013
                 Vector256<double> m1 = Vector256.Create(Math.Cos(b) * Math.Cos(l), r * Math.Sin(b) * Math.Cos(l), -r * Math.Cos(b) * Math.Sin(l), 0);
                 Vector256<double> m2 = Vector256.Create(Math.Cos(b) * Math.Sin(l), r * Math.Sin(b) * Math.Sin(l), r * Math.Cos(b) * Math.Cos(l) , 0);
                 Vector256<double> m3 = Vector256.Create(Math.Sin(b)              , -r * Math.Cos(b)             , 0                             , 0);
+                
                 Vector256<double> vv = Vector256.Create(dr                       , db                           , dl                            , 0);
 
                 xyz[0] = x;
@@ -314,6 +316,7 @@ namespace VSOP2013
                 Vector256<double> m1 = Vector256.Create(Cphi, -Sphi * Ceps, Sphi * Seps, 0);
                 Vector256<double> m2 = Vector256.Create(Sphi, Cphi * Ceps, -Cphi * Seps, 0);
                 Vector256<double> m3 = Vector256.Create(0, Seps, Ceps, 0);
+                
                 Vector256<double> vv = Vector256.Create(dynamical[0], dynamical[1], dynamical[2], 0);
                 Vector256<double> vdv = Vector256.Create(dynamical[3], dynamical[4], dynamical[5], 0);
 
@@ -385,6 +388,7 @@ namespace VSOP2013
                 Vector256<double> m1 = Vector256.Create(Cphi, Sphi, 0, 0);
                 Vector256<double> m2 = Vector256.Create(-Sphi * Ceps, Cphi * Ceps, Seps, 0);
                 Vector256<double> m3 = Vector256.Create(Sphi * Seps, -Cphi * Seps, Ceps, 0);
+                
                 Vector256<double> vv = Vector256.Create(icrs[0], icrs[1], icrs[2], 0);
                 Vector256<double> vdv = Vector256.Create(icrs[3], icrs[4], icrs[5], 0);
 
