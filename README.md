@@ -47,131 +47,10 @@ Note: .NET 8 occurs performance regression due to RyuJIT bugs. [Detail Here](htt
 
 <br> 
 
-## Introduction
+## Documentation
 
-The VSOP2013 files contain the series of the elliptic elements for the 8 planets Mercury, Venus, Earth-Moon barycenter, Mars, Jupiter, Saturn, Uranus, and Neptune and for the dwarf planet Pluto of the solution VSOP2013. The planetary solution VSOP2013 is fitted to the numerical integration INPOP10a built at IMCCE, Paris Observatory over the time interval +1890...+2000.
+[Gitbook](https://zangai-family.gitbook.io/vsop2013.net/)
 
-The precision is of a few 0.1″ for the telluric planets (1.6″ for Mars) over the time interval −4000...+8000.
-
-G. FRANCOU & J.-L. SIMON (MAY 2013) 
- 
-Ref: Simon J.-L., Francou G., Fienga A., Manche H., A&A 557, A49 (2013) 
- 
-The planetary solution VSOP2013 is fitted to the numerical integration INPOP10a built at IMCCE, Paris Observatory (https://ftp.imcce.fr/pub/ephem/planets/vsop2013/).   
-
-
-## How to use
-
-* NuGet Package Manager
-    ```
-    PM> NuGet\Install-Package VSOP2013.NET
-    ```
-
-```
-using VSOP2013;
-
-Calculator vsop = new Calculator();
-
-// Create VSOPTime using UTC .
-DateTime Tinput = DateTime.Now;
-VSOPTime vTime = new VSOPTime(Tinput.ToUniversalTime(),TimeFrame.UTC);
-
-// Calculate EMB's present position
-VSOPResult_ELL ell = vsop.GetPlanetPosition(VSOPBody.EMB, vTime);
-
-// Convert to diffirent coordinate system.
-VSOPResult_XYZ xyz=ell.ToXYZ();
-VSOPResult_LBR lbr=ell.ToLBR();
-
-// OR
-xyz = (VSOPResult_XYZ)ell;
-lbr = (VSOPResult_LBR)ell;
-
-// Print result
-Console.WriteLine($"Body: {Enum.GetName(ell.Body)}");
-Console.WriteLine($"Coordinates Type: {Enum.GetName(ell.CoordinatesType)}");
-Console.WriteLine($"Coordinates Reference: {Enum.GetName(ell.CoordinatesReference)}");
-Console.WriteLine($"Reference Frame: {Enum.GetName(ell.ReferenceFrame)}");
-Console.WriteLine($"Time UTC: {ell.Time.UTC.ToString("o")}");
-Console.WriteLine($"Time TDB: {ell.Time.TDB.ToString("o")}");
-Console.WriteLine("---------------------------------------------------------------");
-Console.WriteLine(String.Format("{0,-33}{1,30}", "semi-major axis (au)", ell.a));
-Console.WriteLine(String.Format("{0,-33}{1,30}", "mean longitude (rad)", ell.l));
-Console.WriteLine(String.Format("{0,-33}{1,30}", "k = e*cos(pi) (rad)", ell.k));
-Console.WriteLine(String.Format("{0,-33}{1,30}", "h = e*sin(pi) (rad)", ell.h));
-Console.WriteLine(String.Format("{0,-33}{1,30}", "q = sin(i/2)*cos(omega) (rad)", ell.q));
-Console.WriteLine(String.Format("{0,-33}{1,30}", "p = sin(i/2)*sin(omega) (rad)", ell.p));
-Console.WriteLine("===============================================================");
-```
-
-## Change Log
-
-
-### 2024.04.24 v1.2.0 
-
-Add .NET 8. which cause performance regression.
-
-Add Native Accelerate method ```GetPlanetPosition_Native``` to accelerate calculation. with 30%+ performance Improvment. (Experimental)
-
-Native CPP code is only for Windows x64 AVX2 enviroment.
-
-Using fast floating-point compile options on native libraries can result in a decrease in precision and is difficult to estimate.
-
-
-### 2024.01.14 v1.1.8
-
-Fix critical error in ELL to XYZ convertion. 
-
-
-### 2023.12.13 v1.1.7
-
-Bug fix.
-
-Add explicit cast of VSOPResult
-
-### 2023.9.3 v1.1.6
-
-SIMD Accel Utility. 
-
-Bug Fix
-
-### 2023.7.7 v1.1.5
-
-Bug Fix.
-
-API change with some feature in VSOP87
-
-### 2023.7.05 v1.1.2
-
-Many  improvements.
-
-Some of them are from VSOP87.NET
-
-### 2023.03.26 v1.1.1
-
-Initialize performance upgrade.
-
-Add result classes.
-
-Use MessagePack to compress original data.
-
-### 2022.06.02 v1.0.0
-
-New features.
-
-Performance Optimization.
-
-Upgrade to .NET 6
-
-### 2020.11.14 v0.9b
-
-Upgrade to .NET 5
-
-### 2020.07.06 v0.1b
-
-Initial PR.
-
-<br>
 
 ## Enviroment Require
 
@@ -189,6 +68,3 @@ Windows 10 64bit or Higher
 
 <br>
 
-## Api Reference 
-
-[Gitbook](https://zangai-family.gitbook.io/vsop2013.net/)
