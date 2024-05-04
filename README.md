@@ -54,13 +54,9 @@ Note: .NET 8 occurs performance regression due to RyuJIT bugs. [Detail Here](htt
 
 ## Enviroment Require
 
-.NET6 Runtime
+.NET 6/7/8 Runtime
 
-.NET7 Runtime
-
-.NET8 Runtime (Planned) 
-
-Windows 10 64bit or Higher
+Windows 10 64bit with AVX2 for native accelerate
 
 ## Reference
  
