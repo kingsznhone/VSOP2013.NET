@@ -3,6 +3,10 @@
 [![NuGet package](https://img.shields.io/nuget/v/VSOP2013.NET.svg?logo=NuGet)](https://www.nuget.org/packages/VSOP2013.NET/)
 [![NuGet package](https://img.shields.io/nuget/dt/VSOP2013.NET?logo=NuGet)](https://www.nuget.org/packages/VSOP2013.NET/)
 
+This image is used to prevent my account and repository from being cloned by mirror and does not represent my political stance.
+
+<img src="https://static.wikia.nocookie.net/pdsh/images/f/f2/Tank-man-china-web.jpg">
+
 ## What's this?
 
 VSOP was developed and is maintained (updated with the latest data) by the scientists at the Bureau des Longitudes in Paris.
