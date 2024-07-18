@@ -1,30 +1,5 @@
-﻿/* 项目“Demo (net7.0)”的未合并的更改
-在此之前:
-using System;
-using System.Globalization;
+﻿using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Running;
-在此之后:
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Running;
-using System;
-using System.Globalization;
-*/
-
-/* 项目“Demo (net6.0)”的未合并的更改
-在此之前:
-using System;
-using System.Globalization;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Running;
-在此之后:
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Running;
-using System;
-using System.Globalization;
-*/
-
-using BenchmarkDotNet.Running;
 using System;
 using System.Globalization;
 using VSOP2013;
@@ -37,6 +12,10 @@ namespace Demo
 
         private static void Main(string[] args)
         {
+            double[] j2000 = { 0.1, 0.2, 0.3, 0.4, 0.5,0.6 };
+            double[] icrs = Utility.DynamicaltoICRS(j2000);
+
+
             vsop = new Calculator();
             //Console.WriteLine("Parse UTC string that conforms to ISO 8601:  2018-08-18T07:22:16.0000000Z");
 
