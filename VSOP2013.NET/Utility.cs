@@ -1,5 +1,6 @@
 using System.Numerics;
 using System.Runtime.Intrinsics;
+using System.Security.Cryptography;
 
 namespace VSOP2013
 {
@@ -313,20 +314,20 @@ namespace VSOP2013
 #if NET7_0_OR_GREATER
             if (Vector256.IsHardwareAccelerated)
             {
-                Vector256<double> m1 = Vector256.Create(Cphi, -Sphi * Ceps, Sphi * Seps, 0);
-                Vector256<double> m2 = Vector256.Create(Sphi, Cphi * Ceps, -Cphi * Seps, 0);
-                Vector256<double> m3 = Vector256.Create(0, Seps, Ceps, 0);
+                Vector256<double> r1 = Vector256.Create((ReadOnlySpan<double>)(stackalloc double[] { Cphi, -Sphi * Ceps,  Sphi * Seps, 0 }));
+                Vector256<double> r2 = Vector256.Create((ReadOnlySpan<double>)(stackalloc double[] { Sphi,  Cphi * Ceps, -Cphi * Seps, 0 }));
+                Vector256<double> r3 = Vector256.Create((ReadOnlySpan<double>)(stackalloc double[] { 0   ,  Seps       ,  Ceps       , 0 }));
 
-                Vector256<double> vv = Vector256.Create(dynamical[0], dynamical[1], dynamical[2], 0);
-                Vector256<double> vdv = Vector256.Create(dynamical[3], dynamical[4], dynamical[5], 0);
+                Vector256<double> vv = Vector256.Create((ReadOnlySpan<double>)(stackalloc double[] { dynamical[0], dynamical[1], dynamical[2], 0 }));
+                Vector256<double> vdv = Vector256.Create((ReadOnlySpan<double>)(stackalloc double[] { dynamical[3], dynamical[4], dynamical[5], 0 }));
 
-                icrs[0] = Vector256.Sum(vv * m1);
-                icrs[1] = Vector256.Sum(vv * m2);
-                icrs[2] = Vector256.Sum(vv * m3);
+                icrs[0] = Vector256.Sum(vv * r1);
+                icrs[1] = Vector256.Sum(vv * r2);
+                icrs[2] = Vector256.Sum(vv * r3);
 
-                icrs[3] = Vector256.Sum(vdv * m1);
-                icrs[4] = Vector256.Sum(vdv * m2);
-                icrs[5] = Vector256.Sum(vdv * m3);
+                icrs[3] = Vector256.Sum(vdv * r1);
+                icrs[4] = Vector256.Sum(vdv * r2);
+                icrs[5] = Vector256.Sum(vdv * r3);
                 return icrs.ToArray();
             }
 #endif
