@@ -60,7 +60,7 @@ Windows 10 64bit with AVX2 for native accelerate
 
 ## Reference
  
- [MessagePack](https://github.com/neuecc/MessagePack-CSharp#lz4-compression"MessagePack for C#")
+ [MessagePack](https://github.com/neuecc/MessagePack-CSharp)
 
 <br>
 
