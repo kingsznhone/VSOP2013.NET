@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>net8.0</TargetFrameworks>
     <PlatformTarget>x64</PlatformTarget>
     <ImplicitUsings>enable</ImplicitUsings>
     <Platforms>x64</Platforms>
@@ -19,18 +19,11 @@ VSOP2013, computed the positions of the planets directly at any moment, as well 
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources\VSOP2013_EMB.BIN" />
-    <EmbeddedResource Include="Resources\VSOP2013_JUPITER.BIN" />
-    <EmbeddedResource Include="Resources\VSOP2013_MARS.BIN" />
-    <EmbeddedResource Include="Resources\VSOP2013_MERCURY.BIN" />
-    <EmbeddedResource Include="Resources\VSOP2013_NEPTUNE.BIN" />
-    <EmbeddedResource Include="Resources\VSOP2013_PLUTO.BIN" />
-    <EmbeddedResource Include="Resources\VSOP2013_SATURN.BIN" />
-    <EmbeddedResource Include="Resources\VSOP2013_URANUS.BIN" />
-    <EmbeddedResource Include="Resources\VSOP2013_VENUS.BIN" />
+    <EmbeddedResource Include="Resources\VSOP2013.BIN" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="FastLZMA2Net" Version="0.3.0-alpha" />
     <PackageReference Include="MessagePack" Version="2.5.140" />
     <PackageReference Include="MessagePackAnalyzer" Version="2.5.140">
       <PrivateAssets>all</PrivateAssets>

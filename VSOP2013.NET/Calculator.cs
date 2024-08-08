@@ -1,4 +1,5 @@
-﻿using MessagePack;
+﻿using FastLZMA2Net;
+using MessagePack;
 using System.IO.Compression;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -45,21 +46,19 @@ namespace VSOP2013
         {
             //Import Planet Data
             var assembly = Assembly.GetExecutingAssembly();
-            //var names = assembly.GetManifestResourceNames();
-            VSOP2013DATA = new List<PlanetTable>(9);
-            ParallelLoopResult result = Parallel.For(0, 9, ip =>
+            string datafilename = $"VSOP2013.NET.Resources.VSOP2013.BIN";
+            using (MemoryStream recoveryStream = new MemoryStream())
             {
-                string datafilename = $"VSOP2013.NET.Resources.VSOP2013_{(VSOPBody)(ip)}.BIN";
-                using Stream s = assembly.GetManifestResourceStream(datafilename);
-                using BrotliStream bs = new(s, CompressionMode.Decompress);
-                var data = MessagePackSerializer.Deserialize<PlanetTable>(bs);
-                VSOP2013DATA.Add(data);
-            });
+                using (Stream cs = assembly.GetManifestResourceStream(datafilename))
+                {
+                    using (DecompressionStream ds = new DecompressionStream(cs))
+                    {
+                        ds.CopyTo(recoveryStream);
+                    }
+                }
 
-            VSOP2013DATA = VSOP2013DATA.OrderBy(x => x.body).ToList();
-
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
+                VSOP2013DATA = MessagePackSerializer.Deserialize<List<PlanetTable>>(recoveryStream.ToArray());
+            }
         }
 
         public VSOPResult_ELL GetPlanetPosition(VSOPBody body, VSOPTime time)
