@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFrameworks>net8.0</TargetFrameworks>
@@ -8,9 +8,8 @@
 		<Version>1.3.0</Version>
 		<Title>VSOP2013.NET</Title>
 		<Authors>KingsZNHONE</Authors>
-		<Description>
-			VSOP was developed and is maintained (updated with the latest data) by the scientists at the Bureau des Longitudes in Paris.
-			VSOP2013, computed the positions of the planets directly at any moment, as well as their orbital elements with improved accuracy.
+		<Description>VSOP was developed and is maintained (updated with the latest data) by the scientists at the Bureau des Longitudes in Paris.
+VSOP2013, computed the positions of the planets directly at any moment, as well as their orbital elements with improved accuracy.
 		</Description>
 		<RepositoryUrl>https://github.com/kingsznhone/VSOP2013.NET.git</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
@@ -18,11 +17,15 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>VSOP2013.NET</Title>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IncludeSymbols>True</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageIcon>vsop2013.png</PackageIcon>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<EmbeddedResource Include="Resources\VSOP2013.BIN" />
 	</ItemGroup>
+
 
 	<ItemGroup>
 		<PackageReference Include="FastLZMA2Net" Version="0.6.0-beta" />
@@ -30,6 +33,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
+    <None Include="vsop2013.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
 		<None Update="Resources\NativeAccelerator.dll">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
