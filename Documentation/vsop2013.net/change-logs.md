@@ -1,6 +1,18 @@
 # Change Logs
 
-### &#x20;v1.2.1  2024.05.04&#x20;
+### v1.3.0 2024.08.09
+
+Breaking Change Warning
+
+End of .NET 6/7 support
+
+Change data serializer from messagepack to memorypack.
+
+Change data compressor from brotli to FastLZMA2 (beta)
+
+Add OSplatform protection.
+
+### v1.2.1  2024.05.04&#x20;
 
 Fix .NET 8 performance regression.
 
@@ -10,7 +22,7 @@ Use P/Invoke source generator. Native accelerate speed up 50%.
 
 Add .NET 8. which cause performance regression.
 
-Add Native Accelerate method `GetPlanetPosition_Native` to accelerate calculation. with 30%+ performance Improvment. (Experimental)
+Add Native Accelerate method `GetPlanetPosition_Native` to accelerate calculation. with 60%+ performance Improvment. (Experimental)
 
 Native CPP code is only for Windows x64 AVX2 enviroment.
 
