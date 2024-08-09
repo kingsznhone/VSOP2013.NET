@@ -7,11 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VSOP2013.NET", "VSOP2013.NE
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Demo", "Demo\Demo.csproj", "{9CC39AF5-6179-4903-8F3C-ED8ACEFE2399}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{036438D2-DD9F-4EC0-BB13-237C0C13501F}"
-	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataConverter", "DataConverter\DataConverter.csproj", "{2A5C5EFE-C49F-436A-9FC1-176AE11E0334}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NativeAccelerator", "NativeAccelerator\NativeAccelerator.vcxproj", "{1F19706F-2068-4359-A307-FF6620D57100}"
@@ -45,6 +40,7 @@ Global
 		{2A5C5EFE-C49F-436A-9FC1-176AE11E0334}.Debug|x86.ActiveCfg = Debug|x64
 		{2A5C5EFE-C49F-436A-9FC1-176AE11E0334}.Debug|x86.Build.0 = Debug|x64
 		{2A5C5EFE-C49F-436A-9FC1-176AE11E0334}.Release|x64.ActiveCfg = Release|x64
+		{2A5C5EFE-C49F-436A-9FC1-176AE11E0334}.Release|x64.Build.0 = Release|x64
 		{2A5C5EFE-C49F-436A-9FC1-176AE11E0334}.Release|x86.ActiveCfg = Release|x64
 		{2A5C5EFE-C49F-436A-9FC1-176AE11E0334}.Release|x86.Build.0 = Release|x64
 		{1F19706F-2068-4359-A307-FF6620D57100}.Debug|x64.ActiveCfg = Debug|x64

@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 
 namespace VSOP2013.DataConverter
 {
@@ -7,7 +7,7 @@ namespace VSOP2013.DataConverter
         /// <summary>
         /// Mean Longitude J2000 (radian)
         /// </summary>
-        private static readonly double[] ci0 =
+        private static readonly double[] s_ci0 =
         {
             0.4402608631669000e1d,
             0.3176134461576000e1d,
@@ -29,9 +29,9 @@ namespace VSOP2013.DataConverter
         };
 
         /// <summary>
-        /// //Mean Motions in longitude (radian/cy)
+        /// Mean Motions in longitude (radian/cy)
         /// </summary>
-        private static readonly double[] ci1 =
+        private static readonly double[] s_ci1 =
         {
             0.2608790314068555e5d,
             0.1021328554743445e5d,
@@ -214,8 +214,8 @@ namespace VSOP2013.DataConverter
 
             for (int j = 0; j < 17; j++)
             {
-                T.aa += Bufferiphi[j] * ci0[j];
-                T.bb += Bufferiphi[j] * ci1[j];
+                T.aa += Bufferiphi[j] * s_ci0[j];
+                T.bb += Bufferiphi[j] * s_ci1[j];
             }
             return T;
         }

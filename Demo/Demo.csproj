@@ -1,17 +1,17 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
-    <Platforms>x64</Platforms>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFrameworks>net8.0</TargetFrameworks>
+		<Platforms>x64</Platforms>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.13.11" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="BenchmarkDotNet" Version="0.13.11" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\VSOP2013.NET\VSOP2013.NET.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\VSOP2013.NET\VSOP2013.NET.csproj" />
+	</ItemGroup>
 
 </Project>

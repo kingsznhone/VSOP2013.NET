@@ -1,8 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>net8.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PlatformTarget>x64</PlatformTarget>
@@ -10,23 +10,24 @@
   </PropertyGroup>
 
   <ItemGroup>
-	  <EmbeddedResource Include="Resources\README.pdf" />
-	  <EmbeddedResource Include="Resources\VSOP2013.ctl" />
-	  <EmbeddedResource Include="Resources\VSOP2013.f" />
-	  <EmbeddedResource Include="Resources\VSOP2013-secular.dat" />
-	  <EmbeddedResource Include="Resources\VSOP2013p1.dat" />
-	  <EmbeddedResource Include="Resources\VSOP2013p2.dat" />
-	  <EmbeddedResource Include="Resources\VSOP2013p3.dat" />
-	  <EmbeddedResource Include="Resources\VSOP2013p4.dat" />
-	  <EmbeddedResource Include="Resources\VSOP2013p5.dat" />
-	  <EmbeddedResource Include="Resources\VSOP2013p6.dat" />
-	  <EmbeddedResource Include="Resources\VSOP2013p7.dat" />
-	  <EmbeddedResource Include="Resources\VSOP2013p8.dat" />
-	  <EmbeddedResource Include="Resources\VSOP2013p9.dat" />
+    <EmbeddedResource Include="Resources\README.pdf" />
+    <EmbeddedResource Include="Resources\VSOP2013.ctl" />
+    <EmbeddedResource Include="Resources\VSOP2013.f" />
+    <EmbeddedResource Include="Resources\VSOP2013-secular.dat" />
+    <EmbeddedResource Include="Resources\VSOP2013p1.dat" />
+    <EmbeddedResource Include="Resources\VSOP2013p2.dat" />
+    <EmbeddedResource Include="Resources\VSOP2013p3.dat" />
+    <EmbeddedResource Include="Resources\VSOP2013p4.dat" />
+    <EmbeddedResource Include="Resources\VSOP2013p5.dat" />
+    <EmbeddedResource Include="Resources\VSOP2013p6.dat" />
+    <EmbeddedResource Include="Resources\VSOP2013p7.dat" />
+    <EmbeddedResource Include="Resources\VSOP2013p8.dat" />
+    <EmbeddedResource Include="Resources\VSOP2013p9.dat" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MessagePack" Version="2.5.140" />
+    <PackageReference Include="FastLZMA2Net" Version="0.6.0-beta" />
+    <PackageReference Include="MemoryPack" Version="1.21.1" />
   </ItemGroup>
 
   <ItemGroup>

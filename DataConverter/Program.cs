@@ -1,6 +1,6 @@
-﻿using MessagePack;
 using System.Diagnostics;
-using System.IO.Compression;
+using FastLZMA2Net;
+using MemoryPack;
 
 namespace VSOP2013.DataConverter
 {
@@ -34,20 +34,19 @@ namespace VSOP2013.DataConverter
             DirectoryInfo OutputDir = new(Directory.GetCurrentDirectory() + @"\Data");
 
             sw.Restart();
-
-            ParallelLoopResult result = Parallel.For(0, 9, ip =>
+            Compressor compressor = new Compressor(0, 10) { HighCompressLevel = 10 };
+            string filename = Path.Combine(OutputDir.FullName, "VSOP2013.BIN");
+            if (File.Exists(filename))
             {
-                string filename = Path.Combine(OutputDir.FullName, string.Format("VSOP2013_{0}.BIN", VSOP2013DATA[ip].body.ToString()));
-                if (File.Exists(filename))
-                {
-                    File.Delete(filename);
-                }
-                using FileStream fs = new(filename, FileMode.OpenOrCreate);
-                using BrotliStream bs = new(fs, CompressionLevel.SmallestSize);
-                MessagePackSerializer.Serialize(bs, VSOP2013DATA[ip]);
-                Console.WriteLine($"{VSOP2013DATA[ip].body}: \n{filename}.");
-                Console.WriteLine();
-            });
+                File.Delete(filename);
+            }
+            using (FileStream fs = new FileStream(filename, FileMode.CreateNew))
+            {
+                var compressed = compressor.Compress(MemoryPackSerializer.Serialize(VSOP2013DATA));
+                fs.Write(compressed.AsSpan());
+            }
+            Console.WriteLine($"VSOP2013DATA: \n{filename}");
+            Console.WriteLine();
 
             sw.Stop();
             ticks = sw.ElapsedTicks;
@@ -60,13 +59,9 @@ namespace VSOP2013.DataConverter
 
             sw.Restart();
             VSOP2013DATA.Clear();
-            result = Parallel.For(0, 9, ip =>
-            {
-                string filename = Path.Combine(OutputDir.FullName, string.Format("VSOP2013_{0}.BIN", ((VSOPBody)ip).ToString()));
-                using FileStream fs = new(filename, FileMode.OpenOrCreate);
-                using BrotliStream bs = new(fs, CompressionMode.Decompress);
-                VSOP2013DATA.Add(MessagePackSerializer.Deserialize<PlanetTable>(bs));
-            });
+            Decompressor decompressor = new Decompressor(0);
+            var decompressed = decompressor.Decompress(File.ReadAllBytes(filename));//critical bug
+            VSOP2013DATA = MemoryPackSerializer.Deserialize<List<PlanetTable>>(decompressed);
 
             sw.Stop();
             ticks = sw.ElapsedTicks;

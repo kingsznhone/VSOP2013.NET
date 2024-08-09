@@ -1,22 +1,16 @@
-﻿using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Configs;
 using System;
 using System.Globalization;
+using BenchmarkDotNet.Running;
 using VSOP2013;
 
 namespace Demo
 {
     internal class Program
     {
-        private static Calculator vsop;
+        private static readonly Calculator vsop = new Calculator();
 
         private static void Main(string[] args)
         {
-            double[] j2000 = { 0.1, 0.2, 0.3, 0.4, 0.5,0.6 };
-            double[] icrs = Utility.DynamicaltoICRS(j2000);
-
-
-            vsop = new Calculator();
             //Console.WriteLine("Parse UTC string that conforms to ISO 8601:  2018-08-18T07:22:16.0000000Z");
 
             //Parse Time
@@ -158,15 +152,15 @@ namespace Demo
             }
         }
 
-        private static void WriteColorLine(params object[] oo)
+        private static void WriteColorLine(params object[] flow)
         {
-            foreach (var o in oo)
-                if (o == null)
+            foreach (var element in flow)
+                if (element == null)
                     Console.ResetColor();
-                else if (o is ConsoleColor color)
+                else if (element is ConsoleColor color)
                     Console.ForegroundColor = color;
                 else
-                    Console.Write(o.ToString());
+                    Console.Write(element.ToString());
             Console.WriteLine();
             Console.ResetColor();
         }

@@ -1,12 +1,10 @@
-﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Jobs;
 using System;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Jobs;
 using VSOP2013;
 
 namespace Demo
 {
-    [SimpleJob(RuntimeMoniker.Net60)]
-    [SimpleJob(RuntimeMoniker.Net70)]
     [SimpleJob(RuntimeMoniker.Net80)]
     [MemoryDiagnoser]
     public class PerfTest

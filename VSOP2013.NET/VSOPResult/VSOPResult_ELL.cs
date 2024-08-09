@@ -1,4 +1,4 @@
-﻿namespace VSOP2013
+namespace VSOP2013
 {
     /// <summary>
     /// Elliptic   Elements

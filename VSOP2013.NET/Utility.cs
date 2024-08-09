@@ -1,6 +1,5 @@
 using System.Numerics;
 using System.Runtime.Intrinsics;
-using System.Security.Cryptography;
 
 namespace VSOP2013
 {
@@ -96,11 +95,11 @@ namespace VSOP2013
 
             if (Vector256.IsHardwareAccelerated)
             {
-                Vector256<double> v1 = Vector256.Create(x / r                                     , y / r                                     , z / r                                                , 0);
+                Vector256<double> v1 = Vector256.Create(x / r, y / r, z / r, 0);
                 Vector256<double> v2 = Vector256.Create(x * z / (r * r * Math.Sqrt(x * x + y * y)), y * z / (r * r * Math.Sqrt(x * x + y * y)), -(x * x + y * y) / (r * r * Math.Sqrt(x * x + y * y)), 0);
-                Vector256<double> v3 = Vector256.Create(-y / (x * x + y * y)                      , x / (x * x + y * y)                       , 0                                                    , 0);
+                Vector256<double> v3 = Vector256.Create(-y / (x * x + y * y), x / (x * x + y * y), 0, 0);
 
-                Vector256<double> vv = Vector256.Create(dx                                        , dy                                        , dz                                                   , 0);
+                Vector256<double> vv = Vector256.Create(dx, dy, dz, 0);
 
                 lbr[0] = l;
                 lbr[1] = b;
@@ -314,12 +313,12 @@ namespace VSOP2013
 #if NET7_0_OR_GREATER
             if (Vector256.IsHardwareAccelerated)
             {
-                Vector256<double> r1 = Vector256.Create((ReadOnlySpan<double>)(stackalloc double[] { Cphi, -Sphi * Ceps,  Sphi * Seps, 0 }));
-                Vector256<double> r2 = Vector256.Create((ReadOnlySpan<double>)(stackalloc double[] { Sphi,  Cphi * Ceps, -Cphi * Seps, 0 }));
-                Vector256<double> r3 = Vector256.Create((ReadOnlySpan<double>)(stackalloc double[] { 0   ,  Seps       ,  Ceps       , 0 }));
+                Vector256<double> r1 = Vector256.Create(Cphi, -Sphi * Ceps, Sphi * Seps, 0);
+                Vector256<double> r2 = Vector256.Create(Sphi, Cphi * Ceps, -Cphi * Seps, 0);
+                Vector256<double> r3 = Vector256.Create(0, Seps, Ceps, 0);
 
-                Vector256<double> vv = Vector256.Create((ReadOnlySpan<double>)(stackalloc double[] { dynamical[0], dynamical[1], dynamical[2], 0 }));
-                Vector256<double> vdv = Vector256.Create((ReadOnlySpan<double>)(stackalloc double[] { dynamical[3], dynamical[4], dynamical[5], 0 }));
+                Vector256<double> vv = Vector256.Create(dynamical[0], dynamical[1], dynamical[2], 0);
+                Vector256<double> vdv = Vector256.Create(dynamical[3], dynamical[4], dynamical[5], 0);
 
                 icrs[0] = Vector256.Sum(vv * r1);
                 icrs[1] = Vector256.Sum(vv * r2);

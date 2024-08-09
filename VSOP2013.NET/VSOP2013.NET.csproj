@@ -1,47 +1,53 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
-    <PlatformTarget>x64</PlatformTarget>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Platforms>x64</Platforms>
-	  <Version>1.2.1</Version>
-	  <Title>VSOP2013.NET</Title>
-	  	  <Authors>KingsZNHONE</Authors>
-	  <Description>VSOP was developed and is maintained (updated with the latest data) by the scientists at the Bureau des Longitudes in Paris.
-VSOP2013, computed the positions of the planets directly at any moment, as well as their orbital elements with improved accuracy.</Description>
-	  <RepositoryUrl>https://github.com/kingsznhone/VSOP2013.NET.git</RepositoryUrl>
-	  <RepositoryType>git</RepositoryType>
-	  <PackageProjectUrl>https://github.com/kingsznhone/VSOP2013.NET</PackageProjectUrl>
-	  <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-	  <Title>VSOP2013.NET</Title>
-	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>net8.0</TargetFrameworks>
+		<PlatformTarget>x64</PlatformTarget>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Platforms>x64</Platforms>
+		<Version>1.3.0</Version>
+		<Title>VSOP2013.NET</Title>
+		<Authors>KingsZNHONE</Authors>
+		<Description>VSOP was developed and is maintained (updated with the latest data) by the scientists at the Bureau des Longitudes in Paris.
+VSOP2013, computed the positions of the planets directly at any moment, as well as their orbital elements with improved accuracy.
+		</Description>
+		<RepositoryUrl>https://github.com/kingsznhone/VSOP2013.NET</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageProjectUrl>https://github.com/kingsznhone/VSOP2013.NET</PackageProjectUrl>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Title>VSOP2013.NET</Title>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IncludeSymbols>True</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageIcon>vsop2013.png</PackageIcon>
+    <PackageTags>vsop;</PackageTags>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\VSOP2013_EMB.BIN" />
-    <EmbeddedResource Include="Resources\VSOP2013_JUPITER.BIN" />
-    <EmbeddedResource Include="Resources\VSOP2013_MARS.BIN" />
-    <EmbeddedResource Include="Resources\VSOP2013_MERCURY.BIN" />
-    <EmbeddedResource Include="Resources\VSOP2013_NEPTUNE.BIN" />
-    <EmbeddedResource Include="Resources\VSOP2013_PLUTO.BIN" />
-    <EmbeddedResource Include="Resources\VSOP2013_SATURN.BIN" />
-    <EmbeddedResource Include="Resources\VSOP2013_URANUS.BIN" />
-    <EmbeddedResource Include="Resources\VSOP2013_VENUS.BIN" />
-  </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Resources\VSOP2013.BIN" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="MessagePack" Version="2.5.140" />
-    <PackageReference Include="MessagePackAnalyzer" Version="2.5.140">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
 
-  <ItemGroup>
-    <None Update="Resources\NativeAccelerator.dll">
+	<ItemGroup>
+		<PackageReference Include="FastLZMA2Net" Version="0.6.0-beta" />
+		<PackageReference Include="MemoryPack" Version="1.21.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="vsop2013.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
+		<None Update="Resources\NativeAccelerator.dll">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 
 </Project>

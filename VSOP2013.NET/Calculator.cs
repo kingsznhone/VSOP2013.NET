@@ -1,32 +1,30 @@
-﻿using MessagePack;
-using System.IO.Compression;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics;
+using System.Runtime.Versioning;
+using FastLZMA2Net;
+using MemoryPack;
 
 namespace VSOP2013
 {
-#if NET6_0
-    public class Calculator
-    {
-        [DllImport("Resources/NativeAccelerator.dll")]
-        public static extern double StartIteration(Term[] terms, int length, double tj, double tit);
-#elif NET7_0_OR_GREATER
     public partial class Calculator
     {
-        [LibraryImport("Resources/NativeAccelerator.dll", EntryPoint = "StartIteration", StringMarshalling = StringMarshalling.Utf16)]
-        internal static partial double StartIteration(Term[] terms, int length, double tj, double tit);
-#endif
+        [LibraryImport("Resources/NativeAccelerator.dll", StringMarshalling = StringMarshalling.Utf16)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [return: MarshalAs(UnmanagedType.R8)]
+        internal static partial double Substitution([In] Term[] terms, int length, double tj, double tit);
+
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Vector128<float> GetZero() => Vector128<float>.Zero;
 
-        private List<PlanetTable> VSOP2013DATA;
+        private List<PlanetTable> _vsop2013DATA;
 
         /// <summary>
         /// //Planetary frequency in longitude
         /// </summary>
-        private readonly double[] freqpla =
+        private readonly double[] _freqpla =
         {
             0.2608790314068555e5,
             0.1021328554743445e5,
@@ -39,27 +37,25 @@ namespace VSOP2013
             0.2533566020437000e2
         };
 
-        private const double a1000 = 365250.0d;
+        private const double A1000 = 365250.0d;
 
         public Calculator()
         {
             //Import Planet Data
             var assembly = Assembly.GetExecutingAssembly();
-            //var names = assembly.GetManifestResourceNames();
-            VSOP2013DATA = new List<PlanetTable>(9);
-            ParallelLoopResult result = Parallel.For(0, 9, ip =>
+            string datafilename = $"VSOP2013.NET.Resources.VSOP2013.BIN";
+            using (MemoryStream recoveryStream = new MemoryStream())
             {
-                string datafilename = $"VSOP2013.NET.Resources.VSOP2013_{(VSOPBody)(ip)}.BIN";
-                using Stream s = assembly.GetManifestResourceStream(datafilename);
-                using BrotliStream bs = new(s, CompressionMode.Decompress);
-                var data = MessagePackSerializer.Deserialize<PlanetTable>(bs);
-                VSOP2013DATA.Add(data);
-            });
+                using (Stream cs = assembly.GetManifestResourceStream(datafilename))
+                {
+                    using (DecompressStream ds = new DecompressStream(cs))
+                    {
+                        ds.CopyTo(recoveryStream);
+                    }
+                }
 
-            VSOP2013DATA = VSOP2013DATA.OrderBy(x => x.body).ToList();
-
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
+                _vsop2013DATA = MemoryPackSerializer.Deserialize<List<PlanetTable>>(recoveryStream.ToArray());
+            }
         }
 
         public VSOPResult_ELL GetPlanetPosition(VSOPBody body, VSOPTime time)
@@ -73,6 +69,7 @@ namespace VSOP2013
             return Coordinate;
         }
 
+        [SupportedOSPlatform("windows")]
         public VSOPResult_ELL GetPlanetPosition_Native(VSOPBody body, VSOPTime time)
         {
             double[] ELL = new double[6];
@@ -89,6 +86,7 @@ namespace VSOP2013
             return await Task.Run(() => GetPlanetPosition(body, time));
         }
 
+        [SupportedOSPlatform("windows")]
         public async Task<VSOPResult_ELL> GetPlanetPositionAsync_Native(VSOPBody body, VSOPTime time)
         {
             return await Task.Run(() => GetPlanetPosition_Native(body, time));
@@ -103,12 +101,13 @@ namespace VSOP2013
         /// <returns></returns>
         public double GetVariable(VSOPBody body, int iv, VSOPTime time)
         {
-            return Calculate(VSOP2013DATA[(int)body].variables[iv], time.J2000);
+            return Calculate(_vsop2013DATA[(int)body].variables[iv], time.J2000);
         }
 
+        [SupportedOSPlatform("windows")]
         public double GetVariable_Native(VSOPBody body, int iv, VSOPTime time)
         {
-            return Calculate_Native(VSOP2013DATA[(int)body].variables[iv], time.J2000);
+            return Calculate_Native(_vsop2013DATA[(int)body].variables[iv], time.J2000);
         }
 
         public async Task<double> GetVariableAsync(VSOPBody body, int iv, VSOPTime time)
@@ -116,6 +115,7 @@ namespace VSOP2013
             return await Task.Run(() => GetVariable(body, iv, time));
         }
 
+        [SupportedOSPlatform("windows")]
         public async Task<double> GetVariableAsync_Native(VSOPBody body, int iv, VSOPTime time)
         {
             return await Task.Run(() => GetVariable_Native(body, iv, time));
@@ -129,7 +129,7 @@ namespace VSOP2013
         private double Calculate(VariableTable Table, double JD2000)
         {
             //Thousand of Julian Years
-            double tj = JD2000 / a1000;
+            double tj = JD2000 / A1000;
 
             //Iteration on Time
             Span<double> t = stackalloc double[21];
@@ -161,17 +161,18 @@ namespace VSOP2013
             }
             if (Table.Variable == VSOPVariable.A)
             {
-                xl = result + freqpla[(int)Table.Body] * tj;
+                xl = result + _freqpla[(int)Table.Body] * tj;
                 xl = (xl % Math.Tau + Math.Tau) % Math.Tau;
                 result = xl;
             }
             return result;
         }
 
+        [SupportedOSPlatform("windows")]
         private unsafe double Calculate_Native(VariableTable Table, double JD2000)
         {
             //Thousand of Julian Years
-            double tj = JD2000 / a1000;
+            double tj = JD2000 / A1000;
 
             //Iteration on Time
             Span<double> t = stackalloc double[21];
@@ -188,11 +189,11 @@ namespace VSOP2013
             {
                 if (Table.PowerTables[it].Terms == null) continue;
                 Term[] terms = Table.PowerTables[it].Terms;
-                result += StartIteration(Table.PowerTables[it].Terms, terms.Length, tj, t[it]);
+                result += Substitution(Table.PowerTables[it].Terms, terms.Length, tj, t[it]);
             }
             if (Table.Variable == (VSOPVariable)1)
             {
-                xl = result + freqpla[(int)Table.Body] * tj;
+                xl = result + _freqpla[(int)Table.Body] * tj;
                 xl = (xl % Math.Tau + Math.Tau) % Math.Tau;
                 result = xl;
             }
