@@ -11,7 +11,7 @@
 		<Description>VSOP was developed and is maintained (updated with the latest data) by the scientists at the Bureau des Longitudes in Paris.
 VSOP2013, computed the positions of the planets directly at any moment, as well as their orbital elements with improved accuracy.
 		</Description>
-		<RepositoryUrl>https://github.com/kingsznhone/VSOP2013.NET.git</RepositoryUrl>
+		<RepositoryUrl>https://github.com/kingsznhone/VSOP2013.NET</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageProjectUrl>https://github.com/kingsznhone/VSOP2013.NET</PackageProjectUrl>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -20,6 +20,9 @@ VSOP2013, computed the positions of the planets directly at any moment, as well 
     <IncludeSymbols>True</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageIcon>vsop2013.png</PackageIcon>
+    <PackageTags>vsop;</PackageTags>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -33,6 +36,10 @@ VSOP2013, computed the positions of the planets directly at any moment, as well 
 	</ItemGroup>
 
 	<ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Include="vsop2013.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
