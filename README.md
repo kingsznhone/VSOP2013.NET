@@ -15,7 +15,7 @@ This repo is not just programming language translation, it's  refactoring of VSO
 
 This thing is totally useless for myself. But I think someone might need this algorithm in the future.
 
-VSOP2013 is much much slower than VSOP87. But  it's more accurate than 87?
+VSOP2013 is much much slower than VSOP87. Maybe more accurate than 87?
 
 I use multi-thread and precalculation technique to accelerate iteration speed.
 
@@ -40,10 +40,10 @@ Note: .NET 8 occurs performance regression due to RyuJIT bugs. [Detail Here](htt
 4. Useful Utility class. Convert Elliptic coordinates to cartesian and spherical 
 5. Async Api included.
 6. precalculation on <b>φ</b> in terms, which gives 20%+ speed up of calculation.
-7. Use [MessagePack](https://github.com/neuecc/MessagePack-CSharp#lz4-compression"MessagePack for C#") for binary serialize.
+7. Use [MemoryPack](https://github.com/Cysharp/MemoryPack) for binary serialize.
 <br>Initialization time becomes less than 10% of previous version.
-8. Brotli compression on source data. ~300Mb -> ~50MB.
-9. Optional Native Side library accelerate. (Only on Windows)
+8. LZMA2 compression on source data. ~300Mb -> ~43MB.
+9. Optional Native Side library accelerate. (60%+ speed up, Only on Windows)
 
 <br> 
 
@@ -51,16 +51,14 @@ Note: .NET 8 occurs performance regression due to RyuJIT bugs. [Detail Here](htt
 
 [Gitbook](https://zangai-family.gitbook.io/vsop2013.net/)
 
-
 ## Enviroment Require
 
-.NET 6/7/8 Runtime
+.NET 8 Runtime
 
 Windows 10 64bit with AVX2 for native accelerate
 
 ## Reference
+ [MemoryPack](https://github.com/Cysharp/MemoryPack)
  
- [MessagePack](https://github.com/neuecc/MessagePack-CSharp)
-
-<br>
+ [FastLZMA2](https://github.com/kingsznhone/FastLZMA2Net)
 
