@@ -1,7 +1,7 @@
-﻿using MessagePack;
 using System.Diagnostics;
-using System.IO.Compression;
 using FastLZMA2Net;
+using MemoryPack;
+
 namespace VSOP2013.DataConverter
 {
     internal class Program
@@ -42,7 +42,7 @@ namespace VSOP2013.DataConverter
             }
             using (FileStream fs = new FileStream(filename, FileMode.CreateNew))
             {
-                var compressed = compressor.Compress(MessagePackSerializer.Serialize(VSOP2013DATA));
+                var compressed = compressor.Compress(MemoryPackSerializer.Serialize(VSOP2013DATA));
                 fs.Write(compressed.AsSpan());
             }
             Console.WriteLine($"VSOP2013DATA: \n{filename}");
@@ -59,10 +59,9 @@ namespace VSOP2013.DataConverter
 
             sw.Restart();
             VSOP2013DATA.Clear();
-
             Decompressor decompressor = new Decompressor(0);
             var decompressed = decompressor.Decompress(File.ReadAllBytes(filename));//critical bug
-            VSOP2013DATA=(MessagePackSerializer.Deserialize<List<PlanetTable>>(decompressed));
+            VSOP2013DATA = MemoryPackSerializer.Deserialize<List<PlanetTable>>(decompressed);
 
             sw.Stop();
             ticks = sw.ElapsedTicks;

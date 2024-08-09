@@ -1,6 +1,6 @@
-﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Jobs;
 using System;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Jobs;
 using VSOP2013;
 
 namespace Demo

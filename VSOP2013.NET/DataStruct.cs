@@ -1,5 +1,5 @@
-﻿using MessagePack;
 using System.Runtime.InteropServices;
+using MemoryPack;
 
 namespace VSOP2013
 {
@@ -26,86 +26,58 @@ namespace VSOP2013
         P = 5,
     }
 
-    [MessagePackObject]
+    [MemoryPackable]
     [Serializable]
-    public struct PlanetTable
+    public partial struct PlanetTable
     {
-        [Key(0)]
         public VSOPBody body;
-
-        [Key(1)]
         public VariableTable[] variables;
     }
 
-    [MessagePackObject]
+    [MemoryPackable]
     [Serializable]
-    public struct VariableTable
+    public partial struct VariableTable
     {
-        [Key(0)]
         public VSOPBody Body;
-
-        [Key(1)]
         public VSOPVariable Variable;
-
-        [Key(2)]
         public PowerTable[] PowerTables;
     }
 
-    [MessagePackObject]
+    [MemoryPackable]
     [Serializable]
-    public struct PowerTable
+    public partial struct PowerTable
     {
-        [Key(0)]
         public VSOPBody Body;
-
-        [Key(1)]
         public VSOPVariable Variable;
-
-        [Key(2)]
         public int Power;
-
-        [Key(3)]
         public int TermsCount;
-
-        [Key(4)]
         public Term[] Terms;
     }
 
-    [MessagePackObject]
+    [MemoryPackable]
     [Serializable]
-    public struct Header
+    public partial struct Header
     {
-        [Key(0)]
         public int ip;
-
-        [Key(1)]
         public int iv;
-
-        [Key(2)]
         public int it;
-
-        [Key(3)]
         public int nt;
     }
 
-    [MessagePackObject]
+    [MemoryPackable]
     [Serializable]
     [StructLayout(LayoutKind.Explicit)]
-    public struct Term
+    public partial struct Term
     {
-        [Key(0)]
         [FieldOffset(0)]
         public double ss;
 
-        [Key(1)]
         [FieldOffset(8)]
         public double cc;
 
-        [Key(2)]
         [FieldOffset(16)]
         public double aa;
 
-        [Key(3)]
         [FieldOffset(24)]
         public double bb;
     }

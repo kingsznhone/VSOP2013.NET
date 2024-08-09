@@ -1,10 +1,9 @@
 #pragma once
 
-
 #ifdef DLLEXPORT// DLLEXPORT
 #define DLL_EXPORT __declspec(dllexport)
-#else 
-#define DLL_EXPORT __declspec(dllimport)    
+#else
+#define DLL_EXPORT __declspec(dllimport)
 #endif
 
 struct Term
@@ -19,7 +18,7 @@ struct Term
 extern "C" {
 #endif
 
-DLL_EXPORT  double StartIteration(struct Term* terms,int length, double tj, double tit);
+    DLL_EXPORT  double Substitution(struct Term* terms, int length, double tj, double tit);
 
 #ifdef __cplusplus
 }
