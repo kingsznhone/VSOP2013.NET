@@ -33,13 +33,13 @@ Note: .NET 8 occurs performance regression due to RyuJIT bugs. [Detail Here](htt
 
 ## Features
 
-1. Use VSOPResult class to manage calculate results.
-2. Use VSOPTime class to manage time. 
+1. Use `VSOPResult` class to manage calculate results.
+2. Use `VSOPTime` class to manage time. 
 <br>Easy to convert time by calling ```VSOPTime.UTC```, ```VSOPTime.TAI```, ```VSOPTime.TDB```
-3. Very high performance per solution
+3. Very high performance per solution using multithread.
 4. Useful Utility class. Convert Elliptic coordinates to cartesian and spherical 
 5. Async Api included.
-6. precalculation on <b>φ</b> in terms, which gives 20%+ speed up of calculation.
+6. precalculation on <b>φ</b> in terms, which gives 20%+ speed up.
 7. Use [MemoryPack](https://github.com/Cysharp/MemoryPack) for binary serialize.
 <br>Initialization time becomes less than 10% of previous version.
 8. LZMA2 compression on source data. ~300Mb -> ~43MB.
