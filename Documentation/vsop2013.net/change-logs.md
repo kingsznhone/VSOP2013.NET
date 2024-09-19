@@ -1,5 +1,9 @@
 # Change Logs
 
+### v1.3.1 2024.09.19
+
+Upgrade dependency FastLZMA2 = 1.0.0
+
 ### v1.3.0 2024.08.09
 
 Breaking Change Warning
