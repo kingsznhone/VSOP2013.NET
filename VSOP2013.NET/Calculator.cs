@@ -159,7 +159,7 @@ namespace VSOP2013
                     result += t[it] * (terms[n].ss * su + terms[n].cc * cu);
                 }
             }
-            if (Table.Variable == VSOPVariable.A)
+            if (Table.Variable == VSOPVariable.L)
             {
                 xl = result + _freqpla[(int)Table.Body] * tj;
                 xl = (xl % Math.Tau + Math.Tau) % Math.Tau;
@@ -191,7 +191,7 @@ namespace VSOP2013
                 Term[] terms = Table.PowerTables[it].Terms;
                 result += Substitution(Table.PowerTables[it].Terms, terms.Length, tj, t[it]);
             }
-            if (Table.Variable == (VSOPVariable)1)
+            if (Table.Variable == VSOPVariable.L)
             {
                 xl = result + _freqpla[(int)Table.Body] * tj;
                 xl = (xl % Math.Tau + Math.Tau) % Math.Tau;
