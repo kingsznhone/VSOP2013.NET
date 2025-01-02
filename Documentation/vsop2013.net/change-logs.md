@@ -1,5 +1,15 @@
 # Change Logs
 
+### v1.4.0 2025.01.02
+
+Remove native Accelerator due to fast fp error in MSVC
+
+[https://developercommunity.visualstudio.com/t/MSVCs-sincos-implementation-is-incorrec/10582378](https://developercommunity.visualstudio.com/t/MSVCs-sincos-implementation-is-incorrec/10582378)
+
+Use seperate sin cos calculate in calculator core, which will cause performance regression
+
+[https://github.com/dotnet/runtime/issues/111016](https://github.com/dotnet/runtime/issues/111016)
+
 ### v1.3.1 2024.09.19
 
 Upgrade dependency FastLZMA2 = 1.0.0

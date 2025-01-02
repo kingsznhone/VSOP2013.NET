@@ -3,7 +3,7 @@
 Calculate a specific variable of a planet.
 
 ```csharp
-public async Task<double> GetVariableAsync(VSOPBody body, int iv, VSOPTime time)
+public Task<double> GetVariableAsync(VSOPBody body, int iv, VSOPTime time)
 ```
 
 **Parameters**

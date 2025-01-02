@@ -19,11 +19,11 @@ public VSOP2013 ();
 ## Methods <a href="#methods" id="methods"></a>
 
 * [GetPlanetPosition(body, time)](getplanetposition.md)
-* [GetPlanetPosition\_Native(body, time)](getplanetposition\_native.md)
+* [GetPlanetPosition\_Native(body, time)](broken-reference)
 * [GetPlanetPositionAsync(body, time)](getplanetpositionasync.md)
-* [GetPlanetPositionAsync\_Native(body, time)](getplanetpositionasync\_native.md)
+* [GetPlanetPositionAsync\_Native(body, time)](broken-reference)
 * [GetVariable(body, iv, time)](getvariable.md)
-* [GetVariable\_Native(body, iv, time)](getvariable\_native.md)
+* [GetVariable\_Native(body, iv, time)](broken-reference)
 * [GetVariableAsync(body, iv, time)](getvariableasync.md)
-* [GetVariableAsync\_Native(body, iv, time)](getvariableasync\_native.md)
+* [GetVariableAsync\_Native(body, iv, time)](broken-reference)
 
