@@ -17,9 +17,9 @@ This thing is totally useless for myself. But I think someone might need this al
 
 VSOP2013 is much much slower than VSOP87. Maybe more accurate than 87?
 
-I use multi-thread and precalculation technique to accelerate iteration speed.
+Using multi-thread and precalculation technique to accelerate iteration speed.
 
-I promise it will be much faster than origin algorithm.
+It is much faster than origin algorithm.
 
 This is the best VSOP2013 library ever.
 
@@ -27,9 +27,9 @@ This is the best VSOP2013 library ever.
 
 ## Performance
 
-<br>![Performance Test](./README/NativeAccelerate.png)
+Test for 1 resolution (Jupiter position now)
 
-Note: .NET 8 occurs performance regression due to RyuJIT bugs. [Detail Here](https://github.com/dotnet/runtime/issues/95954#issuecomment-1956661569)
+<br>![Performance Test](./README/PerfTest.png)
 
 ## Features
 
@@ -43,7 +43,6 @@ Note: .NET 8 occurs performance regression due to RyuJIT bugs. [Detail Here](htt
 7. Use [MemoryPack](https://github.com/Cysharp/MemoryPack) for binary serialize.
 <br>Initialization time becomes less than 10% of previous version.
 8. LZMA2 compression on source data. ~300Mb -> ~43MB.
-9. Optional Native Side library accelerate. (60%+ speed up, Only on Windows)
 
 <br> 
 
@@ -53,9 +52,7 @@ Note: .NET 8 occurs performance regression due to RyuJIT bugs. [Detail Here](htt
 
 ## Enviroment Require
 
-.NET 8 Runtime
-
-Windows 10 64bit with AVX2 for native accelerate
+.NET 8/9 Runtime
 
 ## Reference
  [MemoryPack](https://github.com/Cysharp/MemoryPack)

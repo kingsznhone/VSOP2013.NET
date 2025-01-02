@@ -1,5 +1,7 @@
 using System;
 using System.Globalization;
+using System.Threading.Tasks;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
 using VSOP2013;
 
@@ -7,9 +9,9 @@ namespace Demo
 {
     internal class Program
     {
-        private static readonly Calculator vsop = new Calculator();
+        private static readonly Calculator s_vsop = new Calculator();
 
-        private static void Main(string[] args)
+        private static async Task Main(string[] args)
         {
             //Console.WriteLine("Parse UTC string that conforms to ISO 8601:  2018-08-18T07:22:16.0000000Z");
 
@@ -33,9 +35,10 @@ namespace Demo
             VSOPResult_XYZ xyz;
             VSOPResult_LBR lbr;
 
-            ell = vsop.GetPlanetPosition(VSOPBody.EMB, vTime);
-            FormattedPrint(ell, vTime);
-            ell = vsop.GetPlanetPosition_Native(VSOPBody.EMB, vTime);
+            var debug = await s_vsop.GetPlanetPositionAsync(VSOPBody.EMB, vTime);
+
+            var debug2 = await s_vsop.GetVariableAsync (VSOPBody.EMB, 0, vTime);
+            ell = s_vsop.GetPlanetPosition(VSOPBody.EMB, vTime);
             FormattedPrint(ell, vTime);
             //xyz = (VSOPResult_XYZ)ell;
             //FormattedPrint(xyz, vTime);
@@ -46,11 +49,11 @@ namespace Demo
             //FormattedPrint(lbr, vTime);
             //lbr.ReferenceFrame = ReferenceFrame.ICRSJ2000;
             //FormattedPrint(lbr, vTime);
-
+            //for (int i = 0; i < 1000; i++)
             //{
             //    foreach (VSOPBody body in Enum.GetValues(typeof(VSOPBody)))
             //    {
-            //        ell = vsop.GetPlanetPosition(body, vTime);
+            //        ell = s_vsop.GetPlanetPosition(body, vTime);
             //    }
             //}
 
@@ -59,7 +62,7 @@ namespace Demo
 #if DEBUG
             var summary = BenchmarkRunner.Run<PerfTest>(new DebugBuildConfig());
 #else
-            var summary = BenchmarkRunner.Run<PerfTest>();
+var summary = BenchmarkRunner.Run<PerfTest>();
 #endif
             Console.ReadLine();
         }

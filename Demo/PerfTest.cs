@@ -6,37 +6,31 @@ using VSOP2013;
 namespace Demo
 {
     [SimpleJob(RuntimeMoniker.Net80)]
+    [SimpleJob(RuntimeMoniker.Net90)]
     [MemoryDiagnoser]
     public class PerfTest
     {
-        private Calculator vsop;
+        private Calculator _vsop;
 
-        private DateTime dt;
-        private VSOPTime vTime;
+        private DateTime _dt;
+        private VSOPTime _vTime;
 
         public PerfTest()
-        { vsop = new Calculator(); }
+        { _vsop = new Calculator(); }
 
         [GlobalSetup]
         public void init()
         {
-            dt = DateTime.Now.ToUniversalTime();
-            dt.ToUniversalTime();
-            dt = dt.AddSeconds(-69.184);
-            vTime = new VSOPTime(dt, TimeFrame.UTC);
+            _dt = DateTime.Now.ToUniversalTime();
+            _dt.ToUniversalTime();
+            _dt = _dt.AddSeconds(-69.184);
+            _vTime = new VSOPTime(_dt, TimeFrame.UTC);
         }
 
         [Benchmark(Baseline = true)]
         public VSOPResult Compute()
         {
-            var ell = vsop.GetPlanetPosition(VSOPBody.JUPITER, vTime);
-            return ell;
-        }
-
-        [Benchmark]
-        public VSOPResult Compute_Native()
-        {
-            var ell = vsop.GetPlanetPosition_Native(VSOPBody.JUPITER, vTime);
+            var ell = _vsop.GetPlanetPosition(VSOPBody.JUPITER, _vTime);
             return ell;
         }
     }

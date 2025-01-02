@@ -21,7 +21,7 @@ namespace EphemerisGenerator
                     VSOPTime time = new VSOPTime(new DateTime(1900, 1, 1), TimeFrame.TDB);
                     while (time.TDB < enddate)
                     {
-                        VSOPResult_ELL result = s_calculator.GetPlanetPosition_Native(body, time);
+                        VSOPResult_ELL result = s_calculator.GetPlanetPosition(body, time);
                         sb.Clear();
                         sb.Append((int)body).Append(',').Append(time.J2000).Append(',');
                         sb.Append(string.Join(", ", result.Variables_ELL));
