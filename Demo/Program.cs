@@ -1,7 +1,6 @@
 using System;
 using System.Globalization;
 using System.Threading.Tasks;
-using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
 using VSOP2013;
 
@@ -37,7 +36,7 @@ namespace Demo
 
             var debug = await s_vsop.GetPlanetPositionAsync(VSOPBody.EMB, vTime);
 
-            var debug2 = await s_vsop.GetVariableAsync (VSOPBody.EMB, 0, vTime);
+            var debug2 = await s_vsop.GetVariableAsync(VSOPBody.EMB, 0, vTime);
             ell = s_vsop.GetPlanetPosition(VSOPBody.EMB, vTime);
             FormattedPrint(ell, vTime);
             //xyz = (VSOPResult_XYZ)ell;
@@ -62,7 +61,7 @@ namespace Demo
 #if DEBUG
             var summary = BenchmarkRunner.Run<PerfTest>(new DebugBuildConfig());
 #else
-var summary = BenchmarkRunner.Run<PerfTest>();
+            var summary = BenchmarkRunner.Run<PerfTest>();
 #endif
             Console.ReadLine();
         }

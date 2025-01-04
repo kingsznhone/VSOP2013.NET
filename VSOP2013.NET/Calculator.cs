@@ -1,8 +1,4 @@
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Runtime.Intrinsics;
-using System.Runtime.Versioning;
 using FastLZMA2Net;
 using MemoryPack;
 
@@ -65,7 +61,6 @@ namespace VSOP2013
             return Task.Run(() => GetPlanetPosition(body, time));
         }
 
-
         /// <summary>
         /// Calculate a specific variable
         /// </summary>
@@ -81,7 +76,6 @@ namespace VSOP2013
         {
             return Task.Run(() => GetVariable(body, iv, time));
         }
-
 
         /// <summary>
         /// </summary>
