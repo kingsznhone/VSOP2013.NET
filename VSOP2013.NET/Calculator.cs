@@ -11,7 +11,7 @@ namespace VSOP2013
         /// <summary>
         /// //Planetary frequency in longitude
         /// </summary>
-        private readonly double[] _freqpla =
+        private static readonly double[] _freqpla =
         {
             0.2608790314068555e5,
             0.1021328554743445e5,
@@ -30,10 +30,10 @@ namespace VSOP2013
         {
             //Import Planet Data
             var assembly = Assembly.GetExecutingAssembly();
-            string datafilename = $"VSOP2013.NET.Resources.VSOP2013.BIN";
+            string dataFilename = $"VSOP2013.NET.Resources.VSOP2013.BIN";
             using (MemoryStream recoveryStream = new MemoryStream())
             {
-                using (Stream cs = assembly.GetManifestResourceStream(datafilename))
+                using (Stream cs = assembly.GetManifestResourceStream(dataFilename))
                 {
                     using (DecompressStream ds = new DecompressStream(cs))
                     {
@@ -56,9 +56,9 @@ namespace VSOP2013
             return Coordinate;
         }
 
-        public Task<VSOPResult_ELL> GetPlanetPositionAsync(VSOPBody body, VSOPTime time)
+        public ValueTask<VSOPResult_ELL> GetPlanetPositionAsync(VSOPBody body, VSOPTime time)
         {
-            return Task.Run(() => GetPlanetPosition(body, time));
+            return new ValueTask<VSOPResult_ELL>(Task.Run(() => GetPlanetPosition(body, time)));
         }
 
         /// <summary>
@@ -72,9 +72,10 @@ namespace VSOP2013
         {
             return Calculate(_vsop2013DATA[(int)body].variables[iv], time.J2000);
         }
-        public Task<double> GetVariableAsync(VSOPBody body, int iv, VSOPTime time)
+
+        public ValueTask<double> GetVariableAsync(VSOPBody body, int iv, VSOPTime time)
         {
-            return Task.Run(() => GetVariable(body, iv, time));
+            return new ValueTask<double>(Task.Run(() => GetVariable(body, iv, time)));
         }
 
         /// <summary>
@@ -97,8 +98,6 @@ namespace VSOP2013
             }
 
             double result = 0d;
-            double u, su, cu;
-            double xl;
             Term[] terms;
             for (int it = 0; it < Table.PowerTables.Length; it++)
             {
@@ -106,16 +105,15 @@ namespace VSOP2013
                 terms = Table.PowerTables[it].Terms;
                 for (int n = 0; n < terms.Length; n++)
                 {
-                    u = terms[n].aa + terms[n].bb * tj;
-
-                    su = Math.Sin(u);
-                    cu = Math.Cos(u);
-
+                    double u = terms[n].aa + terms[n].bb * tj;
+                    double su = Math.Sin(u);
+                    double cu = Math.Cos(u);
                     result += t[it] * (terms[n].ss * su + terms[n].cc * cu);
                 }
             }
             if (Table.Variable == VSOPVariable.L)
             {
+                double xl;
                 xl = result + _freqpla[(int)Table.Body] * tj;
                 xl = (xl % Math.Tau + Math.Tau) % Math.Tau;
                 result = xl;

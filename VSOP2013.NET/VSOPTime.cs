@@ -38,10 +38,10 @@ namespace VSOP2013
         public double J2000 => VSOPTime.ToJ2000(TDB);
 
         private static List<Func<DateTime, DateTime>>
-            s_upGradeFuncs = new List<Func<DateTime, DateTime>>(
+            _upGradeFuncs = new List<Func<DateTime, DateTime>>(
                 new Func<DateTime, DateTime>[] { UTCtoTAI, TAItoTT, TTtoTDB });
 
-        private static List<Func<DateTime, DateTime>> s_downGradeFuncs = new List<Func<DateTime, DateTime>>(
+        private static List<Func<DateTime, DateTime>> _downGradeFuncs = new List<Func<DateTime, DateTime>>(
                 new Func<DateTime, DateTime>[] { TAItoUTC, TTtoTAI, TDBtoTT });
 
         public VSOPTime(DateTime dt, TimeFrame sourceframe)
@@ -62,12 +62,12 @@ namespace VSOP2013
             {
                 if (TargetFrame > SourceFrame)
                 {
-                    dt = s_upGradeFuncs[(int)SourceFrame](dt);
+                    dt = _upGradeFuncs[(int)SourceFrame](dt);
                     SourceFrame += 1;
                 }
                 else if (TargetFrame < SourceFrame)
                 {
-                    dt = s_downGradeFuncs[(int)SourceFrame - 1](dt);
+                    dt = _downGradeFuncs[(int)SourceFrame - 1](dt);
                     SourceFrame -= 1;
                 }
             }

@@ -29,8 +29,7 @@ namespace VSOP2013
 
             if (cA != rB)
             {
-                Console.WriteLine("Matrixes can't be multiplied!!");
-                return null;
+                throw new ArgumentException("Matrixes can't be multiplied!!");
             }
             else
             {
@@ -89,7 +88,7 @@ namespace VSOP2013
             //Sin(θ) = Cos(b), Cos(θ) = Sin(b)
             b = Math.Asin(z / r);
 
-#if NET7_0_OR_GREATER
+#if NET8_0_OR_GREATER
 
             #region vector matrix mul
 
@@ -104,10 +103,10 @@ namespace VSOP2013
                 lbr[0] = l;
                 lbr[1] = b;
                 lbr[2] = r;
-                lbr[3] = Vector256.Sum(vv * v1);
-                lbr[4] = -Vector256.Sum(vv * v2);
-                lbr[5] = Vector256.Sum(vv * v3);
-                return lbr.ToArray();
+                lbr[3] = Vector256.Sum(v3 * vv);
+                lbr[4] = -Vector256.Sum(v2 * vv);
+                lbr[5] = Vector256.Sum(v1 * vv);
+                //return lbr.ToArray();
             }
 
             #endregion vector matrix mul
@@ -162,7 +161,7 @@ namespace VSOP2013
             y = r * Math.Cos(b) * Math.Sin(l);
             z = r * Math.Sin(b);
 
-#if NET7_0_OR_GREATER
+#if NET8_0_OR_GREATER
 
             #region vector matrix mul
 
@@ -177,9 +176,9 @@ namespace VSOP2013
                 xyz[0] = x;
                 xyz[1] = y;
                 xyz[2] = z;
-                xyz[3] = Vector256.Sum(vv * m1);
-                xyz[4] = Vector256.Sum(vv * m2);
-                xyz[5] = -Vector256.Sum(vv * m3);
+                xyz[3] = Vector256.Sum(m1 * vv);
+                xyz[4] = Vector256.Sum(m2 * vv);
+                xyz[5] = -Vector256.Sum(m3 * vv);
                 return xyz.ToArray();
             }
 
@@ -310,7 +309,7 @@ namespace VSOP2013
             Sphi = Math.Sin(phi);
             Cphi = Math.Cos(phi);
 
-#if NET7_0_OR_GREATER
+#if NET8_0_OR_GREATER
             if (Vector256.IsHardwareAccelerated)
             {
                 Vector256<double> r1 = Vector256.Create(Cphi, -Sphi * Ceps, Sphi * Seps, 0);

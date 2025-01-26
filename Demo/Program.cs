@@ -8,7 +8,7 @@ namespace Demo
 {
     internal class Program
     {
-        private static readonly Calculator s_vsop = new Calculator();
+        private static readonly Calculator _vsop = new Calculator();
 
         private static async Task Main(string[] args)
         {
@@ -34,27 +34,33 @@ namespace Demo
             VSOPResult_XYZ xyz;
             VSOPResult_LBR lbr;
 
-            var debug = await s_vsop.GetPlanetPositionAsync(VSOPBody.EMB, vTime);
+            var debug = await _vsop.GetPlanetPositionAsync(VSOPBody.EMB, vTime);
 
-            var debug2 = await s_vsop.GetVariableAsync(VSOPBody.EMB, 0, vTime);
-            ell = s_vsop.GetPlanetPosition(VSOPBody.EMB, vTime);
+            var debug2 = await _vsop.GetVariableAsync(VSOPBody.EMB, 0, vTime);
+            ell = _vsop.GetPlanetPosition(VSOPBody.EMB, vTime);
             FormattedPrint(ell, vTime);
-            //xyz = (VSOPResult_XYZ)ell;
-            //FormattedPrint(xyz, vTime);
-            //xyz.ReferenceFrame = ReferenceFrame.ICRSJ2000;
-            //FormattedPrint(xyz, vTime);
 
-            //lbr = (VSOPResult_LBR)ell;
-            //FormattedPrint(lbr, vTime);
-            //lbr.ReferenceFrame = ReferenceFrame.ICRSJ2000;
-            //FormattedPrint(lbr, vTime);
-            //for (int i = 0; i < 1000; i++)
-            //{
-            //    foreach (VSOPBody body in Enum.GetValues(typeof(VSOPBody)))
-            //    {
-            //        ell = s_vsop.GetPlanetPosition(body, vTime);
-            //    }
-            //}
+            double[] origin_XYZ = [-0.585386916046096, 0.7917314769504893, 3.5464737892804974E-06, -0.014120827616219243, -0.010294811978545626, 9.235246642556724E-09];
+            double[] converted_LBR = Utility.XYZtoLBR(origin_XYZ);
+            Console.WriteLine("Converted LBR Coordinates:");
+            Console.WriteLine($"L: {converted_LBR[0]}");
+            Console.WriteLine($"B: {converted_LBR[1]}");
+            Console.WriteLine($"R: {converted_LBR[2]}");
+            Console.WriteLine($"dL: {converted_LBR[3]}");
+            Console.WriteLine($"dB: {converted_LBR[4]}");
+            Console.WriteLine($"dR: {converted_LBR[5]}");
+            Console.WriteLine();
+
+            double[] origin_LBR = [2.207648105914849, 3.6023508314166335E-06, 0.9846415476671041, 0.017747319023700473, 7.438945360842563E-09, 0.00011725987886259545];
+            double[] converted_XYZ = Utility.LBRtoXYZ(origin_LBR);
+            Console.WriteLine("Converted XYZ Coordinates:");
+            Console.WriteLine($"X: {converted_XYZ[0]}");
+            Console.WriteLine($"Y: {converted_XYZ[1]}");
+            Console.WriteLine($"Z: {converted_XYZ[2]}");
+            Console.WriteLine($"dX: {converted_XYZ[3]}");
+            Console.WriteLine($"dY: {converted_XYZ[4]}");
+            Console.WriteLine($"dZ: {converted_XYZ[5]}");
+            Console.WriteLine();
 
             Console.WriteLine("Press Enter to Start Performance Test...");
             Console.ReadLine();

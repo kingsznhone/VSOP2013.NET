@@ -7,7 +7,7 @@ namespace EphemerisGenerator
 {
     internal class Program
     {
-        private static Calculator s_calculator = new Calculator();
+        private static Calculator _calculator = new Calculator();
 
         private static void Main(string[] args)
         {
@@ -22,7 +22,7 @@ namespace EphemerisGenerator
                     VSOPTime time = new VSOPTime(new DateTime(1900, 1, 1), TimeFrame.TDB);
                     while (time.TDB < enddate)
                     {
-                        VSOPResult_ELL result = s_calculator.GetPlanetPosition(body, time);
+                        VSOPResult_ELL result = _calculator.GetPlanetPosition(body, time);
                         sb.Clear();
                         sb.Append((int)body).Append(',').Append(time.J2000).Append(',');
                         sb.Append(string.Join(", ", result.Variables_ELL));

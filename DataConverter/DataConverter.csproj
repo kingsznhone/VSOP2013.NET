@@ -27,11 +27,23 @@
 
   <ItemGroup>
     <PackageReference Include="FastLZMA2Net" Version="1.0.0" />
-    <PackageReference Include="MemoryPack" Version="1.21.1" />
+    <PackageReference Include="MemoryPack" Version="1.21.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\VSOP2013.NET\VSOP2013.NET.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\kings\.nuget\packages\fastlzma2net\1.0.0\build\x64\fast-lzma2.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\kings\.nuget\packages\fastlzma2net\1.0.0\build\x64\fast-lzma2.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\kings\.nuget\packages\fastlzma2net\1.0.0\build\x64\fast-lzma2.dll" />
   </ItemGroup>
 
 
