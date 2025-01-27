@@ -21,15 +21,7 @@ Using multi-thread and precalculation technique to accelerate iteration speed.
 
 It is much faster than origin algorithm.
 
-This is the best VSOP2013 library ever.
-
 ![Demo](./README/Demo.png)
-
-## Performance
-
-Test for 1 resolution (Jupiter position now)
-
-<br>![Performance Test](./README/PerfTest.png)
 
 ## Features
 
