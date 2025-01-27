@@ -22,6 +22,6 @@ Array of elliptic coordinate elements
 
 ### **Return**
 
-`double[]`
+double\[]
 
 Array of cartesian coordinate elements

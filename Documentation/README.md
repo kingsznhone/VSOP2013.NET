@@ -28,9 +28,23 @@ This is the best VSOP2013 library ever.
 
 ## Performance
 
-<figure><img src=".gitbook/assets/NativeAccelerate.png" alt=""><figcaption></figcaption></figure>
+```
 
-Native overload use cpp dll function for kernel iteration.
+BenchmarkDotNet v0.13.11, Windows 11 (10.0.22631.4751/23H2/2023Update/SunValley3)
+12th Gen Intel Core i9-12950HX, 1 CPU, 16 logical and 16 physical cores
+.NET SDK 9.0.102
+  [Host]   : .NET 8.0.12 (8.0.1224.60305), X64 RyuJIT AVX2 [AttachedDebugger]
+  .NET 8.0 : .NET 8.0.12 (8.0.1224.60305), X64 RyuJIT AVX2
+  .NET 9.0 : .NET 9.0.1 (9.0.124.61010), X64 RyuJIT AVX2
+
+
+```
+
+| Method  | Job      | Runtime  |     Mean |     Error |    StdDev | Ratio | Allocated | Alloc Ratio |
+| ------- | -------- | -------- | -------: | --------: | --------: | ----: | --------: | ----------: |
+| Compute | .NET 8.0 | .NET 8.0 | 1.473 ms | 0.0150 ms | 0.0133 ms |  1.00 |   2.91 KB |        1.00 |
+|         |          |          |          |           |           |       |           |             |
+| Compute | .NET 9.0 | .NET 9.0 | 1.431 ms | 0.0196 ms | 0.0174 ms |  1.00 |    2.9 KB |        1.00 |
 
 Note: .NET 8 occurs performance regression due to RyuJIT bugs. [Detail Here](https://github.com/dotnet/runtime/issues/95954#issuecomment-1956661569)
 
@@ -45,11 +59,12 @@ Note: .NET 8 occurs performance regression due to RyuJIT bugs. [Detail Here](htt
 6. precalculation on **φ** in data loading, which gives 20%+ speed up of calculation.
 7. Use  [MessagePack](https://github.com/neuecc/MessagePack-CSharp) for binary serialize.\
    Initialization time becomes less than 10% of previous version.
-8. Brotli compression on source data. \~300Mb -> \~50MB.
-9. Optional Native Side library accelerate. (Only on Windows)
+8. FastLZMA2 compression on data. \~300Mb -> \~50MB.
 
 
 
 ### Reference
 
 [https://github.com/neuecc/MessagePack-CSharp](https://github.com/neuecc/MessagePack-CSharp)
+
+[https://github.com/kingsznhone/FastLZMA2Net](https://github.com/kingsznhone/FastLZMA2Net)

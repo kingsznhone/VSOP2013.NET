@@ -20,6 +20,6 @@ Matrix B\
 
 **Return**
 
-`double[,]`
+double\[,]
 
 Matrix C = AB.

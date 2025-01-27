@@ -16,6 +16,6 @@ Array of cartesian coordinate elements that inertial frame of ICRS equinox and e
 
 ### **Return**
 
-`double[]`
+double\[]
 
 Array of cartesian coordinate elements that inertial frame of dynamical equinox and ecliptic.

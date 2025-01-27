@@ -8,6 +8,8 @@ This class provide time convert and management for VSOP2013.
 public class VSOPTime
 ```
 
+***
+
 ## Constructors <a href="#constructors" id="constructors"></a>
 
 ```csharp
@@ -40,7 +42,7 @@ UTC Time frame.
 
 
 
-`DateTime TAI`
+`DateTime` TAI
 
 International Atomic Time
 
@@ -52,7 +54,7 @@ Terrestrial Time (aka. TDT)
 
 
 
-`DateTime TDB`
+`DateTime TDB`&#x20;
 
 Barycentric Dynamical Time. VSOP2013 use this time frame in calculation.
 

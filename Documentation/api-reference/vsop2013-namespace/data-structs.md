@@ -8,13 +8,13 @@ public struct PlanetTable
 
 ### Fields <a href="#fields" id="fields"></a>
 
-[`VSOPBody`](enums.md#fields) `body`
+[`VSOPBody`](enums.md#fields)  body
 
 Planet Enum
 
 
 
-[`VariableTable`](data-structs.md#variabletable)`[] variables`
+[`VariableTable`](data-structs.md#variabletable)`[]`  variables
 
 All 6 variable data stored.
 
@@ -28,19 +28,19 @@ public struct VariableTable
 
 ### Fields <a href="#fields" id="fields"></a>
 
-[`VSOPBody`](enums.md#fields) `body`
+[`VSOPBody`](enums.md#fields) body
 
 Planet Enum
 
 
 
-[`VSOPVariable`](enums.md#fields-2) `Variable`
+[`VSOPVariable`](enums.md#fields-2) Variable
 
 Which variable of this table.
 
 
 
-[`PowerTable`](data-structs.md#powertable)`[] PowerTables`
+[`PowerTable`](data-structs.md#powertable)`[]` PowerTables
 
 All power table stored.
 
@@ -54,13 +54,13 @@ public struct PowerTable
 
 ### Fields <a href="#fields" id="fields"></a>
 
-[`VSOPBody`](enums.md#fields) `body`
+[`VSOPBody`](enums.md#fields) body
 
 Planet Enum
 
 
 
-[`VSOPVariable`](enums.md#fields-2) `Variable`
+[`VSOPVariable`](enums.md#fields-2) Variable
 
 Which variable of this table.
 
@@ -72,13 +72,13 @@ Power of this table.
 
 
 
-`int TermsCount`
+`int` TermsCount
 
 Total terms count.
 
 
 
-[`Term`](data-structs.md#term)`[] Terms`
+[`Term`](data-structs.md#term)`[]` Terms
 
 All terms stored.
 
@@ -94,19 +94,19 @@ public struct Term
 
 ### Fields <a href="#fields" id="fields"></a>
 
-`double ss`
+`double` ss
 
 
 
-`double cc`
+`double` cc
 
 
 
-`double aa`
+`double` aa
 
 
 
-`double bb`
+`double` bb
 
 
 
@@ -120,18 +120,18 @@ public struct Header
 
 ### Fields <a href="#fields" id="fields"></a>
 
-`int ip`
+`int` ip
 
 Planet index
 
-`int iv`
+`int` iv
 
 Variable index
 
-`int it`
+`int` it
 
 index of terms
 
-`int nt`
+`int` nt
 
 total terms count

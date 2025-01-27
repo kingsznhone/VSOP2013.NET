@@ -14,7 +14,7 @@ Planet enum.
 
 
 
-`iv`  int
+`iv` [ int](https://learn.microsoft.com/en-us/dotnet/api/system.int32?view=net-9.0)
 
 Variable index
 

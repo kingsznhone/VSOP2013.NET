@@ -38,8 +38,6 @@ Raw result data from calculator.
 
 
 
-***
-
 ```csharp
 public VSOPResult_ELL(VSOPResult_XYZ result)
 ```
@@ -50,13 +48,11 @@ Create a new elliptic result from cartesian result.
 
 **Parameters**
 
-`result` VSOPResult\_XYZ&#x20;
+`result` [VSOPResult\_XYZ ](vsopresult_xyz-class.md)
 
 Cartesian result
 
 
-
-***
 
 ```csharp
 public VSOPResult_ELL(VSOPResult_LBR result)
@@ -68,7 +64,7 @@ Create a new elliptic result from spherical result.
 
 **Parameters**
 
-`result` VSOPResult\_LBR
+`result` [VSOPResult\_LBR](vsopresult_lbr-class.md)
 
 Spherical result
 

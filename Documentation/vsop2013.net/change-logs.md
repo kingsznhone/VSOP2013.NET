@@ -1,5 +1,11 @@
 # Change Logs
 
+### v1.4.1 2024.01.27
+
+Fix Matrix multiply error at  [XYZToLBR()](../api-reference/vsop2013-namespace/utility-class/xyztolbr.md)
+
+Add support for  dotnet 9
+
 ### v1.4.0 2025.01.02
 
 Remove native Accelerator due to fast fp error in MSVC

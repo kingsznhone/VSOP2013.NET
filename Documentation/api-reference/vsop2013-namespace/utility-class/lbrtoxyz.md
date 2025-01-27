@@ -16,6 +16,6 @@ Array of spherical coordinate elements
 
 ### **Return**
 
-`double[]`
+double\[]
 
 Array of cartesian coordinate elements
