@@ -1,4 +1,6 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.Intrinsics;
 using FastLZMA2Net;
 using MemoryPack;
 
@@ -68,6 +70,7 @@ namespace VSOP2013
         /// <param name="iv">0-5 : a l k h q p</param>
         /// <param name="time"></param>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public double GetVariable(VSOPBody body, int iv, VSOPTime time)
         {
             return Calculate(_vsop2013DATA[(int)body].variables[iv], time.J2000);
@@ -83,13 +86,14 @@ namespace VSOP2013
         /// <param name="Table"></param>
         /// <param name="JD2000"></param>
         /// <returns>Elliptic Elements</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining| MethodImplOptions.AggressiveOptimization)]
         private double Calculate(VariableTable Table, double JD2000)
         {
             //Thousand of Julian Years
             double tj = JD2000 / A1000;
 
             //Iteration on Time
-            Span<double> t = stackalloc double[21];
+            Span<double> t =new double[32];
             t[0] = 1.0d;
             t[1] = tj;
             for (int i = 2; i < 21; i++)
@@ -98,11 +102,10 @@ namespace VSOP2013
             }
 
             double result = 0d;
-            Term[] terms;
             for (int it = 0; it < Table.PowerTables.Length; it++)
             {
                 if (Table.PowerTables[it].Terms == null) continue;
-                terms = Table.PowerTables[it].Terms;
+                ref readonly Term[] terms = ref Table.PowerTables[it].Terms;
                 for (int n = 0; n < terms.Length; n++)
                 {
                     double u = terms[n].aa + terms[n].bb * tj;
@@ -120,5 +123,7 @@ namespace VSOP2013
             }
             return result;
         }
+
+
     }
 }

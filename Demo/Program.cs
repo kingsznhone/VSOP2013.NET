@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.Threading.Tasks;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
 using VSOP2013;
 

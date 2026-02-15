@@ -6,7 +6,7 @@ using VSOP2013;
 namespace Demo
 {
     [SimpleJob(RuntimeMoniker.Net80)]
-    [SimpleJob(RuntimeMoniker.Net90)]
+    [SimpleJob(RuntimeMoniker.Net10_0)]
     [MemoryDiagnoser]
     public class PerfTest
     {
@@ -30,7 +30,7 @@ namespace Demo
         [Benchmark(Baseline = true)]
         public VSOPResult Compute()
         {
-            var ell = _vsop.GetPlanetPosition(VSOPBody.JUPITER, _vTime);
+            var ell = _vsop.GetPlanetPosition(VSOPBody.EMB, _vTime);
             return ell;
         }
     }

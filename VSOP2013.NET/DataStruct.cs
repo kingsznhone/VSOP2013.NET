@@ -28,7 +28,7 @@ namespace VSOP2013
 
     [MemoryPackable]
     [Serializable]
-    public partial struct PlanetTable
+    public partial class PlanetTable
     {
         public VSOPBody body;
         public VariableTable[] variables;
@@ -36,7 +36,7 @@ namespace VSOP2013
 
     [MemoryPackable]
     [Serializable]
-    public partial struct VariableTable
+    public partial class VariableTable
     {
         public VSOPBody Body;
         public VSOPVariable Variable;
@@ -45,7 +45,7 @@ namespace VSOP2013
 
     [MemoryPackable]
     [Serializable]
-    public partial struct PowerTable
+    public partial class PowerTable
     {
         public VSOPBody Body;
         public VSOPVariable Variable;

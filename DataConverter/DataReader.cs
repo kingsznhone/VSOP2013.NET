@@ -57,17 +57,18 @@ namespace VSOP2013.DataConverter
             List<PlanetTable> VSOP2013DATA = new();
             for (int ip = 0; ip < 9; ip++)
             {
-                PlanetTable planet = new()
+                VSOP2013DATA.Add(new PlanetTable
                 {
                     body = (VSOPBody)ip,
-                    variables = new VariableTable[6]
-                };
-
-                for (int iv = 0; iv < 6; iv++)
-                {
-                    planet.variables[iv].PowerTables = new PowerTable[21];
-                }
-                VSOP2013DATA.Add(planet);
+                    variables = Enumerable.Range(0, 6)
+                        .Select(_ => new VariableTable
+                        {
+                            PowerTables = Enumerable.Range(0, 21)
+                                .Select(_ => new PowerTable())
+                                .ToArray()
+                        })
+                        .ToArray()
+                });
             }
 
             ParallelLoopResult result = Parallel.For(0, 9, ip =>
@@ -75,11 +76,12 @@ namespace VSOP2013.DataConverter
                 ReadPlanet(VSOP2013DATA[ip], ip);
             });
 
-            for (int ip = 0; ip < 9; ip++)
+            //Table Pruning
+            foreach (var planet in VSOP2013DATA)
             {
-                for (int iv = 0; iv < 6; iv++)
+                foreach (var variable in planet.variables)
                 {
-                    VSOP2013DATA[ip].variables[iv].PowerTables = DataPruning(VSOP2013DATA[ip].variables[iv].PowerTables);
+                    variable.PowerTables = variable.PowerTables.TakeWhile(t => t?.Terms is not null).ToArray();
                 }
             }
 
@@ -218,21 +220,6 @@ namespace VSOP2013.DataConverter
                 T.bb += Bufferiphi[j] * _ci1[j];
             }
             return T;
-        }
-
-        private static PowerTable[] DataPruning(PowerTable[] tables)
-        {
-            for (int i = 0; i < tables.Length; i++)
-            {
-                if (tables[i].Terms is null)
-                {
-                    PowerTable[] result = new PowerTable[i];
-
-                    Array.Copy(tables, result, i);
-                    return result;
-                }
-            }
-            return tables;
         }
     }
 }
