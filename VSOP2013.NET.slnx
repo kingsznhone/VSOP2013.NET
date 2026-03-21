@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="DataConverter/DataConverter.csproj" />
+  <Project Path="Demo/Demo.csproj" />
+  <Project Path="VSOP2013.NET/VSOP2013.NET.csproj" />
+</Solution>

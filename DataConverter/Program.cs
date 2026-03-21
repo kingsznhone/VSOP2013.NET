@@ -1,0 +1,87 @@
+using System.Diagnostics;
+using System.IO.Compression;
+using MemoryPack;
+
+namespace VSOP2013.DataConverter
+{
+    internal class Program
+    {
+        private static void Main(string[] args)
+        {
+            #region Read Original Data
+
+            Stopwatch sw = new();
+            sw.Start();
+
+            List<PlanetTable> VSOP2013DATA = DataReader.ReadData();
+            VSOP2013DATA = VSOP2013DATA.OrderBy(x => x.Body).ToList();
+
+            sw.Stop();
+            double ticks = sw.ElapsedTicks;
+            double Freq = Stopwatch.Frequency;
+            double milliseconds = (ticks / Freq) * 1000;
+            Console.WriteLine($"Data Read & Convert OK...Elapsed milliseconds: {milliseconds} ms");
+
+            #endregion Read Original Data
+
+            #region Dump Data
+
+            string OutputDirPath = Directory.GetCurrentDirectory() + @"\Data";
+            if (!Directory.Exists(OutputDirPath))
+            {
+                Directory.CreateDirectory(OutputDirPath);
+            }
+            DirectoryInfo OutputDir = new(Directory.GetCurrentDirectory() + @"\Data");
+
+            sw.Restart();
+            string filename = Path.Combine(OutputDir.FullName, "VSOP2013.BR");
+            if (File.Exists(filename))
+            {
+                File.Delete(filename);
+            }
+            using (FileStream fs = new FileStream(filename, FileMode.CreateNew))
+            using (BrotliStream brotliStream = new BrotliStream(fs, CompressionLevel.SmallestSize))
+            {
+                brotliStream.Write(MemoryPackSerializer.Serialize(VSOP2013DATA));
+            }
+            Console.WriteLine($"VSOP2013DATA: \n{filename}");
+            Console.WriteLine();
+
+            sw.Stop();
+            ticks = sw.ElapsedTicks;
+            milliseconds = (ticks / Freq) * 1000;
+            Console.WriteLine($"Data Dumped OK. Elapsed: {milliseconds}ms");
+
+            #endregion Dump Data
+
+            #region Test
+
+            sw.Restart();
+            VSOP2013DATA.Clear();
+            using (FileStream fs = new FileStream(filename, FileMode.Open))
+            using (BrotliStream brotliStream = new BrotliStream(fs, CompressionMode.Decompress))
+            using (MemoryStream ms = new MemoryStream())
+            {
+                brotliStream.CopyTo(ms);
+                VSOP2013DATA = MemoryPackSerializer.Deserialize<List<PlanetTable>>(ms.ToArray());
+            }
+
+            sw.Stop();
+            ticks = sw.ElapsedTicks;
+            milliseconds = (ticks / Freq) * 1000;
+            Console.WriteLine($"Dump Data Reload Test OK. Elapsed: {milliseconds}ms");
+            Console.WriteLine("Press Enter to exit...");
+            Console.ReadLine();
+
+            // Open explorer to output path.
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = "explorer.exe",
+                Arguments = OutputDir.FullName,
+                UseShellExecute = true
+            });
+
+            #endregion Test
+        }
+    }
+}
