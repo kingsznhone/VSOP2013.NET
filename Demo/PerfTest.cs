@@ -5,7 +5,6 @@ using VSOP2013;
 
 namespace Demo
 {
-    [SimpleJob(RuntimeMoniker.Net80)]
     [SimpleJob(RuntimeMoniker.Net10_0)]
     [MemoryDiagnoser]
     public class PerfTest

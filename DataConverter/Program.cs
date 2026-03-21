@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using FastLZMA2Net;
+using System.IO.Compression;
 using MemoryPack;
 
 namespace VSOP2013.DataConverter
@@ -34,16 +34,15 @@ namespace VSOP2013.DataConverter
             DirectoryInfo OutputDir = new(Directory.GetCurrentDirectory() + @"\Data");
 
             sw.Restart();
-            Compressor compressor = new Compressor(0, 10) { HighCompressLevel = 10 };
-            string filename = Path.Combine(OutputDir.FullName, "VSOP2013.BIN");
+            string filename = Path.Combine(OutputDir.FullName, "VSOP2013.BR");
             if (File.Exists(filename))
             {
                 File.Delete(filename);
             }
             using (FileStream fs = new FileStream(filename, FileMode.CreateNew))
+            using (BrotliStream brotliStream = new BrotliStream(fs, CompressionLevel.SmallestSize))
             {
-                var compressed = compressor.Compress(MemoryPackSerializer.Serialize(VSOP2013DATA));
-                fs.Write(compressed.AsSpan());
+                brotliStream.Write(MemoryPackSerializer.Serialize(VSOP2013DATA));
             }
             Console.WriteLine($"VSOP2013DATA: \n{filename}");
             Console.WriteLine();
@@ -59,9 +58,13 @@ namespace VSOP2013.DataConverter
 
             sw.Restart();
             VSOP2013DATA.Clear();
-            Decompressor decompressor = new Decompressor(0);
-            var decompressed = decompressor.Decompress(File.ReadAllBytes(filename));//critical bug
-            VSOP2013DATA = MemoryPackSerializer.Deserialize<List<PlanetTable>>(decompressed);
+            using (FileStream fs = new FileStream(filename, FileMode.Open))
+            using (BrotliStream brotliStream = new BrotliStream(fs, CompressionMode.Decompress))
+            using (MemoryStream ms = new MemoryStream())
+            {
+                brotliStream.CopyTo(ms);
+                VSOP2013DATA = MemoryPackSerializer.Deserialize<List<PlanetTable>>(ms.ToArray());
+            }
 
             sw.Stop();
             ticks = sw.ElapsedTicks;

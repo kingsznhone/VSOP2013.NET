@@ -4,8 +4,6 @@ namespace VSOP2013
     {
         public override VSOPBody Body { get; }
 
-        private CoordinatesReference _coordinatesReference;
-        public override CoordinatesReference CoordinatesReference => _coordinatesReference;
         public override CoordinatesType CoordinatesType => CoordinatesType.Spherical;
 
         private ReferenceFrame _referenceFrame;
@@ -19,13 +17,11 @@ namespace VSOP2013
                 {
                     Variables_LBR = Utility.XYZtoLBR(Utility.DynamicaltoICRS(Utility.LBRtoXYZ(Variables_LBR)));
                     _referenceFrame = value;
-                    _coordinatesReference = CoordinatesReference.EquatorialHeliocentric;
                 }
                 else if (_referenceFrame == ReferenceFrame.ICRSJ2000 && value == ReferenceFrame.DynamicalJ2000)
                 {
                     Variables_LBR = Utility.XYZtoLBR(Utility.ICRStoDynamical(Utility.LBRtoXYZ(Variables_LBR)));
-                    _referenceFrame = ReferenceFrame.DynamicalJ2000;
-                    _coordinatesReference = CoordinatesReference.EclipticHeliocentric;
+                    _referenceFrame = value;
                 }
             }
         }
@@ -39,7 +35,6 @@ namespace VSOP2013
         public VSOPResult_LBR(VSOPResult_ELL result)
         {
             Variables_ELL = result.Variables_ELL;
-            _coordinatesReference = result.CoordinatesReference;
             _referenceFrame = result.ReferenceFrame;
             Body = result.Body;
             Time = result.Time;
@@ -49,42 +44,41 @@ namespace VSOP2013
         public VSOPResult_LBR(VSOPResult_XYZ result)
         {
             Variables_ELL = result.Variables_ELL;
-            _coordinatesReference = result.CoordinatesReference;
             _referenceFrame = result.ReferenceFrame;
             Body = result.Body;
             Time = result.Time;
-            Variables_LBR = Utility.ELLtoLBR(result.Body, result.Variables_ELL);
+            Variables_LBR = Utility.XYZtoLBR(result.Variables_XYZ);
         }
 
         #region Elements
 
         /// <summary>
-        /// a = semi-major axis (au)
+        /// Longitude (rad)
         /// </summary>
         public double l { get => Variables_LBR[0]; }
 
         /// <summary>
-        /// l = mean longitude (rd)
+        /// Latitude (rad)
         /// </summary>
         public double b { get => Variables_LBR[1]; }
 
         /// <summary>
-        /// k = e*cos(pi) (rd)
+        /// Radius (au)
         /// </summary>
         public double r { get => Variables_LBR[2]; }
 
         /// <summary>
-        /// h = e*sin(pi) (rd)
+        /// Longitude velocity (rad/day)
         /// </summary>
         public double dl { get => Variables_LBR[3]; }
 
         /// <summary>
-        /// q = sin(i/2)*cos(omega) (rd)
+        /// Latitude velocity (rad/day)
         /// </summary>
         public double db { get => Variables_LBR[4]; }
 
         /// <summary>
-        /// p = sin(i/2)*sin(omega) (rd)
+        /// Radius velocity (au/day)
         /// </summary>
         public double dr { get => Variables_LBR[5]; }
 
@@ -95,7 +89,7 @@ namespace VSOP2013
             return new VSOPResult_XYZ(this);
         }
 
-        public VSOPResult_ELL toELL()
+        public VSOPResult_ELL ToELL()
         {
             return new VSOPResult_ELL(this);
         }

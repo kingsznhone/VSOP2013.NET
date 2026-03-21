@@ -9,8 +9,6 @@ namespace VSOP2013
     {
         public override VSOPBody Body { get; }
 
-        public override CoordinatesReference CoordinatesReference => CoordinatesReference.EclipticHeliocentric;
-
         public override CoordinatesType CoordinatesType => CoordinatesType.Elliptic;
 
         public override ReferenceFrame ReferenceFrame

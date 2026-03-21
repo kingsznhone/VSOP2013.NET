@@ -34,9 +34,13 @@ namespace VSOP2013
         public abstract VSOPBody Body { get; }
 
         /// <summary>
-        /// Coordinates Reference
+        /// Coordinates Reference (derived from ReferenceFrame)
         /// </summary>
-        public abstract CoordinatesReference CoordinatesReference { get; }
+        public CoordinatesReference CoordinatesReference => ReferenceFrame switch
+        {
+            ReferenceFrame.ICRSJ2000 => CoordinatesReference.EquatorialHeliocentric,
+            _ => CoordinatesReference.EclipticHeliocentric,
+        };
 
         /// <summary>
         /// Coordinates Type

@@ -88,8 +88,6 @@ namespace VSOP2013
             //Sin(θ) = Cos(b), Cos(θ) = Sin(b)
             b = Math.Asin(z / r);
 
-#if NET8_0_OR_GREATER
-
             #region vector matrix mul
 
             if (Vector256.IsHardwareAccelerated)
@@ -110,8 +108,6 @@ namespace VSOP2013
             }
 
             #endregion vector matrix mul
-
-#endif
 
             // Inverse Jacobian matrix  From  cartesian to spherical
             //https://en.wikipedia.org/wiki/Spherical_coordinate_system#Integration_and_differentiation_in_spherical_coordinates
@@ -161,8 +157,6 @@ namespace VSOP2013
             y = r * Math.Cos(b) * Math.Sin(l);
             z = r * Math.Sin(b);
 
-#if NET8_0_OR_GREATER
-
             #region vector matrix mul
 
             if (Vector256.IsHardwareAccelerated)
@@ -184,7 +178,6 @@ namespace VSOP2013
 
             #endregion vector matrix mul
 
-#endif
             // Jacobian matrix From spherical to cartesian
             //https://en.wikipedia.org/wiki/Spherical_coordinate_system#Integration_and_differentiation_in_spherical_coordinates
             double[,] J = {
@@ -309,7 +302,6 @@ namespace VSOP2013
             Sphi = Math.Sin(phi);
             Cphi = Math.Cos(phi);
 
-#if NET8_0_OR_GREATER
             if (Vector256.IsHardwareAccelerated)
             {
                 Vector256<double> r1 = Vector256.Create(Cphi, -Sphi * Ceps, Sphi * Seps, 0);
@@ -328,7 +320,6 @@ namespace VSOP2013
                 icrs[5] = Vector256.Sum(vdv * r3);
                 return icrs.ToArray();
             }
-#endif
 
             //Rotation Matrix
             double[,] R = new double[,] { {Cphi, -Sphi*Ceps,  Sphi*Seps },
@@ -378,8 +369,6 @@ namespace VSOP2013
             Sphi = Math.Sin(phi);
             Cphi = Math.Cos(phi);
 
-#if NET7_0_OR_GREATER
-
             #region vector matrix mul
 
             if (Vector256.IsHardwareAccelerated)
@@ -402,8 +391,6 @@ namespace VSOP2013
             }
 
             #endregion vector matrix mul
-
-#endif
 
             //Reverse Matrix
             double[,] R_1 = new double[,] {{ Cphi,       Sphi,      0    },

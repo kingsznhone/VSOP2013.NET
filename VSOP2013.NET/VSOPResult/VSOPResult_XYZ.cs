@@ -4,8 +4,6 @@ namespace VSOP2013
     {
         public override VSOPBody Body { get; }
 
-        private CoordinatesReference _coordinatesReference;
-        public override CoordinatesReference CoordinatesReference => _coordinatesReference;
         public override CoordinatesType CoordinatesType => CoordinatesType.Rectangular;
 
         private ReferenceFrame _referenceFrame;
@@ -19,13 +17,11 @@ namespace VSOP2013
                 {
                     Variables_XYZ = Utility.DynamicaltoICRS(Variables_XYZ);
                     _referenceFrame = value;
-                    _coordinatesReference = CoordinatesReference.EquatorialHeliocentric;
                 }
                 else if (_referenceFrame == ReferenceFrame.ICRSJ2000 && value == ReferenceFrame.DynamicalJ2000)
                 {
                     Variables_XYZ = Utility.ICRStoDynamical(Variables_XYZ);
                     _referenceFrame = value;
-                    _coordinatesReference = CoordinatesReference.EclipticHeliocentric;
                 }
             }
         }
@@ -39,17 +35,15 @@ namespace VSOP2013
         public VSOPResult_XYZ(VSOPResult_LBR result)
         {
             Variables_ELL = result.Variables_ELL;
-            _coordinatesReference = result.CoordinatesReference;
             _referenceFrame = result.ReferenceFrame;
             Body = result.Body;
             Time = result.Time;
-            Variables_XYZ = Utility.ELLtoXYZ(result.Body, result.Variables_ELL);
+            Variables_XYZ = Utility.LBRtoXYZ(result.Variables_LBR);
         }
 
         public VSOPResult_XYZ(VSOPResult_ELL result)
         {
             Variables_ELL = result.Variables_ELL;
-            _coordinatesReference = result.CoordinatesReference;
             _referenceFrame = result.ReferenceFrame;
             Body = result.Body;
             Time = result.Time;
@@ -59,32 +53,32 @@ namespace VSOP2013
         #region Elements
 
         /// <summary>
-        /// a = semi-major axis (au)
+        /// Position x (au)
         /// </summary>
         public double x { get => Variables_XYZ[0]; }
 
         /// <summary>
-        /// l = mean longitude (rd)
+        /// Position y (au)
         /// </summary>
         public double y { get => Variables_XYZ[1]; }
 
         /// <summary>
-        /// k = e*cos(pi) (rd)
+        /// Position z (au)
         /// </summary>
         public double z { get => Variables_XYZ[2]; }
 
         /// <summary>
-        /// h = e*sin(pi) (rd)
+        /// Velocity x (au/day)
         /// </summary>
         public double dx { get => Variables_XYZ[3]; }
 
         /// <summary>
-        /// q = sin(i/2)*cos(omega) (rd)
+        /// Velocity y (au/day)
         /// </summary>
         public double dy { get => Variables_XYZ[4]; }
 
         /// <summary>
-        /// p = sin(i/2)*sin(omega) (rd)
+        /// Velocity z (au/day)
         /// </summary>
         public double dz { get => Variables_XYZ[5]; }
 
@@ -95,7 +89,7 @@ namespace VSOP2013
             return new VSOPResult_LBR(this);
         }
 
-        public VSOPResult_ELL toELL()
+        public VSOPResult_ELL ToELL()
         {
             return new VSOPResult_ELL(this);
         }

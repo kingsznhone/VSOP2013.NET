@@ -1,7 +1,7 @@
+using System.IO.Compression;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Runtime.Intrinsics;
-using FastLZMA2Net;
+
 using MemoryPack;
 
 namespace VSOP2013
@@ -32,14 +32,14 @@ namespace VSOP2013
         {
             //Import Planet Data
             var assembly = Assembly.GetExecutingAssembly();
-            string dataFilename = $"VSOP2013.NET.Resources.VSOP2013.BIN";
+            string dataFilename = $"VSOP2013.NET.Resources.VSOP2013.BR";
             using (MemoryStream recoveryStream = new MemoryStream())
             {
                 using (Stream cs = assembly.GetManifestResourceStream(dataFilename))
                 {
-                    using (DecompressStream ds = new DecompressStream(cs))
+                    using (BrotliStream bs = new BrotliStream(cs, CompressionMode.Decompress))
                     {
-                        ds.CopyTo(recoveryStream);
+                        bs.CopyTo(recoveryStream);
                     }
                 }
 
@@ -86,14 +86,14 @@ namespace VSOP2013
         /// <param name="Table"></param>
         /// <param name="JD2000"></param>
         /// <returns>Elliptic Elements</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining| MethodImplOptions.AggressiveOptimization)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
         private double Calculate(VariableTable Table, double JD2000)
         {
             //Thousand of Julian Years
             double tj = JD2000 / A1000;
 
             //Iteration on Time
-            Span<double> t =new double[32];
+            Span<double> t = stackalloc double[21];
             t[0] = 1.0d;
             t[1] = tj;
             for (int i = 2; i < 21; i++)
@@ -123,7 +123,5 @@ namespace VSOP2013
             }
             return result;
         }
-
-
     }
 }
