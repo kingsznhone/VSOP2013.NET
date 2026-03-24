@@ -10,13 +10,11 @@ public static double[,] MultiplyMatrix(double[,] A, double[,] B)
 
 `A` double\[,]
 
-Matrix A\
-
+Matrix A<br>
 
 `B` double\[,]
 
-Matrix B\
-
+Matrix B<br>
 
 **Return**
 

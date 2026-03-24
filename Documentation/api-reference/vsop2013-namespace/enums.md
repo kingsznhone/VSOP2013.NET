@@ -10,15 +10,16 @@ public enum VSOPBody
 
 | Name    | Value |
 | ------- | ----- |
-| MERCURY | 0     |
-| VENUS   | 1     |
-| EMB     | 2     |
-| MARS    | 3     |
-| JUPITER | 4     |
-| SATURN  | 5     |
-| URANUS  | 6     |
-| NEPTUNE | 7     |
-| PLUTO   | 8     |
+| SUN     | 0     |
+| MERCURY | 1     |
+| VENUS   | 2     |
+| EMB     | 3     |
+| MARS    | 4     |
+| JUPITER | 5     |
+| SATURN  | 6     |
+| URANUS  | 7     |
+| NEPTUNE | 8     |
+| PLUTO   | 9     |
 
 ***
 
@@ -55,21 +56,6 @@ public enum TimeFrame
 | TAI  | 1     |
 | TT   | 2     |
 | TDB  | 3     |
-
-***
-
-## CoordinatesReference
-
-```csharp
-public enum CoordinatesReference
-```
-
-### Fields <a href="#fields" id="fields"></a>
-
-| Name                   | Value |
-| ---------------------- | ----- |
-| EclipticHeliocentric   | 0     |
-| EquatorialHeliocentric | 2     |
 
 ***
 

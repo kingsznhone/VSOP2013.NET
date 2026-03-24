@@ -36,31 +36,31 @@ TimeFrame of dt. Usually UTC.
 
 ## **Properties**
 
-`DateTime UTC`
+`UTC` Datetime
 
 UTC Time frame.
 
 
 
-`DateTime` TAI
+`TAI` Datetime
 
 International Atomic Time
 
 
 
-`DateTime TT`
+`TT` Datetime
 
 Terrestrial Time (aka. TDT)
 
 
 
-`DateTime TDB`&#x20;
+`TDB` Datetime
 
 Barycentric Dynamical Time. VSOP2013 use this time frame in calculation.
 
 
 
-`double J2000`
+`J2000` double
 
 Get J2000 from TDB.
 
@@ -150,4 +150,4 @@ Julian date to analyze.
 
 Datetime Class.
 
-\
+<br>

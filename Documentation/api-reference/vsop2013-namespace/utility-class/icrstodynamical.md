@@ -3,12 +3,12 @@
 Change inertial frame
 
 ```csharp
-static double[] ICRStoDynamical(double[] xyz)
+static double[] ICRStoDynamical(double[] icrs)
 ```
 
 ### **Parameters**
 
-`xyz` double\[]
+`icrs` double\[]
 
 Array of cartesian coordinate elements that inertial frame of ICRS equinox and ecliptic.
 

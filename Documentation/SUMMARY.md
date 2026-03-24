@@ -34,6 +34,8 @@
     * [LBRtoXYZ](api-reference/vsop2013-namespace/utility-class/lbrtoxyz.md)
     * [ELLtoXYZ](api-reference/vsop2013-namespace/utility-class/elltoxyz.md)
     * [ELLtoLBR](api-reference/vsop2013-namespace/utility-class/elltolbr.md)
+    * [XYZtoELL](api-reference/vsop2013-namespace/utility-class/xyztoell.md)
+    * [LBRtoELL](api-reference/vsop2013-namespace/utility-class/lbrtoell.md)
     * [DynamicaltoICRS](api-reference/vsop2013-namespace/utility-class/dynamicaltoicrs.md)
     * [ICRStoDynamical](api-reference/vsop2013-namespace/utility-class/icrstodynamical.md)
   * [VSOPResult Class](api-reference/vsop2013-namespace/vsopresult-class/README.md)

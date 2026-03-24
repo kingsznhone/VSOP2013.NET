@@ -1,5 +1,9 @@
 # Change Logs
 
+### v2.0.0 2026.3.24
+
+Major refactor
+
 ### v1.5.0 2026.03.22
 
 Add dotnet 10 target
