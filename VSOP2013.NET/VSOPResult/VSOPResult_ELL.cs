@@ -30,7 +30,7 @@ namespace VSOP2013
         [JsonPropertyName("p")]
         public double p => _variables[5];
 
-        internal VSOPResult_ELL(VSOPBody body, VSOPTime time,
+        public VSOPResult_ELL(VSOPBody body, VSOPTime time,
             double[] variables, ReferenceFrame frame)
             : base(body, time, variables, frame) { }
 

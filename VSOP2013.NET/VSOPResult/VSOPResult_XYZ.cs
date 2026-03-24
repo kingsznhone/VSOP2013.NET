@@ -30,7 +30,7 @@ namespace VSOP2013
         [JsonPropertyName("dz")]
         public double dz => _variables[5];
 
-        internal VSOPResult_XYZ(VSOPBody body, VSOPTime time,
+        public VSOPResult_XYZ(VSOPBody body, VSOPTime time,
             double[] variables, ReferenceFrame frame)
             : base(body, time, variables, frame) { }
 
