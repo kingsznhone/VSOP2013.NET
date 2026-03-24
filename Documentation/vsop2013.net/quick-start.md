@@ -24,10 +24,6 @@ VSOPResult_ELL ell = vsop.GetPlanetPosition(VSOPBody.EMB, vTime);
 VSOPResult_XYZ xyz=ell.ToXYZ();
 VSOPResult_LBR lbr=ell.ToLBR();
 
-// Explicit cast
-xyz = (VSOPResult_XYZ)ell;
-lbr = (VSOPResult_LBR)ell;
-
 // Print result
 Console.WriteLine($"Body: {Enum.GetName(ell.Body)}");
 Console.WriteLine($"Coordinates Type: {Enum.GetName(ell.CoordinatesType)}");
