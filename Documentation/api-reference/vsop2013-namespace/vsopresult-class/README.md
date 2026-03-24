@@ -10,15 +10,15 @@ public abstract class VSOPResult
 
 ## Properties <a href="#methods" id="methods"></a>
 
-`public abstract` [`VSOPBody`](../enums.md#fields) `Body { get; }`
+`public` [`VSOPBody`](../enums.md#fields) `Body { get; }`
 
 Planet of this result.
 
 
 
-`public abstract` [`CoordinatesReference`](../enums.md#coordinatesreference) `CoordinatesReference{ get; }`
+`public` [`VSOPTime`](../vsoptime-class.md) `Time { get; }`
 
-Coordinates Reference of this result.
+Input time of this result.
 
 
 
@@ -28,19 +28,53 @@ Coordinates type of this result.
 
 
 
-`public abstract` [`ReferenceFrame`](../enums.md#referenceframe) `ReferenceFrame { get; set;}`
+`public` [`ReferenceFrame`](../enums.md#referenceframe) `ReferenceFrame { get; set;}`
 
-ReferenceFrame of this result. Set to `ReferenceFrame.ICRSJ2000` or `ReferenceFrame.DynamicalJ2000` will automatically change coordinate field.
-
-
-
-`public abstract` [`VSOPTime`](../vsoptime-class.md) `Time { get; }`
-
-Input time of this result.
+ReferenceFrame of this result.&#x20;
 
 
 
-`public abstract double[] Variables_ELL { get;}`
+`public ReadOnlySpan<double> Variables { get;}`
 
-Raw data of this result in elliptic coordinate.
+Raw 6-element coordinate array (read-only view).
+
+
+
+## Methods
+
+```cs
+public abstract VSOPResult_ELL ToELL()
+```
+
+Convert a result to Elliptic Coordinates.
+
+
+
+```csharp
+public abstract VSOPResult_XYZ ToXYZ()
+```
+
+Convert a result to Rectangula Coordinates.
+
+
+
+```csharp
+public abstract VSOPResult_LBR ToLBR()
+```
+
+Convert a result to Spherical Coordinates.
+
+
+
+```cs
+public abstract VSOPResult ChangeFrame(ReferenceFrame targetFrame);
+```
+
+Change reference frame of a result.
+
+**Parameters**
+
+`targetFrame`   [ReferenceFrame](../enums.md#referenceframe)&#x20;
+
+target reference frame to convert
 

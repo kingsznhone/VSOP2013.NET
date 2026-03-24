@@ -15,6 +15,8 @@ public static class Utility
 * [LBRtoXYZ(double\[\] lbr)](lbrtoxyz.md)
 * [ELLtoXYZ(double\[\] ell)](elltoxyz.md)
 * [ELLtoLBR(double\[\] ell)](elltolbr.md)
-* [DynamicaltoICRS(double\[\] xyz)](dynamicaltoicrs.md)
-* [ICRStoDynamical(double\[\] xyz)](dynamicaltoicrs.md)
+* [XYZtoELL(double\[\] xyz)](elltoxyz.md)
+* [LBRtoELL(double\[\] lbr)](lbrtoell.md)
+* [DynamicaltoICRS(double\[\] dynamical)](dynamicaltoicrs.md)
+* [ICRStoDynamical(double\[\] icrs)](dynamicaltoicrs.md)
 

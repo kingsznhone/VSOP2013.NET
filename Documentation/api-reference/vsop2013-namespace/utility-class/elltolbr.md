@@ -3,10 +3,16 @@
 Convert elliptic coordinate to spherical coordinate.
 
 ```csharp
-static double[] ELLtoLBR(double[] ell)
+static double[] ELLtoLBR(VSOPBody body, double[] ell)
 ```
 
 ### **Parameters**
+
+`body` [VSOPBody](../enums.md#fields)
+
+Planet
+
+
 
 `ell` double\[]
 

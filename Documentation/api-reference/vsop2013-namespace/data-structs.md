@@ -3,18 +3,18 @@
 ## PlanetTable
 
 ```csharp
-public struct PlanetTable
+public class PlanetTable
 ```
 
 ### Fields <a href="#fields" id="fields"></a>
 
-[`VSOPBody`](enums.md#fields)  body
+`body` [VSOPBody](enums.md#fields)
 
 Planet Enum
 
 
 
-[`VariableTable`](data-structs.md#variabletable)`[]`  variables
+`variables`  Dictionary<[VSOPVariable](enums.md#fields-2), [VariableTable](data-structs.md#variabletable)>
 
 All 6 variable data stored.
 
@@ -23,24 +23,24 @@ All 6 variable data stored.
 ## VariableTable
 
 ```csharp
-public struct VariableTable
+public class VariableTable
 ```
 
 ### Fields <a href="#fields" id="fields"></a>
 
-[`VSOPBody`](enums.md#fields) body
+`body` [VSOPBody](enums.md#fields)
 
 Planet Enum
 
 
 
-[`VSOPVariable`](enums.md#fields-2) Variable
+`Variable` [VSOPVariable](enums.md#fields-2)
 
 Which variable of this table.
 
 
 
-[`PowerTable`](data-structs.md#powertable)`[]` PowerTables
+`PowerTables` [PowerTable\[\]](data-structs.md#powertable)
 
 All power table stored.
 
@@ -49,40 +49,38 @@ All power table stored.
 ## PowerTable
 
 ```csharp
-public struct PowerTable
+public class PowerTable
 ```
 
 ### Fields <a href="#fields" id="fields"></a>
 
-[`VSOPBody`](enums.md#fields) body
+`body` [VSOPBody](enums.md#fields)
 
 Planet Enum
 
 
 
-[`VSOPVariable`](enums.md#fields-2) Variable
+`Variable` [VSOPVariable](enums.md#fields-2)
 
 Which variable of this table.
 
 
 
-`int Power`
+`Power` int
 
 Power of this table.
 
 
 
-`int` TermsCount
+`TermsCount` int
 
 Total terms count.
 
 
 
-[`Term`](data-structs.md#term)`[]` Terms
+`Terms` [Term\[\]](data-structs.md#term)
 
 All terms stored.
-
-
 
 ***
 
@@ -94,19 +92,19 @@ public struct Term
 
 ### Fields <a href="#fields" id="fields"></a>
 
-`double` ss
+`ss`  double
 
 
 
-`double` cc
+`cc`  double
 
 
 
-`double` aa
+`aa`  double
 
 
 
-`double` bb
+`bb`  double
 
 
 

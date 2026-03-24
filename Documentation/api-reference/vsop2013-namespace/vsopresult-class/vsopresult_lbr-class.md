@@ -11,36 +11,36 @@ public class VSOPResult_LBR : VSOPResult
 ## Constructors <a href="#constructors" id="constructors"></a>
 
 ```csharp
-public VSOPResult_LBR(VSOPResult_ELL result)
+public VSOPResult_XYZ(VSOPBody body, VSOPTime time, double[] variables, ReferenceFrame frame)
 ```
 
-Create a new spherical result from elliptic result.
+Create a new elliptic result from calculate result.
 
 
 
 **Parameters**
 
-`result` [VSOPResult\_ELL](vsopresult\_ell-class.md)&#x20;
+`body` [VSOPBody](../enums.md#fields)
 
-Elliptic result
-
-
-
-***
-
-```csharp
-public VSOPResult_LBR(VSOPResult_XYZ result)
-```
-
-Create a new spherical result from cartesian result.
+Planet
 
 
 
-**Parameters**
+`time` [VSOPTime](../vsoptime-class.md)
 
-`result` [VSOPResult\_XYZ](vsopresult\_xyz-class.md)
+Time wrapper for VSOP.
 
-Cartesian result
+
+
+`variables` double\[]
+
+Raw result data from calculator.
+
+&#x20;
+
+`frame`  [ReferenceFrame](../enums.md#referenceframe)
+
+Reference frame of this result.
 
 
 
@@ -81,20 +81,3 @@ latitude velocity (rd/day)
 `double dr {get;}`
 
 radius velocity (au/day)
-
-***
-
-## Methods
-
-```csharp
-public VSOPResult_ELL ToELL()
-```
-
-Convert this result to elliptic coordinate.
-
-
-
-<pre class="language-csharp"><code class="lang-csharp"><strong>public VSOPResult_XYZ ToXYZ()
-</strong></code></pre>
-
-Convert this result to cartesian coordinate.

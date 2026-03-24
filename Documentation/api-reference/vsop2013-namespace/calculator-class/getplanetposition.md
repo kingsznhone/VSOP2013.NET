@@ -22,10 +22,10 @@ Exclusive time class in VSOP2013.
 
 **Return**
 
-[`VSOPResult_ELL`](../vsopresult-class/vsopresult\_ell-class.md)
+[`VSOPResult_ELL`](../vsopresult-class/vsopresult_ell-class.md)
 
 Full Result with 6 variable of Elliptic Coordinates.
 
-Can be explicit cast to [`VSOPResult_XYZ`](../vsopresult-class/vsopresult\_xyz-class.md) and [`VSOPResult_LBR`](../vsopresult-class/vsopresult\_lbr-class.md)
+Can be explicit cast to [`VSOPResult_XYZ`](../vsopresult-class/vsopresult_xyz-class.md) and [`VSOPResult_LBR`](../vsopresult-class/vsopresult_lbr-class.md)
 
-\
+<br>
