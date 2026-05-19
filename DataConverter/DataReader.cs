@@ -1,4 +1,5 @@
-using System.Reflection;
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
 
 namespace VSOP2013.DataConverter
 {
@@ -86,26 +87,19 @@ namespace VSOP2013.DataConverter
                 }
             }
 
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-
             return VSOP2013DATA;
         }
 
         private static void ReadPlanet(PlanetTable Planet, VSOPBody body)
         {
-            //var debug = Assembly.GetExecutingAssembly().GetManifestResourceNames();
+            string datafilename = Path.Combine(AppContext.BaseDirectory, "Resources", $"VSOP2013p{(int)body}.dat");
 
-            var assembly = Assembly.GetExecutingAssembly();
-            string datafilename = $"DataConverter.Resources.VSOP2013p{(int)body}.dat";
-            Stream? s = assembly.GetManifestResourceStream(datafilename);
-
-            if (s is null)
+            if (!File.Exists(datafilename))
             {
-                throw new FileNotFoundException($"Resource '{datafilename}' not found.");
+                throw new FileNotFoundException($"Data file not found: '{datafilename}'.");
             }
 
-            StreamReader sr = new StreamReader(s);
+            StreamReader sr = new StreamReader(datafilename);
             string line;
             while ((line = sr.ReadLine()) != null)
             {

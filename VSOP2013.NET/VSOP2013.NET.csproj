@@ -40,9 +40,8 @@ VSOP2013, computed the positions of the planets directly at any moment, as well 
     </Content>
   </ItemGroup>
 
-
   <ItemGroup>
-    <PackageReference Include="MemoryPack" Version="1.21.4" />
+    <ProjectReference Include="..\VSOP2013.NET.DataStructures\VSOP2013.NET.DataStructures.csproj" />
   </ItemGroup>
 
   <ItemGroup>

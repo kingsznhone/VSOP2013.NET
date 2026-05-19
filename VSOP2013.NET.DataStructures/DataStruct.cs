@@ -57,14 +57,6 @@ namespace VSOP2013
         public Term[] Terms;
     }
 
-    public partial struct Header
-    {
-        public VSOPBody Body;
-        public VSOPVariable Variable;
-        public int Power;
-        public int TermsCount;
-    }
-
     [MemoryPackable]
     [Serializable]
     [StructLayout(LayoutKind.Explicit)]
@@ -81,5 +73,13 @@ namespace VSOP2013
 
         [FieldOffset(24)]
         public double bb;
+    }
+
+    public partial struct Header
+    {
+        public VSOPBody Body;
+        public VSOPVariable Variable;
+        public int Power;
+        public int TermsCount;
     }
 }
