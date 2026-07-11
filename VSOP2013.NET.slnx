@@ -2,5 +2,6 @@
   <Project Path="DataConverter/DataConverter.csproj" />
   <Project Path="Demo/Demo.csproj" />
   <Project Path="VSOP2013.NET.DataStructures/VSOP2013.NET.DataStructures.csproj" />
+  <Project Path="VSOP2013.NET.Tests/VSOP2013.NET.Tests.csproj" />
   <Project Path="VSOP2013.NET/VSOP2013.NET.csproj" />
 </Solution>

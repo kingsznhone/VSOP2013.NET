@@ -12,7 +12,7 @@
 
 ## 1. VSOP2013 交点根数定义
 
-VSOP2013 使用 **$\sin(i/2)$ 约定** 的修正交点根数（Modified Equinoctial Elements）：
+VSOP2013 使用一组采用 **$\sin(i/2)$ 参数化** 的椭圆变量（equinoctial variables）：
 
 | 参数 | 含义 | 定义 |
 |------|------|------|
@@ -25,7 +25,7 @@ VSOP2013 使用 **$\sin(i/2)$ 约定** 的修正交点根数（Modified Equinoct
 
 其中 $\bar{\omega} = \Omega + \omega$ 是经度近日点，$M$ 是平近点角。
 
-> **关键区别**：经典交点根数使用 $\tan(i/2)$，VSOP2013 使用 $\sin(i/2)$。这直接影响 $q, p$ 的计算以及轨道面基向量的构造。
+> **关键区别**：通常所称的 Modified Equinoctial Elements 使用 $\tan(i/2)$，VSOP2013 使用 $\sin(i/2)$。这直接影响 $q, p$ 的计算以及轨道面基向量的构造。
 
 ---
 
@@ -116,7 +116,7 @@ $$= 2pq(2 - 2p^2 - 2q^2 - 2\chi^2) = 2pq(2 - 2(p^2+q^2+\chi^2)) = 0$$
 
 $$|\hat{e}_1|^2 = (1-2p^2)^2 + 4p^2q^2 + 4p^2\chi^2 = 1 - 4p^2 + 4p^4 + 4p^2(q^2+\chi^2)$$
 
-$$= 1 - 4p^2 + 4p^2(p^2 + q^2 + \chi^2) = 1$$  
+$$= 1 - 4p^2 + 4p^2(p^2 + q^2 + \chi^2) = 1$$
 
 ✓
 
@@ -192,7 +192,7 @@ $$\boxed{L = E - k\sin E + h\cos E}$$
 
 将 $E = E' + \bar{\omega}$ 代入，利用 $k = e\cos\bar{\omega}$，$h = e\sin\bar{\omega}$：
 
-$$k\sin E + h\cos E$$
+$$k\sin E - h\cos E$$
 $$= e\cos\bar{\omega}\sin(E'+\bar{\omega}) - e\sin\bar{\omega}\cos(E'+\bar{\omega})$$
 
 展开：
@@ -221,5 +221,6 @@ $$E - k\sin E + h\cos E = (E' + \bar{\omega}) - e\sin E' = (E' - e\sin E') + \ba
 ## 9. 精度说明
 
 - 逆运算不需要迭代，所有步骤都是解析的（仅涉及 `atan2`、`sqrt` 等初等函数）。
-- $L$ 的值没有做 $\mod 2\pi$ 的归一化，以保留完整的圈数信息，便于与 VSOP 原始数据比较。
-- 往返精度（`ELL → XYZ → ELL`）预期在双精度浮点的机器精度量级（$\sim 10^{-15}$），误差主要来自 `atan2` 的舍入。
+- 笛卡尔状态不能保留平经度的完整圈数；逆运算只能恢复 $L\bmod 2\pi$。实现将 $L$ 规范到 $[0,2\pi)$，与 `Calculator` 的输出约定一致。
+- 对非退化椭圆轨道，`ELL → XYZ → ELL` 的非角度分量通常可达到接近双精度机器精度的误差；$L$ 必须按模 $2\pi$ 比较。接近 $e=1$、$i=\pi$ 或零角动量时，误差会放大或参数化失效。
+- 该逆运算不适用于抛物线、双曲线、零角动量径向运动或倾角恰为 $180°$ 的状态。

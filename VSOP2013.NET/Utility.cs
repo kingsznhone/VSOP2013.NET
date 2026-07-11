@@ -155,18 +155,19 @@ namespace VSOP2013
 
             if (Vector256.IsHardwareAccelerated)
             {
-                Vector256<double> m1 = Vector256.Create(Math.Cos(b) * Math.Cos(l), r * Math.Sin(b) * Math.Cos(l), -r * Math.Cos(b) * Math.Sin(l), 0);
-                Vector256<double> m2 = Vector256.Create(Math.Cos(b) * Math.Sin(l), r * Math.Sin(b) * Math.Sin(l), r * Math.Cos(b) * Math.Cos(l), 0);
-                Vector256<double> m3 = Vector256.Create(Math.Sin(b), -r * Math.Cos(b), 0, 0);
+                Vector256<double> m1 = Vector256.Create(Math.Cos(b) * Math.Cos(l), -r * Math.Sin(b) * Math.Cos(l), -r * Math.Cos(b) * Math.Sin(l), 0);
+                Vector256<double> m2 = Vector256.Create(Math.Cos(b) * Math.Sin(l), -r * Math.Sin(b) * Math.Sin(l), r * Math.Cos(b) * Math.Cos(l), 0);
+                Vector256<double> m3 = Vector256.Create(Math.Sin(b), r * Math.Cos(b), 0, 0);
 
-                Vector256<double> vv = Vector256.Create(dr, db, dl, 0);
+                // Ordered to match the Jacobian columns: r, b, l.
+                Vector256<double> sphericalVelocity = Vector256.Create(dr, db, dl, 0);
 
                 xyz[0] = x;
                 xyz[1] = y;
                 xyz[2] = z;
-                xyz[3] = Vector256.Sum(m1 * vv);
-                xyz[4] = Vector256.Sum(m2 * vv);
-                xyz[5] = -Vector256.Sum(m3 * vv);
+                xyz[3] = Vector256.Sum(m1 * sphericalVelocity);
+                xyz[4] = Vector256.Sum(m2 * sphericalVelocity);
+                xyz[5] = Vector256.Sum(m3 * sphericalVelocity);
                 return xyz;
             }
 
@@ -175,9 +176,9 @@ namespace VSOP2013
             // Jacobian matrix From spherical to cartesian
             //https://en.wikipedia.org/wiki/Spherical_coordinate_system#Integration_and_differentiation_in_spherical_coordinates
             double[,] J = {
-                           { Math.Cos(b) * Math.Cos(l),  r * Math.Sin(b) * Math.Cos(l), -r * Math.Cos(b) * Math.Sin(l)  },
-                           { Math.Cos(b) * Math.Sin(l),  r * Math.Sin(b) * Math.Sin(l),  r * Math.Cos(b) * Math.Cos(l)  },
-                           { Math.Sin(b),               -r * Math.Cos(b),                0                              }};
+                           { Math.Cos(b) * Math.Cos(l), -r * Math.Sin(b) * Math.Cos(l), -r * Math.Cos(b) * Math.Sin(l)  },
+                           { Math.Cos(b) * Math.Sin(l), -r * Math.Sin(b) * Math.Sin(l),  r * Math.Cos(b) * Math.Cos(l)  },
+                           { Math.Sin(b),                r * Math.Cos(b),                0                              }};
             double[,] Velocity = { { dr }, { db }, { dl } };
             var C = MultiplyMatrix(J, Velocity);
             dx = C[0, 0];
@@ -189,7 +190,7 @@ namespace VSOP2013
             xyz[2] = z;
             xyz[3] = dx;
             xyz[4] = dy;
-            xyz[5] = -dz;
+            xyz[5] = dz;
             return xyz;
         }
 
@@ -201,6 +202,7 @@ namespace VSOP2013
         /// <param name="body">planet</param>
         /// <param name="ell">Elliptic Elements: a,l,k,h,q,p </param>
         /// <returns>cartesian Heliocentric Coordinates</returns>
+        /// <remarks>Defined for elliptic elements with a &gt; 0, k² + h² &lt; 1, and q² + p² &lt;= 1.</remarks>
         public static double[] ELLtoXYZ(VSOPBody body, double[] ell)
         {
             double[] xyz = new double[6];
@@ -228,21 +230,36 @@ namespace VSOP2013
             ex2 = ex * ex;
             ex3 = ex * ex * ex;
             z1 = Complex.Conjugate(z);
-            gl = ell[1] % (Math.Tau);
+            gl = (l % Math.Tau + Math.Tau) % Math.Tau;
             gm = gl - Math.Atan2(h, k);
             e = gl + (ex - 0.125d * ex3) * Math.Sin(gm)
                 + 0.5d * ex2 * Math.Sin(2.0d * gm)
                 + 0.375d * ex3 * Math.Sin(3.0d * gm);
-            while (true)
+            bool converged = false;
+            for (int iteration = 0; iteration < 50; iteration++)
             {
                 z2 = new Complex(0d, e);
                 zteta = Complex.Exp(z2);
                 z3 = z1 * zteta;
                 dl = gl - e + z3.Imaginary;
                 rsa = 1.0d - z3.Real;
-                e += dl / rsa;
-                if (Math.Abs(dl) < 1e-15) break;
+                double nextE = e + dl / rsa;
+                if (Math.Abs(nextE - e) <= 1e-15 || nextE == e)
+                {
+                    e = nextE;
+                    converged = true;
+                    break;
+                }
+                e = nextE;
             }
+            if (!converged)
+            {
+                throw new InvalidOperationException("Kepler equation did not converge.");
+            }
+
+            zteta = Complex.Exp(new Complex(0d, e));
+            z3 = z1 * zteta;
+            rsa = 1.0d - z3.Real;
 
             z1 = u * z * z3.Imaginary;
             z2 = new Complex(z1.Imaginary, -z1.Real);
@@ -284,6 +301,7 @@ namespace VSOP2013
         /// <param name="body">planet</param>
         /// <param name="xyz">cartesian Heliocentric Coordinates: x,y,z,dx,dy,dz</param>
         /// <returns>Elliptic Elements: a,l,k,h,q,p</returns>
+        /// <remarks>Defined for non-degenerate elliptic states excluding zero angular momentum and 180-degree inclination.</remarks>
         public static double[] XYZtoELL(VSOPBody body, double[] xyz)
         {
             double[] ell = new double[6];
@@ -367,6 +385,7 @@ namespace VSOP2013
 
             // Mean longitude L from equinoctial Kepler equation: L = E - k·sin(E) + h·cos(E)
             double L = E - k * Math.Sin(E) + h * Math.Cos(E);
+            L = (L % Math.Tau + Math.Tau) % Math.Tau;
 
             ell[0] = a;
             ell[1] = L;

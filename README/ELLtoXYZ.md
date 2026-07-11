@@ -140,13 +140,11 @@ $$f(E) = \lambda - E + \text{Im}(\bar{\mathbf{z}} \cdot e^{iE}) = 0$$
 
 #### 导数
 
-$$f'(E) = -1 + \text{Re}(\bar{\mathbf{z}} \cdot i \cdot e^{iE}) = -1 + \text{Re}(i \cdot \bar{\mathbf{z}} \cdot e^{iE})$$
-
-由于 $\bar{\mathbf{z}} \cdot e^{iE}$ 的实部为 $k\cos E + h\sin E$，乘以 $i$ 后实部变为 $-(k\sin E - h\cos E)$... 但更直接地：
+$$f'(E) = -1 + \text{Im}(i \cdot \bar{\mathbf{z}} \cdot e^{iE})$$
 
 $$\frac{d}{dE}\text{Im}(\bar{\mathbf{z}} \cdot e^{iE}) = \text{Re}(\bar{\mathbf{z}} \cdot e^{iE})$$
 
-> 因为 $\frac{d}{dE} e^{iE} = ie^{iE}$，取虚部的导数等于实部。
+> 因为 $\frac{d}{dE} e^{iE} = ie^{iE}$，且对任意复数 $w$ 都有 $\text{Im}(iw)=\text{Re}(w)$。
 
 所以：$f'(E) = -1 + \text{Re}(\bar{\mathbf{z}} \cdot e^{iE})$
 
@@ -179,7 +177,9 @@ zto = (-z + zteta + z2) / rsa;
 逐行解读：
 
 1. **`z3.Imaginary`**：
-   迭代结束时 $\mathbf{z}_3 = \bar{\mathbf{z}} \cdot \zeta$，其虚部为 $k\sin E - h\cos E = -e\sin E'$（带符号的偏近点角正弦）。但实际上更精确地说，$\text{Im}(\bar{\mathbf{z}} \cdot e^{iE}) = k\sin E - h\cos E$。
+   迭代结束时 $\mathbf{z}_3 = \bar{\mathbf{z}} \cdot \zeta$。由于 $E=E'+\bar\omega$ 且 $\mathbf z=e e^{i\bar\omega}$，因此
+
+   $$\mathbf z_3=e e^{iE'},\qquad \text{Im}(\mathbf z_3)=k\sin E-h\cos E=e\sin E'$$
 
    用 $s$ 表示 `z3.Imaginary`。
 
@@ -203,7 +203,7 @@ zto = (-z + zteta + z2) / rsa;
 
 设 $\zeta = e^{iE}$，$\bar{\mathbf{z}} = k - ih$，$s = \text{Im}(\bar{\mathbf{z}}\zeta)$。
 
-经典的交点根数位置公式，在轨道面的复坐标为：
+经典的交点根数位置公式，在轨道面的单位方向复数为：
 
 $$\mathbf{Z}_\theta = \cos F + i\sin F = \frac{-\mathbf{z} + \zeta + \frac{s}{1+\phi}(-i\mathbf{z})}{1 - \text{Re}(\bar{\mathbf{z}}\zeta)}$$
 
@@ -212,7 +212,11 @@ $$\mathbf{Z}_\theta = \cos F + i\sin F = \frac{-\mathbf{z} + \zeta + \frac{s}{1+
 - $\zeta = e^{iE}$：偏经度旋转
 - $-i\mathbf{z} \cdot s/(1+\phi)$：二阶修正项（与偏心率平方相关）
 
-`zto` 的实部和虚部分别对应轨道面内的归一化坐标 $(\cos F, \sin F)$，但实际上并不精确等于 $\cos F$ 和 $\sin F$——它们已经包含了径向距离的缩放（除以 $r/a$），所以实际的轨道面内位置为：
+分子恰好等于 $(r/a)e^{iF}$，而分母 `rsa` 等于 $r/a$，所以：
+
+$$\boxed{\mathbf Z_\theta=e^{iF}=\cos F+i\sin F},\qquad |\mathbf Z_\theta|=1$$
+
+因此 `zto` 本身不包含径向缩放。实际的轨道面内位置为：
 
 $$x_\text{orb} = a \cdot \text{rsa} \cdot \text{Re}(\mathbf{Z}_\theta), \quad y_\text{orb} = a \cdot \text{rsa} \cdot \text{Im}(\mathbf{Z}_\theta)$$
 
@@ -258,7 +262,7 @@ $$\hat{e}_1 = \begin{pmatrix} 1 - 2p^2 \\ 2pq \\ -2p\chi \end{pmatrix}, \quad \h
 
 #### 旋转矩阵的来源
 
-这个旋转矩阵等价于经典的 $R_z(-\Omega) R_x(-i) R_z(-\omega)$，但使用 $q, p, \chi$ 的参数化避免了三角函数运算。
+在通常的主动旋转约定下，这两个基向量是矩阵 $R_z(\Omega)R_x(i)R_z(-\Omega)$ 的前两列。矩阵只依赖轨道面的倾角 $i$ 和升交点经度 $\Omega$；近日点经度已经包含在真经度 $F$ 中，不应再次出现在这里。
 
 具体地，利用 $q = \sin(i/2)\cos\Omega$，$p = \sin(i/2)\sin\Omega$，$\chi = \cos(i/2)$：
 
@@ -290,8 +294,8 @@ $$n = \frac{\sqrt{\mu}}{a^{3/2}} = \frac{\texttt{rgm}}{a\sqrt{a}}$$
 
 | 代码变量 | 数学含义 | 公式 |
 |----------|---------|------|
-| `xms` | $S = a(h + Y)/\phi$ | 轨道面内的 $\hat{e}_2$ 方向速度因子 |
-| `xmc` | $C = a(k + X)/\phi$ | 轨道面内的 $\hat{e}_1$ 方向速度因子 |
+| `xms` | $S = a(h + Y)/\phi$ | 负的 $\hat{e}_1$ 方向速度因子 |
+| `xmc` | $C = a(k + X)/\phi$ | 正的 $\hat{e}_2$ 方向速度因子 |
 
 这些量来自对轨道面内位置关于时间的微分，利用了开普勒方程的时间导数关系。
 
@@ -305,7 +309,11 @@ $$\dot{x}_\text{orb} = -na\sin E' / (1-e\cos E'), \quad \dot{y}_\text{orb} = na\
 
 $$\vec{v} = n \begin{pmatrix} (2p^2-1)S + 2pqC \\ (1-2q^2)C - 2pqS \\ 2\chi(pS + qC) \end{pmatrix}$$
 
-注意速度旋转矩阵与位置的略有不同——这里 $\hat{e}_1$ 列前面的符号翻转了（$(2p^2-1)$ 而非 $(1-2p^2)$），相当于对 $S$ 分量（$\hat{e}_2$ 方向）取了负号后再旋转。这对应于轨道面内速度方向与位置方向的 $90°$ 相位差。
+将各分量按 $\hat e_1,\hat e_2$ 展开，代码严格等价于：
+
+$$\boxed{\vec v=n\left(-S\hat e_1+C\hat e_2\right)}$$
+
+其中 $S$ 和 $C$ 都包含偏心率分量，不能仅解释为把位置方向旋转 $90°$。
 
 ---
 
@@ -342,7 +350,9 @@ $$\vec{v} = n \begin{pmatrix} (2p^2-1)S + 2pqC \\ (1-2q^2)C - 2pqS \\ 2\chi(pS +
 3. **开普勒方程** 变成 $\lambda = E - \text{Im}(\bar{\mathbf{z}}\zeta)$，Newton 迭代只需一次复数乘法
 4. **轨道面内位置** 直接由 $\zeta$ 和 $\mathbf{z}$ 的代数组合给出
 
-这种写法避免了显式计算 $\bar{\omega}$、$E'$、$\nu$ 等中间角度，减少了三角函数调用，同时消除了 $\bar{\omega} = 0$ 或 $e = 0$ 时的奇异性问题。
+主体位置和速度公式不需要显式计算 $E'$、$\nu$ 等中间角度。初始猜测仍通过 `atan2(h, k)` 计算 $\bar\omega$；当 $e=0$ 时该调用返回零，后续公式仍保持有限。
+
+该算法面向 VSOP2013 的非退化椭圆轨道，要求 $a>0$、$k^2+h^2<1$ 且 $q^2+p^2\leq1$。
 
 ---
 
@@ -363,10 +373,10 @@ $$\vec{v} = n \begin{pmatrix} (2p^2-1)S + 2pqC \\ (1-2q^2)C - 2pqS \\ 2\chi(pS +
 | `e`（迭代后）| $E$ | 偏经度 |
 | `zteta` | $\zeta = e^{iE}$ | 偏经度旋转子 |
 | `rsa` | $r/a = 1 - e\cos E'$ | 归一化距离 |
-| `zto` | $\mathbf{Z}_\theta$ | 轨道面内归一化复坐标 |
+| `zto` | $\mathbf{Z}_\theta=e^{iF}$ | 轨道面内单位方向复数 |
 | `xm` | $m = pX - qY$ | 面外分量因子 |
 | `xr` | $r = a \cdot \texttt{rsa}$ | 日心距离 |
-| `xms` | $S = a(h+Y)/\phi$ | 速度 $\hat{e}_2$ 分量因子 |
-| `xmc` | $C = a(k+X)/\phi$ | 速度 $\hat{e}_1$ 分量因子 |
+| `xms` | $S = a(h+Y)/\phi$ | 负的速度 $\hat{e}_1$ 分量因子 |
+| `xmc` | $C = a(k+X)/\phi$ | 正的速度 $\hat{e}_2$ 分量因子 |
 | `xn` | $n = \sqrt{\mu}/a^{3/2}$ | 平均角速度 |
 | `rgm` | $\sqrt{\mu}$ | 引力参数平方根 |
