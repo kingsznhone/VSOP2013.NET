@@ -1,10 +1,12 @@
 # ELL → XYZ 正运算：数学原理与公式推导
 
-作者 : Claude Opus 4.6
+作者：Claude Opus 4.6
 
 ## 概述
 
 本文档解析 `ELLtoXYZ` 函数的数学原理。该函数源自 VSOP2013 原始 Fortran 代码，使用复数运算将修正交点根数 $(a, L, k, h, q, p)$ 转换为日心笛卡尔坐标 $(x, y, z, \dot{x}, \dot{y}, \dot{z})$。
+
+本文采用 VSOP2013 的单位：$a$ 和位置以 AU 表示，速度以 AU/day 表示，角度以弧度表示，$\mu$ 的单位为 $\mathrm{AU}^3/\mathrm{day}^2$。原始根数以 J2000 动力学黄道与春分点为基准；函数本身不旋转参考系，输出沿用输入根数的参考系。
 
 原代码注释写道 *"This is kind of magic that I will never understand"*——本文档旨在彻底破解这个"魔法"。
 
@@ -21,7 +23,7 @@
 | $q$ | 倾角分量 | $q = \sin(i/2)\cos\Omega$ |
 | $p$ | 倾角分量 | $p = \sin(i/2)\sin\Omega$ |
 
-其中 $\bar{\omega} = \Omega + \omega$ 是经度近日点。
+其中 $\bar{\omega} = \Omega + \omega$ 是近日点经度，$\Omega$ 是升交点经度，$\omega$ 是近心点幅角。下文用 $i$ 表示轨道倾角；复数公式中的 $i$ 则表示虚数单位，两者按上下文区分。
 
 ---
 
@@ -30,10 +32,12 @@
 ### 2.1 辅助常数
 
 ```csharp
-rgm = Math.Sqrt(gmp[(int)body] + gmsol);
+rgm = Math.Sqrt(GM[body] + GM[VSOPBody.SUN]);
 ```
 
 $$\texttt{rgm} = \sqrt{\mu} = \sqrt{GM_\text{planet} + GM_\odot}$$
+
+这里的 $GM$ 是标准引力参数，而非万有引力常数 $G$。当前 C# 实现使用 `GM` 字典保存各天体的参数。
 
 ### 2.2 几何辅助量
 
@@ -62,7 +66,7 @@ z1 = Complex.Conjugate(z);
 $$\mathbf{z} = k + ih = e \cdot e^{i\bar{\omega}}$$
 
 - $|\mathbf{z}| = e$（偏心率）
-- $\arg(\mathbf{z}) = \bar{\omega}$（经度近日点）
+- $\arg(\mathbf{z}) = \bar{\omega}$（近日点经度，仅在 $e>0$ 时有定义）
 - $\bar{\mathbf{z}} = k - ih$（共轭）
 
 > **核心思想**：将偏心率和近日点经度编码为一个复数，后续所有角度变换都变成复数乘法。
@@ -92,7 +96,7 @@ $$\bar{\mathbf{z}} \cdot e^{iE} = (k-ih)(\cos E + i\sin E) = (k\cos E + h\sin E)
 ### 3.2 初始猜测
 
 ```csharp
-gl = ell[1] % (Math.Tau);
+gl = (l % Math.Tau + Math.Tau) % Math.Tau;
 gm = gl - Math.Atan2(h, k);
 e = gl + (ex - 0.125d * ex3) * Math.Sin(gm)
     + 0.5d * ex2 * Math.Sin(2.0d * gm)
@@ -109,23 +113,40 @@ e = gl + (ex - 0.125d * ex3) * Math.Sin(gm)
 
 $$E_0 \approx \lambda + \left(e - \frac{e^3}{8}\right)\sin M + \frac{e^2}{2}\sin 2M + \frac{3e^3}{8}\sin 3M$$
 
-这是经典的 $E = M + \sum c_n \sin(nM)$ 展开，对于太阳系行星（$e < 0.25$），仅需 3 项就能给出非常好的初始值。
+这里 `l = ell[1]`。C# 的 `%` 是余数运算，双重取余将负平经度也规范到 $[0,2\pi)$。
+
+这是经典的 $E' = M + \sum c_n \sin(nM)$ 展开加上 $\bar\omega$ 后得到的偏经度初值。对于太阳系行星（$e < 0.25$），三阶截断通常已能给出较好的初始值；它不是任意高偏心率下的全局收敛保证。
 
 > **注意**：代码中变量名 `e` 在此处被复用为偏经度 $E$ 的迭代值（而非偏心率），偏心率始终使用 `ex`。
 
 ### 3.3 Newton-Raphson 迭代
 
 ```csharp
-while (true)
+bool converged = false;
+for (int iteration = 0; iteration < 50; iteration++)
 {
-    z2 = new Complex(0d, e);        // z2 = iE
-    zteta = Complex.Exp(z2);        // ζ = e^{iE} = cos(E) + i·sin(E)
-    z3 = z1 * zteta;               // z̄·ζ = (k-ih)(cos E + i sin E)
-    dl = gl - e + z3.Imaginary;    // δ = λ - E + Im(z̄·ζ)
-    rsa = 1.0d - z3.Real;          // 1 - Re(z̄·ζ)
-    e += dl / rsa;                 // E ← E + δ/(1 - Re(z̄·ζ))
-    if (Math.Abs(dl) < 1e-15) break;
+   z2 = new Complex(0d, e);
+   zteta = Complex.Exp(z2);
+   z3 = z1 * zteta;
+   dl = gl - e + z3.Imaginary;
+   rsa = 1.0d - z3.Real;
+   double nextE = e + dl / rsa;
+   if (Math.Abs(nextE - e) <= 1e-15 || nextE == e)
+   {
+      e = nextE;
+      converged = true;
+      break;
+   }
+   e = nextE;
 }
+if (!converged)
+{
+   throw new InvalidOperationException("Kepler equation did not converge.");
+}
+
+zteta = Complex.Exp(new Complex(0d, e));
+z3 = z1 * zteta;
+rsa = 1.0d - z3.Real;
 ```
 
 #### 方程与残差
@@ -152,7 +173,9 @@ Newton 更新公式为：
 
 $$E \leftarrow E - \frac{f(E)}{f'(E)} = E + \frac{\delta}{1 - \text{Re}(\bar{\mathbf{z}} \cdot e^{iE})}$$
 
-代码中 `rsa` = $1 - \text{Re}(\bar{\mathbf{z}} \cdot e^{iE})$ = $-f'(E)$，所以 `e += dl / rsa` 就是 Newton 步。
+代码中 `rsa` = $1 - \text{Re}(\bar{\mathbf{z}} \cdot e^{iE})$ = $-f'(E)$，所以 `nextE = e + dl / rsa` 就是 Newton 步。
+
+当前实现检查的是浮点更新量 `Math.Abs(nextE - e) <= 1e-15`（或更新不再改变数值），而不是残差 `Math.Abs(dl) < 1e-15`。循环最多执行 50 次，未满足终止条件时抛出异常；结束后根据最终的 $E$ 重新计算 `zteta`、`z3` 和 `rsa`。这个终止阈值不等于所有输入下的最终误差上界。
 
 #### 物理意义
 
@@ -172,7 +195,7 @@ z2 = new Complex(z1.Imaginary, -z1.Real);
 zto = (-z + zteta + z2) / rsa;
 ```
 
-> **注意**：这里 `z1` 被重新赋值（不再是共轭），`z3` 保留了迭代结束时的值。
+> **注意**：这里 `z1` 被重新赋值（不再是共轭），`z3` 是循环结束后根据最终 $E$ 重新计算的值。
 
 逐行解读：
 
@@ -203,16 +226,27 @@ zto = (-z + zteta + z2) / rsa;
 
 设 $\zeta = e^{iE}$，$\bar{\mathbf{z}} = k - ih$，$s = \text{Im}(\bar{\mathbf{z}}\zeta)$。
 
-经典的交点根数位置公式，在轨道面的单位方向复数为：
+轨道面内的单位方向复数为：
 
 $$\mathbf{Z}_\theta = \cos F + i\sin F = \frac{-\mathbf{z} + \zeta + \frac{s}{1+\phi}(-i\mathbf{z})}{1 - \text{Re}(\bar{\mathbf{z}}\zeta)}$$
 
-其中 $F$ 是真经度。分子中：
+其中 $F = \nu + \bar\omega$ 是真经度，$\nu$ 是真近点角。$F$ 是下文轨道面基底中的角度，通常不等于三维位置的黄经 $\operatorname{atan2}(y,x)$。分子中：
+
 - $-\mathbf{z}$：偏心率修正的偏移
 - $\zeta = e^{iE}$：偏经度旋转
 - $-i\mathbf{z} \cdot s/(1+\phi)$：二阶修正项（与偏心率平方相关）
 
-分子恰好等于 $(r/a)e^{iF}$，而分母 `rsa` 等于 $r/a$，所以：
+利用 $s=e\sin E'$、$\zeta=e^{i\bar\omega}e^{iE'}$ 和 $ue^2=1-\phi$，分子可直接化简为：
+
+$$
+\begin{aligned}
+-\mathbf z+\zeta-iu\mathbf z s
+&=e^{i\bar\omega}\left[-e+\cos E'+i(1-ue^2)\sin E'\right] \\
+&=e^{i\bar\omega}\left[(\cos E'-e)+i\phi\sin E'\right].
+\end{aligned}
+$$
+
+括号内是以近日点为横轴的轨道面坐标除以 $a$。由 $\cos\nu=(\cos E'-e)/(1-e\cos E')$ 和 $\sin\nu=\phi\sin E'/(1-e\cos E')$，分子等于 $(r/a)e^{i(\nu+\bar\omega)}$，而分母 `rsa` 等于 $r/a$，所以在精确算术下：
 
 $$\boxed{\mathbf Z_\theta=e^{iF}=\cos F+i\sin F},\qquad |\mathbf Z_\theta|=1$$
 
@@ -297,13 +331,28 @@ $$n = \frac{\sqrt{\mu}}{a^{3/2}} = \frac{\texttt{rgm}}{a\sqrt{a}}$$
 | `xms` | $S = a(h + Y)/\phi$ | 负的 $\hat{e}_1$ 方向速度因子 |
 | `xmc` | $C = a(k + X)/\phi$ | 正的 $\hat{e}_2$ 方向速度因子 |
 
-这些量来自对轨道面内位置关于时间的微分，利用了开普勒方程的时间导数关系。
+这里计算的是给定瞬时根数对应的二体开普勒速度：微分时固定 $a,k,h,q,p$，仅令 $\dot L=n$。它不是把 VSOP2013 随时间变化的六个根数全部代入后，对整个表达式求总导数。
 
-在经典轨道力学中，轨道面内的速度为：
+先以近日点为横轴，在轨道面内定义 $\xi=a(\cos E'-e)$、$\eta=a\phi\sin E'$。由 $\dot E'=n/(1-e\cos E')$，得：
 
-$$\dot{x}_\text{orb} = -na\sin E' / (1-e\cos E'), \quad \dot{y}_\text{orb} = na\phi\cos E' / (1-e\cos E')$$
+$$\dot\xi = \frac{-na\sin E'}{1-e\cos E'}, \quad \dot\eta = \frac{na\phi\cos E'}{1-e\cos E'}$$
 
-但在交点根数的复数表达中，速度的 $\hat{e}_1$ 和 $\hat{e}_2$ 分量被编码为 $C$ 和 $S$。
+这与第 4 节的 $(x_\text{orb},y_\text{orb})$ 不是同一组坐标轴，二者相差轨道面内的 $\bar\omega$ 旋转。利用真近点角关系，可先写成：
+
+$$\dot\xi=-\frac{na}{\phi}\sin\nu,\qquad \dot\eta=\frac{na}{\phi}(e+\cos\nu).$$
+
+再旋转到 $\hat e_1,\hat e_2$ 基底，利用 $F=\nu+\bar\omega$、$X=\cos F$、$Y=\sin F$：
+
+$$
+\begin{aligned}
+\dot x_\text{orb}
+&=\cos\bar\omega\,\dot\xi-\sin\bar\omega\,\dot\eta
+=-\frac{na}{\phi}(h+Y)=-nS, \\
+\dot y_\text{orb}
+&=\sin\bar\omega\,\dot\xi+\cos\bar\omega\,\dot\eta
+=\frac{na}{\phi}(k+X)=nC.
+\end{aligned}
+$$
 
 #### 旋转到三维空间
 
@@ -319,7 +368,7 @@ $$\boxed{\vec v=n\left(-S\hat e_1+C\hat e_2\right)}$$
 
 ## 6. 算法流程总结
 
-```
+```text
 输入: a, L, k, h, q, p
   │
   ├─ 计算辅助量: φ, χ, e, ω̄
@@ -336,7 +385,7 @@ $$\boxed{\vec v=n\left(-S\hat e_1+C\hat e_2\right)}$$
   │   [x,y,z] = r · [ê₁, ê₂] · [X, Y]ᵀ
   │
   └─ 旋转到三维 (速度):
-      [ẋ,ẏ,ż] = n · 旋转矩阵 · [C, S]ᵀ
+      [ẋ,ẏ,ż] = n · [ê₁, ê₂] · [-S, C]ᵀ
 ```
 
 ---
@@ -350,9 +399,9 @@ $$\boxed{\vec v=n\left(-S\hat e_1+C\hat e_2\right)}$$
 3. **开普勒方程** 变成 $\lambda = E - \text{Im}(\bar{\mathbf{z}}\zeta)$，Newton 迭代只需一次复数乘法
 4. **轨道面内位置** 直接由 $\zeta$ 和 $\mathbf{z}$ 的代数组合给出
 
-主体位置和速度公式不需要显式计算 $E'$、$\nu$ 等中间角度。初始猜测仍通过 `atan2(h, k)` 计算 $\bar\omega$；当 $e=0$ 时该调用返回零，后续公式仍保持有限。
+主体位置和速度公式不需要显式计算 $E'$、$\nu$ 等中间角度。初始猜测仍通过 `atan2(h, k)` 计算 $\bar\omega$；当 $e=0$ 时近日点经度没有几何定义，但初值中所有依赖它的修正项都乘以偏心率的正次幂而消失，因此后续公式仍保持有限。
 
-该算法面向 VSOP2013 的非退化椭圆轨道，要求 $a>0$、$k^2+h^2<1$ 且 $q^2+p^2\leq1$。
+该算法面向 VSOP2013 的非退化椭圆轨道，数学公式要求 $a>0$、$k^2+h^2<1$ 且 $q^2+p^2\leq1$。正向公式在 $q^2+p^2=1$（$i=\pi$）时仍可给出状态，但逆向恢复根数不唯一。当前实现没有完整的输入合法性校验；接近 $e=1$ 时，`xfi`、`rsa` 可能很小，误差会放大，有限次 Newton 迭代也不保证成功。
 
 ---
 
@@ -365,7 +414,7 @@ $$\boxed{\vec v=n\left(-S\hat e_1+C\hat e_2\right)}$$
 | `k`, `h` | $k$, $h$ | 偏心率分量 |
 | `q`, `p` | $q$, $p$ | 倾角分量 |
 | `z` | $\mathbf{z} = k+ih$ | 复偏心率 |
-| `ex` | $e = \|\mathbf{z}\|$ | 偏心率 |
+| `ex` | $e = \lvert\mathbf{z}\rvert$ | 偏心率 |
 | `xfi` | $\phi = \sqrt{1-e^2}$ | 偏心率补量 |
 | `xki` | $\chi = \cos(i/2)$ | 倾角余弦半角 |
 | `u` | $u = 1/(1+\phi)$ | 辅助因子 |
