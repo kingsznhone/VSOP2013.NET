@@ -1,4 +1,5 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
 
 namespace VSOP2013.Tests;
 
@@ -117,7 +118,7 @@ public class UtilityTests
         AssertComponents(expected, actual, 1e-12);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(-25.0)]
     [DataRow(0.25)]
     [DataRow(40.0)]

@@ -1,3 +1,6 @@
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
 using System;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
@@ -9,29 +12,32 @@ namespace Demo
     [MemoryDiagnoser]
     public class PerfTest
     {
-        private Calculator _vsop = null!;
+        private Calculator _full = null!;
+        private Calculator _truncated = null!;
 
-        private DateTime _dt;
         private VSOPTime _vTime;
 
-        [Params(SimdMode.Scalar, SimdMode.Vector128, SimdMode.Vector256, SimdMode.Vector512)]
+        [Params(SimdMode.Scalar, SimdMode.Vector256)]
         public SimdMode Mode { get; set; }
 
         [GlobalSetup]
         public void init()
         {
-            _vsop = new Calculator(Mode);
-            _dt = DateTime.Now.ToUniversalTime();
-            _dt.ToUniversalTime();
-            _dt = _dt.AddSeconds(-69.184);
-            _vTime = new VSOPTime(_dt, TimeFrame.UTC);
+            _full = new Calculator(Mode);
+            _truncated = new Calculator(Mode, truncation: 1e-14);
+            _vTime = new VSOPTime(DateTime.UtcNow.AddSeconds(-69.184), TimeFrame.UTC);
+        }
+
+        [Benchmark(Baseline = true)]
+        public VSOPResult Full()
+        {
+            return _full.GetPlanetPosition(VSOPBody.EMB, _vTime);
         }
 
         [Benchmark]
-        public VSOPResult Compute()
+        public VSOPResult Truncated()
         {
-            var ell = _vsop.GetPlanetPosition(VSOPBody.EMB, _vTime);
-            return ell;
+            return _truncated.GetPlanetPosition(VSOPBody.EMB, _vTime);
         }
     }
 }

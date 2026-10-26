@@ -35,7 +35,7 @@ public class CtlReferenceTests
     }
 
     [TestMethod]
-    public void ScalarAndSimdMatchCtlReference()
+    public void ScalarAndSimdMatchOfficialCtlValues()
     {
         List<CtlEntry> entries = ParseCtl(Path.Combine(AppContext.BaseDirectory, "Resources", "VSOP2013.ctl"));
         Assert.AreEqual(99, entries.Count);

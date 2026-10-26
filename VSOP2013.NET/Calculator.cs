@@ -21,6 +21,11 @@ namespace VSOP2013
         /// </summary>
         public SimdMode Mode { get; }
 
+        /// <summary>
+        /// Truncation level rho: terms with sqrt(C^2 + S^2) &lt; rho are dropped at load time.
+        /// </summary>
+        public double Truncation { get; }
+
         private readonly int _lanes;
 
         public Calculator() : this(SimdMode.Auto)
@@ -31,9 +36,19 @@ namespace VSOP2013
         /// Creates a calculator using the specified vector width.
         /// </summary>
         /// <param name="mode">Vector width; <see cref="SimdMode.Auto"/> picks the widest accelerated width.</param>
+        /// <param name="truncation">
+        /// Truncation level rho as defined by VSOP2013: terms with sqrt(C^2 + S^2) &lt; rho are removed
+        /// (au for A, rad for L, unitless for K/H/Q/P). 0 (default) keeps the full series.
+        /// </param>
         /// <exception cref="PlatformNotSupportedException">The requested width is not hardware accelerated.</exception>
-        public Calculator(SimdMode mode)
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="truncation"/> is negative or not finite.</exception>
+        public Calculator(SimdMode mode, double truncation = 0d)
         {
+            if (!double.IsFinite(truncation) || truncation < 0d)
+            {
+                throw new ArgumentOutOfRangeException(nameof(truncation), truncation, "Truncation must be a finite, non-negative value.");
+            }
+            Truncation = truncation;
             Mode = ResolveMode(mode);
             _lanes = Mode switch
             {
@@ -62,10 +77,7 @@ namespace VSOP2013
             }
 
             ExtractMeanMotion();
-            if (Mode != SimdMode.Scalar)
-            {
-                BuildSoA();
-            }
+            BuildSoA();
         }
 
         /// <summary>
@@ -153,10 +165,12 @@ namespace VSOP2013
         }
 
         /// <summary>
-        /// Split each PowerTable's Term[] into SoA arrays for the SIMD path.
+        /// Split each PowerTable's Term[] into SoA arrays, dropping terms below the truncation level.
+        /// Term[] is released afterwards; every path reads the SoA.
         /// </summary>
         private void BuildSoA()
         {
+            double rho2 = Truncation * Truncation;
             foreach (PlanetTable planet in _vsop2013DATA.Values)
             {
                 foreach (VariableTable variable in planet.variables.Values)
@@ -168,7 +182,16 @@ namespace VSOP2013
                             continue;
                         }
 
-                        int len = power.Terms.Length;
+                        Term[] terms = rho2 > 0d
+                            ? Array.FindAll(power.Terms, t => t.cc * t.cc + t.ss * t.ss >= rho2)
+                            : power.Terms;
+                        power.Terms = null!;
+                        if (terms.Length == 0)
+                        {
+                            continue;
+                        }
+
+                        int len = terms.Length;
                         // Zero padding (ss = cc = 0) contributes exactly 0, so the SIMD loop needs no scalar tail.
                         int padded = (len + _lanes - 1) / _lanes * _lanes;
                         double[] ss = new double[padded];
@@ -177,7 +200,7 @@ namespace VSOP2013
                         double[] bb = new double[padded];
                         for (int i = 0; i < len; i++)
                         {
-                            ref readonly Term term = ref power.Terms[i];
+                            ref readonly Term term = ref terms[i];
                             ss[i] = term.ss;
                             cc[i] = term.cc;
                             aa[i] = term.aa;
@@ -258,18 +281,22 @@ namespace VSOP2013
             double result = 0d;
             for (int it = 0; it < Table.PowerTables.Length; it++)
             {
-                if (Table.PowerTables[it].Terms == null)
+                PowerTable power = Table.PowerTables[it];
+                if (power.AA == null)
                 {
                     continue;
                 }
 
-                ref readonly Term[] terms = ref Table.PowerTables[it].Terms;
-                for (int n = 0; n < terms.Length; n++)
+                double[] ss = power.SS!;
+                double[] cc = power.CC!;
+                double[] aa = power.AA;
+                double[] bb = power.BB!;
+                for (int n = 0; n < aa.Length; n++)
                 {
-                    double u = Math.FusedMultiplyAdd(terms[n].bb, tj, terms[n].aa);
+                    double u = Math.FusedMultiplyAdd(bb[n], tj, aa[n]);
                     double su = Math.Sin(u);
                     double cu = Math.Cos(u);
-                    double term = Math.FusedMultiplyAdd(terms[n].ss, su, terms[n].cc * cu);
+                    double term = Math.FusedMultiplyAdd(ss[n], su, cc[n] * cu);
                     result = Math.FusedMultiplyAdd(t[it], term, result);
                 }
             }

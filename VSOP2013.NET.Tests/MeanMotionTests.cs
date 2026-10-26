@@ -33,7 +33,7 @@ public class MeanMotionTests
     [DataRow(VSOPBody.URANUS, 0.7478165903077800e2d)]
     [DataRow(VSOPBody.NEPTUNE, 0.3813297222612500e2d)]
     [DataRow(VSOPBody.PLUTO, 0.2533566020437000e2d)]
-    public void FirstLPower1TermEqualsFreqpla(VSOPBody body, double freqpla)
+    public void FirstLPower1TermIsOfficialMeanMotion(VSOPBody body, double freqpla)
     {
         Term first = _data[body].variables[VSOPVariable.L].PowerTables[1].Terms[0];
 
