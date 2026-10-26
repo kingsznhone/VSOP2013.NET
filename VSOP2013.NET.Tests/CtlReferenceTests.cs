@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace VSOP2013.Tests;
 

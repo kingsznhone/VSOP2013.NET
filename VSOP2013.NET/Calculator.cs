@@ -10,6 +10,13 @@ using MemoryPack;
 
 namespace VSOP2013
 {
+    /// <summary>
+    /// Full precision VSOP2013 calculator (double precision, matches the official reference values to 1e-10).
+    /// </summary>
+    /// <remarks>
+    /// Instances are read-only after construction and safe to share across threads.
+    /// For fast, low precision visualization use <see cref="CalculatorF"/>.
+    /// </remarks>
     public partial class Calculator
     {
         private Dictionary<VSOPBody, PlanetTable> _vsop2013DATA;
@@ -28,6 +35,9 @@ namespace VSOP2013
 
         private readonly int _lanes;
 
+        /// <summary>
+        /// Creates a full precision calculator with the widest accelerated vector width and no truncation.
+        /// </summary>
         public Calculator() : this(SimdMode.Auto)
         {
         }
@@ -215,6 +225,12 @@ namespace VSOP2013
             }
         }
 
+        /// <summary>
+        /// Calculates the six elliptic elements of a body; the elements are evaluated in parallel.
+        /// </summary>
+        /// <param name="body">Planet.</param>
+        /// <param name="time">Time of evaluation.</param>
+        /// <returns>Elliptic elements in the dynamical frame J2000.</returns>
         public VSOPResult_ELL GetPlanetPosition(VSOPBody body, VSOPTime time)
         {
             double[] ELL = new double[6];
@@ -225,18 +241,21 @@ namespace VSOP2013
             return new VSOPResult_ELL(body, time, ELL, ReferenceFrame.DynamicalJ2000);
         }
 
+        /// <summary>
+        /// Runs <see cref="GetPlanetPosition"/> on the thread pool.
+        /// </summary>
         public ValueTask<VSOPResult_ELL> GetPlanetPositionAsync(VSOPBody body, VSOPTime time)
         {
             return new ValueTask<VSOPResult_ELL>(Task.Run(() => GetPlanetPosition(body, time)));
         }
 
         /// <summary>
-        /// Calculate a specific variable
+        /// Calculates a single elliptic element.
         /// </summary>
-        /// <param name="body">planet</param>
-        /// <param name="variable">VSOPVariable.A/L/K/H/Q/P</param>
-        /// <param name="time"></param>
-        /// <returns></returns>
+        /// <param name="body">Planet.</param>
+        /// <param name="variable">Element to compute (A/L/K/H/Q/P).</param>
+        /// <param name="time">Time of evaluation.</param>
+        /// <returns>The element value; L is normalized to [0, 2pi).</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public double GetVariable(VSOPBody body, VSOPVariable variable, VSOPTime time)
         {
@@ -253,6 +272,9 @@ namespace VSOP2013
             };
         }
 
+        /// <summary>
+        /// Runs <see cref="GetVariable"/> on the thread pool.
+        /// </summary>
         public ValueTask<double> GetVariableAsync(VSOPBody body, VSOPVariable variable, VSOPTime time)
         {
             return new ValueTask<double>(Task.Run(() => GetVariable(body, variable, time)));
@@ -308,6 +330,7 @@ namespace VSOP2013
         }
 
 #if NET9_0_OR_GREATER
+
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         private double CalculateV512(VariableTable Table, double JD2000)
         {
@@ -418,6 +441,7 @@ namespace VSOP2013
             }
             return result;
         }
+
 #endif
     }
 }

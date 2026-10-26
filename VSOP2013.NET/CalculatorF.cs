@@ -11,11 +11,24 @@ using MemoryPack;
 namespace VSOP2013
 {
     /// <summary>
-    /// Single precision approximation of VSOP2013 intended for visualization.
-    /// Every step (time, coefficients, phase, sin/cos, accumulation) runs in float.
-    /// Typical error over +-1000 years: L up to ~3e-3 rad (Mercury), A up to ~1e-4 au (Pluto).
-    /// Use <see cref="Calculator"/> when accuracy matters.
+    /// Fast, low precision approximation of VSOP2013 intended for visualization, animation and teaching.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Every step (time, coefficients, phase, sin/cos, accumulation) runs in single precision.
+    /// Combined with the default truncation (<see cref="DefaultTruncation"/>), it evaluates roughly
+    /// 100 to 500 times faster than <see cref="Calculator"/>.
+    /// </para>
+    /// <para>
+    /// Typical error over +-1000 years around J2000: L up to ~3e-3 rad (~640 arcsec, Mercury),
+    /// A up to ~4e-5 au (Pluto), K/H/Q/P up to ~1e-6. Within +-100 years, L stays below ~70 arcsec.
+    /// The error is dominated by the float rounding of the mean longitude, not by truncation.
+    /// </para>
+    /// <para>
+    /// Do not use it for precise astronomy (telescope pointing, eclipse or transit prediction);
+    /// use <see cref="Calculator"/> when accuracy matters.
+    /// </para>
+    /// </remarks>
     public class CalculatorF
     {
         private const float A1000 = 365250f;
@@ -42,8 +55,13 @@ namespace VSOP2013
         public SimdMode Mode { get; }
 
         /// <summary>
-        /// Default truncation level used by <see cref="CalculatorF"/>.
+        /// Default truncation level rho used by <see cref="CalculatorF"/>: 1e-8.
         /// </summary>
+        /// <remarks>
+        /// A float carries about 7 significant digits (epsilon ~1.2e-7), so terms with an amplitude below ~1e-8
+        /// are lost in the rounding noise of the accumulator anyway. Dropping them keeps about 2% of the series
+        /// and barely changes the result, while making evaluation much faster.
+        /// </remarks>
         public const double DefaultTruncation = 1e-8;
 
         /// <summary>
@@ -51,6 +69,10 @@ namespace VSOP2013
         /// </summary>
         public double Truncation { get; }
 
+        /// <summary>
+        /// Creates a single precision calculator with the widest accelerated vector width
+        /// and the default truncation level <see cref="DefaultTruncation"/>.
+        /// </summary>
         public CalculatorF() : this(SimdMode.Auto)
         {
         }
@@ -61,7 +83,8 @@ namespace VSOP2013
         /// <param name="mode">Vector width; <see cref="SimdMode.Auto"/> picks the widest accelerated width.</param>
         /// <param name="truncation">
         /// Truncation level rho as defined by VSOP2013: terms with sqrt(C^2 + S^2) &lt; rho are removed
-        /// (au for A, rad for L, unitless for K/H/Q/P). 0 keeps the full series.
+        /// (au for A, rad for L, unitless for K/H/Q/P). Defaults to <see cref="DefaultTruncation"/>; 0 keeps the full series,
+        /// which is much slower and gains little because float precision is the limiting factor.
         /// The official tables assume |t| &lt;= 1 millennium; beyond that, high powers of t amplify the truncation error.
         /// </param>
         /// <exception cref="PlatformNotSupportedException">The requested width is not hardware accelerated.</exception>
@@ -178,6 +201,12 @@ namespace VSOP2013
 #endif
         }
 
+        /// <summary>
+        /// Calculates the six elliptic elements of a body in single precision, sequentially on the calling thread.
+        /// </summary>
+        /// <param name="body">Planet.</param>
+        /// <param name="time">Time of evaluation.</param>
+        /// <returns>Elliptic elements in the dynamical frame J2000 (values are widened from float).</returns>
         public VSOPResult_ELL GetPlanetPosition(VSOPBody body, VSOPTime time)
         {
             double[] ELL = new double[6];
@@ -188,17 +217,21 @@ namespace VSOP2013
             return new VSOPResult_ELL(body, time, ELL, ReferenceFrame.DynamicalJ2000);
         }
 
+        /// <summary>
+        /// Runs <see cref="GetPlanetPosition"/> on the thread pool.
+        /// </summary>
         public ValueTask<VSOPResult_ELL> GetPlanetPositionAsync(VSOPBody body, VSOPTime time)
         {
             return new ValueTask<VSOPResult_ELL>(Task.Run(() => GetPlanetPosition(body, time)));
         }
 
         /// <summary>
-        /// Calculate a specific variable in single precision.
+        /// Calculates a single elliptic element in single precision.
         /// </summary>
-        /// <param name="body">planet</param>
-        /// <param name="variable">VSOPVariable.A/L/K/H/Q/P</param>
-        /// <param name="time"></param>
+        /// <param name="body">Planet.</param>
+        /// <param name="variable">Element to compute (A/L/K/H/Q/P).</param>
+        /// <param name="time">Time of evaluation.</param>
+        /// <returns>The element value; L is normalized to [0, 2pi).</returns>
         public float GetVariable(VSOPBody body, VSOPVariable variable, VSOPTime time)
         {
             PowerSoA?[] powers = _tables[(int)body]?[(int)variable]
@@ -220,6 +253,9 @@ namespace VSOP2013
             return result;
         }
 
+        /// <summary>
+        /// Runs <see cref="GetVariable"/> on the thread pool.
+        /// </summary>
         public ValueTask<float> GetVariableAsync(VSOPBody body, VSOPVariable variable, VSOPTime time)
         {
             return new ValueTask<float>(Task.Run(() => GetVariable(body, variable, time)));
@@ -251,6 +287,7 @@ namespace VSOP2013
         }
 
 #if NET9_0_OR_GREATER
+
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         private static float Calculate_Vector512(PowerSoA?[] powers, float tj)
         {
@@ -343,6 +380,7 @@ namespace VSOP2013
             }
             return result;
         }
+
 #endif
     }
 }
