@@ -42,7 +42,7 @@ VSOP2013, computed the positions of the planets directly at any moment, as well 
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <TargetPath>VSOP2013.BR</TargetPath>
       <Pack>true</Pack>
-      <PackagePath>contentFiles\any\any\</PackagePath>
+      <PackagePath>contentFiles/any/any/</PackagePath>
       <PackageCopyToOutput>true</PackageCopyToOutput>
       <PackageFlatten>true</PackageFlatten>
     </Content>

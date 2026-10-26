@@ -1,4 +1,4 @@
-name: NuGet Pack
+name: NuGet Pack Check
 
 on:
   push:
@@ -28,6 +28,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         with:
           name: nuget-package
+          retention-days: 7
           path: |
             artifacts/*.nupkg
             artifacts/*.snupkg
