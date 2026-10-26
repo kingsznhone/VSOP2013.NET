@@ -55,6 +55,19 @@ namespace VSOP2013
         public int Power;
         public int TermsCount;
         public Term[] Terms;
+
+        // SoA copies of Terms built at load time for the SIMD path; not serialized.
+        [MemoryPackIgnore]
+        public double[]? SS;
+
+        [MemoryPackIgnore]
+        public double[]? CC;
+
+        [MemoryPackIgnore]
+        public double[]? AA;
+
+        [MemoryPackIgnore]
+        public double[]? BB;
     }
 
     [MemoryPackable]

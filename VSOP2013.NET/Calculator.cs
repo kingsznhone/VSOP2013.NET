@@ -1,5 +1,10 @@
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
 using System.IO.Compression;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Runtime.Intrinsics;
 
 using MemoryPack;
 
@@ -9,26 +14,37 @@ namespace VSOP2013
     {
         private Dictionary<VSOPBody, PlanetTable> _vsop2013DATA;
 
-        /// <summary>
-        /// //Planetary frequency in longitude
-        /// </summary>
-        private static readonly Dictionary<VSOPBody, double> _freqpla = new()
-        {
-            { VSOPBody.MERCURY, 0.2608790314068555e5d },
-            { VSOPBody.VENUS,   0.1021328554743445e5d },
-            { VSOPBody.EMB,     0.6283075850353215e4d },
-            { VSOPBody.MARS,    0.3340612434145457e4d },
-            { VSOPBody.JUPITER, 0.5296909615623250e3d },
-            { VSOPBody.SATURN,  0.2132990861084880e3d },
-            { VSOPBody.URANUS,  0.7478165903077800e2d },
-            { VSOPBody.NEPTUNE, 0.3813297222612500e2d },
-            { VSOPBody.PLUTO,   0.2533566020437000e2d },
-        };
-
         private const double A1000 = 365250.0d;
 
-        public Calculator()
+        /// <summary>
+        /// Vector width actually used by this instance after hardware detection.
+        /// </summary>
+        public SimdMode Mode { get; }
+
+        private readonly int _lanes;
+
+        public Calculator() : this(SimdMode.Auto)
         {
+        }
+
+        /// <summary>
+        /// Creates a calculator using the specified vector width.
+        /// </summary>
+        /// <param name="mode">Vector width; <see cref="SimdMode.Auto"/> picks the widest accelerated width.</param>
+        /// <exception cref="PlatformNotSupportedException">The requested width is not hardware accelerated.</exception>
+        public Calculator(SimdMode mode)
+        {
+            Mode = ResolveMode(mode);
+            _lanes = Mode switch
+            {
+#if NET9_0_OR_GREATER
+                SimdMode.Vector512 => Vector512<double>.Count,
+                SimdMode.Vector256 => Vector256<double>.Count,
+                SimdMode.Vector128 => Vector128<double>.Count,
+#endif
+                _ => 1,
+            };
+
             //Import Planet Data
             string dataFilePath = Path.Combine(AppContext.BaseDirectory, "VSOP2013.BR");
             using (MemoryStream recoveryStream = new MemoryStream())
@@ -43,6 +59,136 @@ namespace VSOP2013
 
                 _vsop2013DATA = MemoryPackSerializer.Deserialize<List<PlanetTable>>(recoveryStream.ToArray())
                     .ToDictionary(p => p.Body);
+            }
+
+            ExtractMeanMotion();
+            if (Mode != SimdMode.Scalar)
+            {
+                BuildSoA();
+            }
+        }
+
+        /// <summary>
+        /// Mean motion in longitude taken from the data (first term of L at power 1).
+        /// </summary>
+        private readonly Dictionary<VSOPBody, double> _meanMotion = new();
+
+        // Low part of 2pi so that TauHi + TauLo carries ~107 bits.
+        private const double TauLo = 2.4492935982947064e-16;
+
+        /// <summary>
+        /// Removes the mean-motion term from L so the periodic accumulator stays small,
+        /// and keeps it for an exact-ish linear evaluation reduced modulo 2pi.
+        /// </summary>
+        private void ExtractMeanMotion()
+        {
+            foreach (PlanetTable planet in _vsop2013DATA.Values)
+            {
+                PowerTable[] powers = planet.variables[VSOPVariable.L].PowerTables;
+                if (powers.Length < 2 || powers[1].Terms is not { Length: > 0 } terms)
+                {
+                    continue;
+                }
+
+                ref readonly Term first = ref terms[0];
+                if (first.aa == 0d && first.bb == 0d && first.ss == 0d)
+                {
+                    _meanMotion[planet.Body] = first.cc;
+                    powers[1].Terms = terms[1..];
+                }
+            }
+        }
+
+        /// <summary>
+        /// Computes (freq * tj) mod 2pi without losing the low bits of the product.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static double LinearModTau(double freq, double tj)
+        {
+            double p = freq * tj;
+            double e = Math.FusedMultiplyAdd(freq, tj, -p);
+            double k = Math.Round(p / Math.Tau);
+            double r = Math.FusedMultiplyAdd(-k, Math.Tau, p);
+            r = Math.FusedMultiplyAdd(-k, TauLo, r);
+            return r + e;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private double NormalizeL(VSOPBody body, double periodic, double tj)
+        {
+            double xl = periodic;
+            if (_meanMotion.TryGetValue(body, out double freq))
+            {
+                xl += LinearModTau(freq, tj);
+            }
+            return (xl % Math.Tau + Math.Tau) % Math.Tau;
+        }
+
+        private static SimdMode ResolveMode(SimdMode mode)
+        {
+#if NET9_0_OR_GREATER
+            return mode switch
+            {
+                SimdMode.Auto => Vector512.IsHardwareAccelerated ? SimdMode.Vector512
+                    : Vector256.IsHardwareAccelerated ? SimdMode.Vector256
+                    : Vector128.IsHardwareAccelerated ? SimdMode.Vector128
+                    : SimdMode.Scalar,
+                SimdMode.Scalar => SimdMode.Scalar,
+                SimdMode.Vector128 when Vector128.IsHardwareAccelerated => mode,
+                SimdMode.Vector256 when Vector256.IsHardwareAccelerated => mode,
+                SimdMode.Vector512 when Vector512.IsHardwareAccelerated => mode,
+                SimdMode.Vector128 or SimdMode.Vector256 or SimdMode.Vector512 =>
+                    throw new PlatformNotSupportedException($"{mode} is not hardware accelerated on this machine."),
+                _ => throw new ArgumentOutOfRangeException(nameof(mode), mode, null),
+            };
+#else
+            return mode switch
+            {
+                SimdMode.Auto or SimdMode.Scalar => SimdMode.Scalar,
+                SimdMode.Vector128 or SimdMode.Vector256 or SimdMode.Vector512 =>
+                    throw new PlatformNotSupportedException($"{mode} requires .NET 9 or later."),
+                _ => throw new ArgumentOutOfRangeException(nameof(mode), mode, null),
+            };
+#endif
+        }
+
+        /// <summary>
+        /// Split each PowerTable's Term[] into SoA arrays for the SIMD path.
+        /// </summary>
+        private void BuildSoA()
+        {
+            foreach (PlanetTable planet in _vsop2013DATA.Values)
+            {
+                foreach (VariableTable variable in planet.variables.Values)
+                {
+                    foreach (PowerTable power in variable.PowerTables)
+                    {
+                        if (power.Terms == null)
+                        {
+                            continue;
+                        }
+
+                        int len = power.Terms.Length;
+                        // Zero padding (ss = cc = 0) contributes exactly 0, so the SIMD loop needs no scalar tail.
+                        int padded = (len + _lanes - 1) / _lanes * _lanes;
+                        double[] ss = new double[padded];
+                        double[] cc = new double[padded];
+                        double[] aa = new double[padded];
+                        double[] bb = new double[padded];
+                        for (int i = 0; i < len; i++)
+                        {
+                            ref readonly Term term = ref power.Terms[i];
+                            ss[i] = term.ss;
+                            cc[i] = term.cc;
+                            aa[i] = term.aa;
+                            bb[i] = term.bb;
+                        }
+                        power.SS = ss;
+                        power.CC = cc;
+                        power.AA = aa;
+                        power.BB = bb;
+                    }
+                }
             }
         }
 
@@ -71,7 +217,17 @@ namespace VSOP2013
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public double GetVariable(VSOPBody body, VSOPVariable variable, VSOPTime time)
         {
-            return Calculate(_vsop2013DATA[body].variables[variable], time.J2000);
+            VariableTable table = _vsop2013DATA[body].variables[variable];
+            double jd2000 = time.J2000;
+            return Mode switch
+            {
+#if NET9_0_OR_GREATER
+                SimdMode.Vector512 => CalculateV512(table, jd2000),
+                SimdMode.Vector256 => CalculateV256(table, jd2000),
+                SimdMode.Vector128 => CalculateV128(table, jd2000),
+#endif
+                _ => CalculateScalar(table, jd2000),
+            };
         }
 
         public ValueTask<double> GetVariableAsync(VSOPBody body, VSOPVariable variable, VSOPTime time)
@@ -85,7 +241,7 @@ namespace VSOP2013
         /// <param name="JD2000"></param>
         /// <returns>Elliptic Elements</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-        private double Calculate(VariableTable Table, double JD2000)
+        private double CalculateScalar(VariableTable Table, double JD2000)
         {
             //Thousand of Julian Years
             double tj = JD2000 / A1000;
@@ -102,24 +258,139 @@ namespace VSOP2013
             double result = 0d;
             for (int it = 0; it < Table.PowerTables.Length; it++)
             {
-                if (Table.PowerTables[it].Terms == null) continue;
+                if (Table.PowerTables[it].Terms == null)
+                {
+                    continue;
+                }
+
                 ref readonly Term[] terms = ref Table.PowerTables[it].Terms;
                 for (int n = 0; n < terms.Length; n++)
                 {
-                    double u = terms[n].aa + terms[n].bb * tj;
+                    double u = Math.FusedMultiplyAdd(terms[n].bb, tj, terms[n].aa);
                     double su = Math.Sin(u);
                     double cu = Math.Cos(u);
-                    result += t[it] * (terms[n].ss * su + terms[n].cc * cu);
+                    double term = Math.FusedMultiplyAdd(terms[n].ss, su, terms[n].cc * cu);
+                    result = Math.FusedMultiplyAdd(t[it], term, result);
                 }
             }
             if (Table.Variable == VSOPVariable.L)
             {
-                double xl;
-                xl = result + _freqpla[Table.Body] * tj;
-                xl = (xl % Math.Tau + Math.Tau) % Math.Tau;
-                result = xl;
+                result = NormalizeL(Table.Body, result, tj);
             }
             return result;
         }
+
+#if NET9_0_OR_GREATER
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        private double CalculateV512(VariableTable Table, double JD2000)
+        {
+            double tj = JD2000 / A1000;
+            Vector512<double> vtj = Vector512.Create(tj);
+            PowerTable[] powerTables = Table.PowerTables;
+            double tPow = 1d;
+            double result = 0d;
+            for (int it = 0; it < powerTables.Length; it++, tPow *= tj)
+            {
+                PowerTable power = powerTables[it];
+                if (power.AA == null)
+                {
+                    continue;
+                }
+
+                int len = power.AA.Length;
+                ref double ss = ref MemoryMarshal.GetArrayDataReference(power.SS!);
+                ref double cc = ref MemoryMarshal.GetArrayDataReference(power.CC!);
+                ref double aa = ref MemoryMarshal.GetArrayDataReference(power.AA);
+                ref double bb = ref MemoryMarshal.GetArrayDataReference(power.BB!);
+                Vector512<double> acc = Vector512<double>.Zero;
+                for (int n = 0; n < len; n += Vector512<double>.Count)
+                {
+                    Vector512<double> u = Vector512.FusedMultiplyAdd(Vector512.LoadUnsafe(ref bb, (nuint)n), vtj, Vector512.LoadUnsafe(ref aa, (nuint)n));
+                    (Vector512<double> su, Vector512<double> cu) = Vector512.SinCos(u);
+                    acc += Vector512.FusedMultiplyAdd(Vector512.LoadUnsafe(ref ss, (nuint)n), su, Vector512.LoadUnsafe(ref cc, (nuint)n) * cu);
+                }
+                result = Math.FusedMultiplyAdd(tPow, Vector512.Sum(acc), result);
+            }
+            if (Table.Variable == VSOPVariable.L)
+            {
+                result = NormalizeL(Table.Body, result, tj);
+            }
+            return result;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        private double CalculateV256(VariableTable Table, double JD2000)
+        {
+            double tj = JD2000 / A1000;
+            Vector256<double> vtj = Vector256.Create(tj);
+            PowerTable[] powerTables = Table.PowerTables;
+            double tPow = 1d;
+            double result = 0d;
+            for (int it = 0; it < powerTables.Length; it++, tPow *= tj)
+            {
+                PowerTable power = powerTables[it];
+                if (power.AA == null)
+                {
+                    continue;
+                }
+
+                int len = power.AA.Length;
+                ref double ss = ref MemoryMarshal.GetArrayDataReference(power.SS!);
+                ref double cc = ref MemoryMarshal.GetArrayDataReference(power.CC!);
+                ref double aa = ref MemoryMarshal.GetArrayDataReference(power.AA);
+                ref double bb = ref MemoryMarshal.GetArrayDataReference(power.BB!);
+                Vector256<double> acc = Vector256<double>.Zero;
+                for (int n = 0; n < len; n += Vector256<double>.Count)
+                {
+                    Vector256<double> u = Vector256.FusedMultiplyAdd(Vector256.LoadUnsafe(ref bb, (nuint)n), vtj, Vector256.LoadUnsafe(ref aa, (nuint)n));
+                    (Vector256<double> su, Vector256<double> cu) = Vector256.SinCos(u);
+                    acc += Vector256.FusedMultiplyAdd(Vector256.LoadUnsafe(ref ss, (nuint)n), su, Vector256.LoadUnsafe(ref cc, (nuint)n) * cu);
+                }
+                result = Math.FusedMultiplyAdd(tPow, Vector256.Sum(acc), result);
+            }
+            if (Table.Variable == VSOPVariable.L)
+            {
+                result = NormalizeL(Table.Body, result, tj);
+            }
+            return result;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        private double CalculateV128(VariableTable Table, double JD2000)
+        {
+            double tj = JD2000 / A1000;
+            Vector128<double> vtj = Vector128.Create(tj);
+            PowerTable[] powerTables = Table.PowerTables;
+            double tPow = 1d;
+            double result = 0d;
+            for (int it = 0; it < powerTables.Length; it++, tPow *= tj)
+            {
+                PowerTable power = powerTables[it];
+                if (power.AA == null)
+                {
+                    continue;
+                }
+
+                int len = power.AA.Length;
+                ref double ss = ref MemoryMarshal.GetArrayDataReference(power.SS!);
+                ref double cc = ref MemoryMarshal.GetArrayDataReference(power.CC!);
+                ref double aa = ref MemoryMarshal.GetArrayDataReference(power.AA);
+                ref double bb = ref MemoryMarshal.GetArrayDataReference(power.BB!);
+                Vector128<double> acc = Vector128<double>.Zero;
+                for (int n = 0; n < len; n += Vector128<double>.Count)
+                {
+                    Vector128<double> u = Vector128.FusedMultiplyAdd(Vector128.LoadUnsafe(ref bb, (nuint)n), vtj, Vector128.LoadUnsafe(ref aa, (nuint)n));
+                    (Vector128<double> su, Vector128<double> cu) = Vector128.SinCos(u);
+                    acc += Vector128.FusedMultiplyAdd(Vector128.LoadUnsafe(ref ss, (nuint)n), su, Vector128.LoadUnsafe(ref cc, (nuint)n) * cu);
+                }
+                result = Math.FusedMultiplyAdd(tPow, Vector128.Sum(acc), result);
+            }
+            if (Table.Variable == VSOPVariable.L)
+            {
+                result = NormalizeL(Table.Body, result, tj);
+            }
+            return result;
+        }
+#endif
     }
 }

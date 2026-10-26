@@ -1,3 +1,6 @@
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
 using System;
 using System.Globalization;
 using System.Text.Json;
@@ -38,7 +41,7 @@ namespace Demo
 
             Console.WriteLine("Press Enter to Start Performance Test...");
             Console.ReadLine();
-            return;
+            //return;
 #if DEBUG
             var summary = BenchmarkRunner.Run<PerfTest>(new DebugBuildConfig());
 #else
@@ -131,12 +134,21 @@ namespace Demo
         private static void WriteColorLine(params object[] flow)
         {
             foreach (var element in flow)
+            {
                 if (element == null)
+                {
                     Console.ResetColor();
+                }
                 else if (element is ConsoleColor color)
+                {
                     Console.ForegroundColor = color;
+                }
                 else
+                {
                     Console.Write(element.ToString());
+                }
+            }
+
             Console.WriteLine();
             Console.ResetColor();
         }

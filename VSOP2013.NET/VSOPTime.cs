@@ -126,16 +126,16 @@ namespace VSOP2013
         public static double ToJ2000(DateTime dt)
         {
             //Input TDB
-            double j2000 = 2451545.0d;
-            // TDB from J2000  = OADate + JD - j2000(JD)
-            return dt.ToOADate() + 2415018.5d - j2000;
+            // OADate is discontinuous before 1899-12-30, so use ticks instead.
+            return (double)(dt.Ticks - _j2000Ticks) / TimeSpan.TicksPerDay;
         }
 
         public static double ToJulianDate(DateTime dt)
         {
-            // TDB JD  = OADate + JD
-            return dt.ToOADate() + 2415018.5d;
+            return ToJ2000(dt) + 2451545.0d;
         }
+
+        private static readonly long _j2000Ticks = new DateTime(2000, 1, 1, 12, 0, 0).Ticks;
 
         /// <summary>
         ///
@@ -144,9 +144,7 @@ namespace VSOP2013
         /// <returns>Datetime in TDB Frame</returns>
         public static DateTime FromJ2000(double J2000)
         {
-            double j2000 = 2451545.0d;
-
-            return DateTime.FromOADate(J2000 + j2000 - 2415018.5).ToUniversalTime();
+            return new DateTime(_j2000Ticks + (long)Math.Round(J2000 * TimeSpan.TicksPerDay), DateTimeKind.Utc);
         }
 
         #endregion JulianDate Convert

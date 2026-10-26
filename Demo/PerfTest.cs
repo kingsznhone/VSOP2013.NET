@@ -9,24 +9,25 @@ namespace Demo
     [MemoryDiagnoser]
     public class PerfTest
     {
-        private Calculator _vsop;
+        private Calculator _vsop = null!;
 
         private DateTime _dt;
         private VSOPTime _vTime;
 
-        public PerfTest()
-        { _vsop = new Calculator(); }
+        [Params(SimdMode.Scalar, SimdMode.Vector128, SimdMode.Vector256, SimdMode.Vector512)]
+        public SimdMode Mode { get; set; }
 
         [GlobalSetup]
         public void init()
         {
+            _vsop = new Calculator(Mode);
             _dt = DateTime.Now.ToUniversalTime();
             _dt.ToUniversalTime();
             _dt = _dt.AddSeconds(-69.184);
             _vTime = new VSOPTime(_dt, TimeFrame.UTC);
         }
 
-        [Benchmark(Baseline = true)]
+        [Benchmark]
         public VSOPResult Compute()
         {
             var ell = _vsop.GetPlanetPosition(VSOPBody.EMB, _vTime);
