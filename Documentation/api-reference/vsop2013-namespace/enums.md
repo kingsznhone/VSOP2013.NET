@@ -86,3 +86,21 @@ public enum TimeFrame
 | DynamicalJ2000 | 0     |
 | ICRSJ2000      | 2     |
 
+***
+
+## SimdMode
+
+```csharp
+public enum SimdMode
+```
+
+Selects the vector width used by [Calculator](calculator-class/) and [CalculatorF](calculatorf-class.md).
+
+| Name      | Value | Description                                          |
+| --------- | ----- | ---------------------------------------------------- |
+| Auto      | 0     | Pick the widest hardware accelerated width available |
+| Scalar    | 1     | Scalar evaluation only                               |
+| Vector128 | 2     | 128-bit vectors (2 doubles / 4 floats)               |
+| Vector256 | 3     | 256-bit vectors (4 doubles / 8 floats)               |
+| Vector512 | 4     | 512-bit vectors (8 doubles / 16 floats)              |
+

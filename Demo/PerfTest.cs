@@ -3,17 +3,23 @@
 
 using System;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using VSOP2013;
 
 namespace Demo
 {
+    /// <summary>
+    /// GetPlanetPosition(EMB) for {Scalar, Vector256} x {Calculator (double), CalculatorF (float)}.
+    /// Ratios are computed against the double calculator within the same SIMD mode.
+    /// </summary>
     [SimpleJob(RuntimeMoniker.Net10_0)]
     [MemoryDiagnoser]
+    [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByParams)]
     public class PerfTest
     {
-        private Calculator _full = null!;
-        private Calculator _truncated = null!;
+        private Calculator _double = null!;
+        private CalculatorF _float = null!;
 
         private VSOPTime _vTime;
 
@@ -23,21 +29,22 @@ namespace Demo
         [GlobalSetup]
         public void init()
         {
-            _full = new Calculator(Mode);
-            _truncated = new Calculator(Mode, truncation: 1e-14);
+            // Double: full series. Float: default truncation (1e-8), the intended configuration.
+            _double = new Calculator(Mode);
+            _float = new CalculatorF(Mode);
             _vTime = new VSOPTime(DateTime.UtcNow.AddSeconds(-69.184), TimeFrame.UTC);
         }
 
         [Benchmark(Baseline = true)]
-        public VSOPResult Full()
+        public VSOPResult Double()
         {
-            return _full.GetPlanetPosition(VSOPBody.EMB, _vTime);
+            return _double.GetPlanetPosition(VSOPBody.EMB, _vTime);
         }
 
         [Benchmark]
-        public VSOPResult Truncated()
+        public VSOPResult Float()
         {
-            return _truncated.GetPlanetPosition(VSOPBody.EMB, _vTime);
+            return _float.GetPlanetPosition(VSOPBody.EMB, _vTime);
         }
     }
 }

@@ -3,6 +3,7 @@
 ## Classes
 
 * [Calculator](calculator-class/)
+* [CalculatorF](calculatorf-class.md)
 * [VSOPResult](vsopresult-class/)
 * [VSOPResult\_ELL](vsopresult-class/vsopresult\_ell-class.md)
 * [VSOPResult\_LBR](vsopresult-class/vsopresult\_lbr-class.md)
@@ -23,6 +24,7 @@
 * [CoordinatesReference](enums.md#coordinatesreference)
 * [CoordinatesType](enums.md#coordinatestype)
 * [ReferenceFrame](enums.md#referenceframe)
+* [SimdMode](enums.md#simdmode)
 * [VSOPBody](enums.md#fields)
 * [VSOPVariable](enums.md#fields-2)
 * [TimeFrame](enums.md#fields-4)

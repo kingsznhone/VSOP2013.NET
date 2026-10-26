@@ -99,11 +99,9 @@ namespace VSOP2013
             Mode = ResolveMode(mode);
             _lanes = Mode switch
             {
-#if NET9_0_OR_GREATER
                 SimdMode.Vector512 => Vector512<float>.Count,
                 SimdMode.Vector256 => Vector256<float>.Count,
                 SimdMode.Vector128 => Vector128<float>.Count,
-#endif
                 _ => 1,
             };
 
@@ -175,7 +173,6 @@ namespace VSOP2013
 
         private static SimdMode ResolveMode(SimdMode mode)
         {
-#if NET9_0_OR_GREATER
             return mode switch
             {
                 SimdMode.Auto => Vector512.IsHardwareAccelerated ? SimdMode.Vector512
@@ -190,15 +187,6 @@ namespace VSOP2013
                     throw new PlatformNotSupportedException($"{mode} is not hardware accelerated on this machine."),
                 _ => throw new ArgumentOutOfRangeException(nameof(mode), mode, null),
             };
-#else
-            return mode switch
-            {
-                SimdMode.Auto or SimdMode.Scalar => SimdMode.Scalar,
-                SimdMode.Vector128 or SimdMode.Vector256 or SimdMode.Vector512 =>
-                    throw new PlatformNotSupportedException($"{mode} requires .NET 9 or later."),
-                _ => throw new ArgumentOutOfRangeException(nameof(mode), mode, null),
-            };
-#endif
         }
 
         /// <summary>
@@ -239,11 +227,9 @@ namespace VSOP2013
             float tj = (float)time.J2000 / A1000;
             float result = Mode switch
             {
-#if NET9_0_OR_GREATER
                 SimdMode.Vector512 => Calculate_Vector512(powers, tj),
                 SimdMode.Vector256 => Calculate_Vector256(powers, tj),
                 SimdMode.Vector128 => Calculate_Vector128(powers, tj),
-#endif
                 _ => Calculate(powers, tj),
             };
             if (variable == VSOPVariable.L)
@@ -285,8 +271,6 @@ namespace VSOP2013
             }
             return result;
         }
-
-#if NET9_0_OR_GREATER
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         private static float Calculate_Vector512(PowerSoA?[] powers, float tj)
@@ -380,7 +364,5 @@ namespace VSOP2013
             }
             return result;
         }
-
-#endif
     }
 }

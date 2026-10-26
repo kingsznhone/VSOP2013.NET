@@ -62,11 +62,9 @@ namespace VSOP2013
             Mode = ResolveMode(mode);
             _lanes = Mode switch
             {
-#if NET9_0_OR_GREATER
                 SimdMode.Vector512 => Vector512<double>.Count,
                 SimdMode.Vector256 => Vector256<double>.Count,
                 SimdMode.Vector128 => Vector128<double>.Count,
-#endif
                 _ => 1,
             };
 
@@ -148,7 +146,6 @@ namespace VSOP2013
 
         private static SimdMode ResolveMode(SimdMode mode)
         {
-#if NET9_0_OR_GREATER
             return mode switch
             {
                 SimdMode.Auto => Vector512.IsHardwareAccelerated ? SimdMode.Vector512
@@ -163,15 +160,6 @@ namespace VSOP2013
                     throw new PlatformNotSupportedException($"{mode} is not hardware accelerated on this machine."),
                 _ => throw new ArgumentOutOfRangeException(nameof(mode), mode, null),
             };
-#else
-            return mode switch
-            {
-                SimdMode.Auto or SimdMode.Scalar => SimdMode.Scalar,
-                SimdMode.Vector128 or SimdMode.Vector256 or SimdMode.Vector512 =>
-                    throw new PlatformNotSupportedException($"{mode} requires .NET 9 or later."),
-                _ => throw new ArgumentOutOfRangeException(nameof(mode), mode, null),
-            };
-#endif
         }
 
         /// <summary>
@@ -263,11 +251,9 @@ namespace VSOP2013
             double jd2000 = time.J2000;
             return Mode switch
             {
-#if NET9_0_OR_GREATER
                 SimdMode.Vector512 => CalculateV512(table, jd2000),
                 SimdMode.Vector256 => CalculateV256(table, jd2000),
                 SimdMode.Vector128 => CalculateV128(table, jd2000),
-#endif
                 _ => CalculateScalar(table, jd2000),
             };
         }
@@ -328,8 +314,6 @@ namespace VSOP2013
             }
             return result;
         }
-
-#if NET9_0_OR_GREATER
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         private double CalculateV512(VariableTable Table, double JD2000)
@@ -441,7 +425,5 @@ namespace VSOP2013
             }
             return result;
         }
-
-#endif
     }
 }
