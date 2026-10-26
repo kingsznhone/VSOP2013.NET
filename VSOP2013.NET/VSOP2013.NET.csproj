@@ -7,6 +7,7 @@
     <Version>3.0.0</Version>
     <Title>VSOP2013.NET</Title>
     <Authors>KingsZNHONE</Authors>
+    <Nullable>enable</Nullable>
     <Copyright>Copyright © 2022-2026 KingsZNHONE</Copyright>
     <Description>VSOP was developed and is maintained (updated with the latest data) by the scientists at the Bureau des Longitudes in Paris.
 VSOP2013, computed the positions of the planets directly at any moment, as well as their orbital elements with improved accuracy.
@@ -26,7 +27,6 @@ VSOP2013, computed the positions of the planets directly at any moment, as well 
     <PackageTags>vsop;vsop2013;astronomy;ephemeris;planetary;orbital-mechanics;astrodynamics;solar-system</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Platforms>AnyCPU</Platforms>
-    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeReferencedProjectInPackage</TargetsForTfmSpecificBuildOutput>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
@@ -49,16 +49,8 @@ VSOP2013, computed the positions of the planets directly at any moment, as well 
   </ItemGroup>
 
   <ItemGroup>
-    <!-- DataStructures is not published separately: bundle its assembly instead of declaring a dependency. -->
-    <ProjectReference Include="..\VSOP2013.NET.DataStructures\VSOP2013.NET.DataStructures.csproj" PrivateAssets="all" />
     <PackageReference Include="MemoryPack" Version="1.21.4" />
   </ItemGroup>
-
-  <Target Name="IncludeReferencedProjectInPackage">
-    <ItemGroup>
-      <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.ReferenceSourceTarget)' == 'ProjectReference'" />
-    </ItemGroup>
-  </Target>
 
   <ItemGroup>
     <None Include="..\README.md">

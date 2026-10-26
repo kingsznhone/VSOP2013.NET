@@ -12,7 +12,6 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\VSOP2013.NET\VSOP2013.NET.csproj" />
-	  <ProjectReference Include="..\VSOP2013.NET.DataStructures\VSOP2013.NET.DataStructures.csproj" />
 	</ItemGroup>
 
 </Project>
