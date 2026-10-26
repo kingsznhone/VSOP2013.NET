@@ -291,6 +291,7 @@ namespace VSOP2013
         /// Convert Elliptic coordinate to spherical coordinate.
         /// </summary>
         /// <param name="body">planet</param>
+        /// <param name="ell">Elliptic elements (a, l, k, h, q, p)</param>
         /// <returns>Spherical Heliocentric Coordinates</returns>
         public static double[] ELLtoLBR(VSOPBody body, double[] ell)
         {

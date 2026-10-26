@@ -20,6 +20,11 @@ jobs:
       - name: Pack
         run: dotnet pack VSOP2013.NET/VSOP2013.NET.csproj -c Release -o artifacts
 
+      - name: Package smoke test
+        run: |
+          VERSION=$(dotnet msbuild VSOP2013.NET/VSOP2013.NET.csproj -getProperty:Version)
+          dotnet run --project PackageSmokeTest -c Release -p:VsopVersion=$VERSION
+
       - uses: actions/upload-artifact@v7
         with:
           name: nuget-package

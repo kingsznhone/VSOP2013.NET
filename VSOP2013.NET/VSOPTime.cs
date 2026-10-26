@@ -59,9 +59,10 @@ namespace VSOP2013
         /// <summary>
         ///
         /// </summary>
-        /// <param name="dt">DateTime in UTC Frame</param>
-        /// <param name="TargetFrame"></param>
-        /// <returns></returns>
+        /// <param name="dt">DateTime to convert</param>
+        /// <param name="SourceFrame">Time frame of <paramref name="dt"/></param>
+        /// <param name="TargetFrame">Target time frame</param>
+        /// <returns>DateTime in the target time frame</returns>
         public static DateTime ChangeFrame(DateTime dt, TimeFrame SourceFrame, TimeFrame TargetFrame)
         {
             while (SourceFrame != TargetFrame)
