@@ -1,6 +1,6 @@
 # GetPlanetPosition
 
-Calculate all 6 variable of a planet.
+Calculate all 6 variable of a planet. The six variables are evaluated in parallel.
 
 ```csharp
 public VSOPResult_ELL GetPlanetPosition(VSOPBody body, VSOPTime time)

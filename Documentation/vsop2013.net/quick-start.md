@@ -40,3 +40,27 @@ Console.WriteLine(String.Format("{0,-33}{1,30}", "q = sin(i/2)*cos(omega) (rad)"
 Console.WriteLine(String.Format("{0,-33}{1,30}", "p = sin(i/2)*sin(omega) (rad)", ell.p));
 Console.WriteLine("===============================================================");
 ```
+
+#### Choose SIMD mode and truncation
+
+`Calculator` uses the widest hardware accelerated vector width by default. You can pick one explicitly, and drop small terms to trade precision for speed:
+
+```csharp
+// Full series, widest SIMD width (default).
+Calculator full = new Calculator();
+Console.WriteLine(full.Mode); // e.g. Vector512 / Vector256 / Scalar
+
+// Scalar evaluation, terms smaller than 1e-14 are dropped.
+Calculator scalar = new Calculator(SimdMode.Scalar, truncation: 1e-14);
+```
+
+#### Fast, low precision calculation
+
+For visualization or animation, use [CalculatorF](../api-reference/vsop2013-namespace/calculatorf-class.md). It runs in single precision and is much faster, but is not suitable for precise astronomy.
+
+```csharp
+CalculatorF fast = new CalculatorF();
+VSOPResult_ELL ell = fast.GetPlanetPosition(VSOPBody.MARS, vTime);
+```
+
+> **Note:** Create a calculator once and reuse it. Construction loads the data file, and instances are thread safe after that.

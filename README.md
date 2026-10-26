@@ -23,18 +23,33 @@ It is much faster than origin algorithm.
 
 ![Demo](./README/Demo.png)
 
+## Performance
+
+`GetPlanetPosition(EMB)` on i9-12950HX, .NET 10:
+
+| Calculator                       |   Scalar | Vector256 |
+| -------------------------------- | -------: | --------: |
+| Calculator (double, full series) | 1,241 μs |    243 μs |
+| CalculatorF (float, truncated)   |  12.6 μs |    2.4 μs |
+
+`CalculatorF` is for visualization and animation only; it trades accuracy for speed.
+See the [Gitbook](https://zangai-family.gitbook.io/vsop2013.net/) for details.
+
 ## Features
 
 1. Use `VSOPResult` class to manage calculate results.
 2. Use `VSOPTime` class to manage time. 
 <br>Easy to convert time by calling ```VSOPTime.UTC```, ```VSOPTime.TAI```, ```VSOPTime.TDB```
-3. Very high performance per solution using multithread.
+3. Very high performance per solution using SIMD (`Vector128/256/512`, auto detected) and multithread.
 4. Useful Utility class. Convert Elliptic coordinates to cartesian and spherical 
 5. Async Api included.
 6. precalculation on <b>φ</b> in terms, which gives 20%+ speed up.
-7. Use [MemoryPack](https://github.com/Cysharp/MemoryPack) for binary serialize.
+7. Optional term truncation: `new Calculator(SimdMode.Auto, truncation)`.
+8. `CalculatorF`: single precision calculator for visualization and animation, 100 to 500 times faster (low precision).
+9. Validated against the official `VSOP2013.ctl` reference values (max error 1e-10).
+10. Use [MemoryPack](https://github.com/Cysharp/MemoryPack) for binary serialize.
 <br>Initialization time becomes less than 10% of previous version.
-8. Brotli compression on source data. ~300Mb -> ~43MB.
+11. Brotli compression on source data. ~300Mb -> ~43MB.
 
 <br> 
 

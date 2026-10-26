@@ -191,17 +191,12 @@ namespace VSOP2013.DataConverter
                 ptr += 3;
             }
 
-            ci = double.Parse(line[ptr..(ptr + 20)].Trim());
-            ptr += 20;
-            ptr++;
-            ci *= Math.Pow(10, double.Parse(line[ptr..(ptr + 3)].Trim()));
-            ptr += 3;
+            // Parse mantissa and exponent together: mantissa * 10^exp would round twice.
+            ci = ParseScaled(line[ptr..(ptr + 20)], line[(ptr + 21)..(ptr + 24)]);
+            ptr += 24;
             T.ss = ci;
 
-            ci = double.Parse(line[ptr..(ptr + 20)].Trim());
-            ptr += 20;
-            ptr++;
-            ci *= Math.Pow(10, double.Parse(line[ptr..(ptr + 3)].Trim()));
+            ci = ParseScaled(line[ptr..(ptr + 20)], line[(ptr + 21)..(ptr + 24)]);
 
             T.cc = ci;
 
@@ -211,6 +206,12 @@ namespace VSOP2013.DataConverter
                 T.bb += iPhi[j] * _ci1[j];
             }
             return T;
+        }
+
+        private static double ParseScaled(ReadOnlySpan<char> mantissa, ReadOnlySpan<char> exponent)
+        {
+            string text = $"{mantissa.Trim()}e{int.Parse(exponent.Trim())}";
+            return double.Parse(text, System.Globalization.CultureInfo.InvariantCulture);
         }
     }
 }

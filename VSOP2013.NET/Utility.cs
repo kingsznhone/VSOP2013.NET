@@ -1,3 +1,6 @@
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
 using System.Numerics;
 using System.Runtime.Intrinsics;
 
@@ -83,7 +86,9 @@ namespace VSOP2013
             //modulo l into [0,Tau)
             l -= Math.Floor(l / Math.Tau) * Math.Tau;
             if (l < 0)
+            {
                 l += Math.Tau;
+            }
 
             #region vector matrix mul
 
@@ -286,6 +291,7 @@ namespace VSOP2013
         /// Convert Elliptic coordinate to spherical coordinate.
         /// </summary>
         /// <param name="body">planet</param>
+        /// <param name="ell">Elliptic elements (a, l, k, h, q, p)</param>
         /// <returns>Spherical Heliocentric Coordinates</returns>
         public static double[] ELLtoLBR(VSOPBody body, double[] ell)
         {

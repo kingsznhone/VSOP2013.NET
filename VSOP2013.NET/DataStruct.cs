@@ -1,3 +1,8 @@
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+#nullable enable
+
 using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
 using MemoryPack;
@@ -55,6 +60,19 @@ namespace VSOP2013
         public int Power;
         public int TermsCount;
         public Term[] Terms;
+
+        // SoA copies of Terms built at load time for the SIMD path; not serialized.
+        [MemoryPackIgnore]
+        public double[]? SS;
+
+        [MemoryPackIgnore]
+        public double[]? CC;
+
+        [MemoryPackIgnore]
+        public double[]? AA;
+
+        [MemoryPackIgnore]
+        public double[]? BB;
     }
 
     [MemoryPackable]

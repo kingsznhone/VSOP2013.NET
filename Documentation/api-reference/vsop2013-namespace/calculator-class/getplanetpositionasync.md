@@ -3,7 +3,7 @@
 Calculate all 6 variable of a planet.
 
 ```csharp
-public Task<VSOPResult_ELL> GetPlanetPositionAsync(VSOPBody body, VSOPTime time)
+public ValueTask<VSOPResult_ELL> GetPlanetPositionAsync(VSOPBody body, VSOPTime time)
 ```
 
 **Parameters**
@@ -22,7 +22,7 @@ Exclusive time class in VSOP2013.
 
 **Return**
 
-`Task<`[`VSOPResult_ELL`](../vsopresult-class/vsopresult_ell-class.md)`>`
+`ValueTask<`[`VSOPResult_ELL`](../vsopresult-class/vsopresult_ell-class.md)`>`
 
 Full Result with 6 variable of Elliptic Coordinates.
 

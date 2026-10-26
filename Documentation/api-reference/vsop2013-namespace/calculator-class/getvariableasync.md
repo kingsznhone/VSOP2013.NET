@@ -3,7 +3,7 @@
 Calculate a specific variable of a planet.
 
 ```csharp
-public Task<double> GetVariableAsync(VSOPBody body, int iv, VSOPTime time)
+public ValueTask<double> GetVariableAsync(VSOPBody body, VSOPVariable variable, VSOPTime time)
 ```
 
 **Parameters**
@@ -14,11 +14,9 @@ Planet enum.
 
 
 
-`iv`  [int](https://learn.microsoft.com/en-us/dotnet/api/system.int32?view=net-9.0)
+`variable` [VSOPVariable](../enums.md#fields-2)
 
-Variable index
-
-0-5 : a l k h q p
+Elliptic element to compute: A, L, K, H, Q or P.
 
 
 
@@ -30,7 +28,7 @@ Exclusive time class in VSOP2013.
 
 **Return**
 
-Task\<double>
+ValueTask\<double>
 
 variable result.
 

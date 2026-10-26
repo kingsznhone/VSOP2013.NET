@@ -1,5 +1,23 @@
 # Change Logs
 
+### v3.0.0
+
+Breaking Change Warning
+
+End of .NET 8 support. Only .NET 10 is targeted now.
+
+Add [SimdMode](../api-reference/vsop2013-namespace/enums.md#simdmode) and SIMD evaluation (128/256/512-bit vectors). `new Calculator()` picks the widest hardware accelerated width automatically.
+
+Add `Truncation` parameter to the [Calculator](../api-reference/vsop2013-namespace/calculator-class/) constructor. Terms smaller than the truncation level are dropped at load time.
+
+Add [CalculatorF](../api-reference/vsop2013-namespace/calculatorf-class.md), a single precision calculator for visualization and animation. Roughly 100 to 500 times faster than `Calculator`.
+
+Improve the precision of mean longitude: the mean motion term is evaluated separately and reduced modulo 2π with extended precision.
+
+Fix `VSOPTime` for dates earlier than 1899-12-30 (`OADate` is discontinuous there). J2000 conversion now uses ticks.
+
+Add unit tests that compare scalar and SIMD results with the official `VSOP2013.ctl` values (max error 1e-10), and precision reports for truncated and single precision calculators.
+
 ### v2.0.0 2026.3.24
 
 Major refactor
